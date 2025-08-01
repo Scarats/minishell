@@ -9,13 +9,13 @@
 # include <sys/wait.h>
 # include <unistd.h>
 
-typedef enum node_type
+typedef enum e_node_type
 {
-	NODE_COMMAND,
-	NODE_PIPE,
-	NODE_AND,
-	NODE_OR
-}					node_type;
+    NODE_COMMAND,
+    NODE_PIPE,
+    NODE_AND,
+    NODE_OR
+}                    t_node_type;
 
 typedef struct s_input
 {
@@ -29,7 +29,7 @@ typedef struct s_output
 {
 	char			*data;
 
-	bool 			append; // for >>
+	bool append; // for >>
 	struct s_output	*next;
 	struct s_output	*previous;
 }					t_output;
@@ -40,12 +40,13 @@ typedef struct s_cmd
 
 	char			*function;
 	char			**options;
-	char 			*path; // Can be a file or a directory (i guess lol)
+	char *redirection; // Will change the node's output.
+	char *path;         // Can be a file or a directory (i guess lol)
 }					t_cmd;
 
 typedef struct s_node
 {
-	node_type		type;
+	t_node_type		type;
 
 	struct s_node	*left;
 	struct s_node	*right;
@@ -58,7 +59,7 @@ typedef struct s_node
 
 typedef struct s_main_data
 {
-
+	t_node **
 }					t_main_data;
 
 #endif
