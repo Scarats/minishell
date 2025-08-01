@@ -13,13 +13,13 @@ $(OBJ_DIR)/%.o: %.c
 	${CC} ${FLAGS} -c $< -o $@
 
 ${NAME}: 	${OBJS}
-	@make -C ./libft
-	${CC} ${OBJS} -Llibft -lft -o ${NAME} 
+	@make -C ./utils/libft
+	${CC} ${OBJS} -Lutils/libft -lft -o ${NAME} 
 
 all: 		${NAME}
 
 clean:	
-	@make fclean -C libft
+	@make fclean -C ./utils/libft
 	${RM} -r ${OBJ_DIR}
 
 fclean:		clean
