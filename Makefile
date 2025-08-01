@@ -1,4 +1,4 @@
-SRCS	= ./pipex.c
+SRCS	= minishell.c
 
 FLAGS	= -Wall -Wextra -Werror 
 CC		= cc
@@ -6,7 +6,7 @@ RM		= rm -f
 OBJ_DIR = dot_o
 OBJS	= $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
 
-NAME	= pipex
+NAME	= minishell
 
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
