@@ -28,11 +28,11 @@ typedef struct s_output {
 
   bool append; // for >>
   struct s_output *next;
-  struct s_output *previous;
+  struct s_output *previous; // Might be useless, let's see later.
 } t_output;
 
 typedef struct s_cmd {
-  char **tokens;
+  char **tokens; // Store the full command, but is a duplicata since below is the same.
 
   char *function;
   char **options;
@@ -45,7 +45,7 @@ typedef struct s_node {
 
   struct s_node *left;
   struct s_node *right;
-  struct s_node *parent;
+  struct s_node *parent; // Might be useless, let's see later.
 
   t_cmd *cmd;
   t_input *input;
@@ -54,6 +54,7 @@ typedef struct s_node {
 
 typedef struct s_main_data {
   t_node *node;
+  t_list *malloc_list;
 } t_main_data;
 
 #endif
