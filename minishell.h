@@ -49,6 +49,9 @@ typedef struct s_node
 	pid_t left_pid;
 	pid_t right_pid;
 
+	int input_fd;
+	int output_fd;
+
 	t_cmd *cmd;
 	t_input *input;
 	t_output *output;
@@ -70,7 +73,8 @@ typedef enum token_type_s{
     TOKEN_PIPE,
     TOKEN_REDIRECT_OUT,
     TOKEN_REDIRECT_IN,
-    TOKEN_REDIRECT_APPEND,
+    TOKEN_APPEND,
+	TOKEN_HEREDOC,
     TOKEN_AND,
     TOKEN_OR,
     TOKEN_LPAREN,
@@ -83,5 +87,8 @@ typedef struct tokenizer_s{
     int pos;
     int length;
 } tokenizer_t;
+
+// FUNCTIONS
+int pipex(t_node *node);
 
 #endif
