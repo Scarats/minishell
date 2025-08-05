@@ -45,6 +45,10 @@ typedef struct s_node
 	struct s_node *right;
 	struct s_node *parent; // Might be useless, let's see later.
 
+	int pipefd[2];
+	pid_t left_pid;
+	pid_t right_pid;
+
 	t_cmd *cmd;
 	t_input *input;
 	t_output *output;
@@ -55,5 +59,29 @@ typedef struct s_main_data
 	t_node *node;
 	t_list *malloc_list;
 } t_main_data;
+
+typedef struct token_s{
+    token_type_t type;
+    char *value;
+} token_t;
+
+typedef enum token_type_s{
+    TOKEN_WORD,
+    TOKEN_PIPE,
+    TOKEN_REDIRECT_OUT,
+    TOKEN_REDIRECT_IN,
+    TOKEN_REDIRECT_APPEND,
+    TOKEN_AND,
+    TOKEN_OR,
+    TOKEN_LPAREN,
+    TOKEN_RPAREN,
+    TOKEN_EOF
+} token_type_t;
+
+typedef struct tokenizer_s{
+    char *input;
+    int pos;
+    int length;
+} tokenizer_t;
 
 #endif
