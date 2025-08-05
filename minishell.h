@@ -57,4 +57,13 @@ typedef struct s_main_data {
   t_list *malloc_list;
 } t_main_data;
 
+typedef enum {
+    TOKEN_WORD,
+    TOKEN_PIPE,
+    TOKEN_REDIRECT_OUT,
+    TOKEN_REDIRECT_IN,
+    TOKEN_REDIRECT_APPEND,
+    TOKEN_EOF
+} token_type_t;
+
 #endif
