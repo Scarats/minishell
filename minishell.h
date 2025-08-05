@@ -32,8 +32,7 @@ typedef struct s_output
 
 typedef struct s_cmd
 {
-	char **tokens;	// Store the full command,but is a duplicata since below is the same.
-	char *path; // Can be a file or a directory (i guess lol)
+	char **tokens;	// Store the full command.
 
 	int error; // To catch excve errors.
 } t_cmd;
