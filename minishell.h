@@ -63,12 +63,7 @@ typedef struct s_main_data
 	t_list *malloc_list;
 } t_main_data;
 
-typedef struct token_s{
-    token_type_t type;
-    char *value;
-} token_t;
-
-typedef enum token_type_s{
+typedef enum e_token_type{
     TOKEN_WORD,
     TOKEN_PIPE,
     TOKEN_REDIRECT_OUT,
@@ -80,15 +75,21 @@ typedef enum token_type_s{
     TOKEN_LPAREN,
     TOKEN_RPAREN,
     TOKEN_EOF
-} token_type_t;
+} t_token_type;
 
-typedef struct tokenizer_s{
+typedef struct s_token{
+    t_token_type type;
+    char *value;
+} t_token;
+
+typedef struct s_tokenizer{
     char *input;
     int pos;
     int length;
-} tokenizer_t;
+} t_tokenizer;
 
 // FUNCTIONS
 int pipex(t_node *node);
+int traverse_tree(t_node *node);
 
 #endif

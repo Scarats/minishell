@@ -1,6 +1,8 @@
-#include "./minishell.h"
+#include "minishell.h"
 
 int main()
 {
-	traverse_tree();
+	t_node node;
+	traverse_tree(&node);
+	return(0);
 }

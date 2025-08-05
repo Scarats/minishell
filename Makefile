@@ -1,4 +1,4 @@
-SRCS = minishell.c src/execution/execution.c
+SRCS = minishell.c src/execution/execution.c  src/execution/pipes.c 
 
 FLAGS = -Wall -Wextra -Werror 
 CC    = cc

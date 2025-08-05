@@ -1,6 +1,4 @@
-#include "../minishell.h"
-
-
+#include "../../minishell.h"
 
 // Will check the type of the node.
 // Then redirect to the according type.
@@ -12,9 +10,9 @@ int traverse_tree(t_node *node)
 	// Leaf node
 	// Exec
 	// return.
-	if (node->type == NODE_PIPE)
+	else if (node->type == NODE_PIPE)
 		pipex(node);
-	if (node->type == NODE_AND)
-	if (node->type == NODE_OR)
+	// else if (node->type == NODE_AND)
+	// else if (node->type == NODE_OR)
 	//
 }

@@ -1,9 +1,9 @@
-#include "../minishell.h"
+#include "../../minishell.h"
 
 // Will call the left node.
 int left(t_node *node)
 {
-	close(node->pipefd[0]); // close unused read
+	close(node->pipefd[0]);
 	if (node->pipefd[1] != STDOUT_FILENO)
 		dup2(node->pipefd[1], STDOUT_FILENO);
 	close(node->pipefd[1]);
@@ -14,7 +14,7 @@ int left(t_node *node)
 // Will call the right node.
 int right(t_node *node)
 {
-	close(node->pipefd[1]); // close unused read
+	close(node->pipefd[1]);
 	if (node->pipefd[1] != STDOUT_FILENO)
 		dup2(node->pipefd[1], STDOUT_FILENO);
 	close(node->pipefd[0]);
@@ -36,7 +36,7 @@ int pipex(t_node *node)
 	node->left_pid = fork();
 	if (node->left_pid == -1 )
 		return (perror("fork"), 1);
-	if (node->left_pid == 0)
+	else if (node->left_pid == 0)
 		left(node);
 
 	node->right_pid = fork();
