@@ -2,8 +2,7 @@
 
 int main()
 {
-	t_node node;
 	t_main_data data;
-	traverse_tree(&node, data);
+	traverse_tree(data.node, &data);
 	return(0);
 }

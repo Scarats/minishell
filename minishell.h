@@ -92,7 +92,7 @@ typedef struct s_tokenizer{
 } t_tokenizer;
 
 // FUNCTIONS
-int pipex(t_node *node);
-int traverse_tree(t_node *node);
+int pipex(t_node *node, t_main_data *data);
+int traverse_tree(t_node *node, t_main_data *data);
 
 #endif
