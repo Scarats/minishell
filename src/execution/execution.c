@@ -10,9 +10,10 @@ int traverse_tree(t_node *node)
 	// Leaf node
 	// Exec
 	// return.
-	else if (node->type == NODE_PIPE)
-		pipex(node);
+	if (node->type == NODE_PIPE && pipex(node) != 0)
+		return (1); // Call error function.
 	// else if (node->type == NODE_AND)
 	// else if (node->type == NODE_OR)
 	//
+	return (0);
 }

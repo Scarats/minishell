@@ -61,6 +61,9 @@ typedef struct s_main_data
 {
 	t_node *node;
 	t_list *malloc_list;
+	
+	int error;
+	char *str_error;
 } t_main_data;
 
 typedef enum e_token_type{
