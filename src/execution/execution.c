@@ -5,15 +5,13 @@
 // It will execute recursively.
 int traverse_tree(t_node *node ,t_main_data *data)
 {
-	// 1. Check type.
 	if (data->node->type == NODE_COMMAND)
-	// Leaf node
-	// Exec
-	// return.
-	if (data->node->type == NODE_PIPE && pipex(node, data) != 0)
-		return (1); // Call error function.
-	// else if (node->type == NODE_AND)
-	// else if (node->type == NODE_OR)
-	//
-	return (0);
+		return (exec_cmd());
+	else if (data->node->type == NODE_PIPE)
+		return (pipex(node, data));
+	else if (node->type == NODE_AND)
+		return (and_and(node, data));
+	else if (node->type == NODE_OR)
+		return (or_or(node, data));
+	return (1); // Should not arrive here i guess
 }
