@@ -1,52 +1,52 @@
 #include "../../minishell.h"
 
 // Will call the left node.
-int left(t_node *node)
+int left(t_main_data *data)
 {
-	close(node->pipefd[0]);
-	if (node->pipefd[1] != STDOUT_FILENO)
-		dup2(node->pipefd[1], STDOUT_FILENO);
-	close(node->pipefd[1]);
-	traverse_tree(node->left);
+	close(data->node->pipefd[0]);
+	if (data->node->pipefd[1] != STDOUT_FILENO)
+		dup2(data->node->pipefd[1], STDOUT_FILENO);
+	close(data->node->pipefd[1]);
+	traverse_tree(data->node->left);
 	exit(0);
 }
 
 // Will call the right node.
-int right(t_node *node)
+int right(t_main_data *data)
 {
-	close(node->pipefd[1]);
-	if (node->pipefd[1] != STDOUT_FILENO)
-		dup2(node->pipefd[1], STDOUT_FILENO);
-	close(node->pipefd[0]);
-	traverse_tree(node->right);
+	close(data->node->pipefd[1]);
+	if (data->node->pipefd[1] != STDOUT_FILENO)
+		dup2(data->node->pipefd[1], STDOUT_FILENO);
+	close(data->node->pipefd[0]);
+	traverse_tree(data->node->right);
 	exit(0);
 }
 
 // Will create two childs, left and right, for each end of the pipe.
-int pipex(t_node *node)
+int pipex(t_main_data *data)
 {
-	if (pipe(node->pipefd) == -1)
+	if (pipe(data->node->pipefd) == -1)
 		return (perror("pipe"), 1);
 	
-	node->left->input_fd = node->input_fd;
-    node->left->output_fd = node->pipefd[1];
-    node->right->input_fd = node->pipefd[0];
-    node->right->output_fd = node->output_fd;
+	data->node->left->input_fd = data->node->input_fd;
+    data->node->left->output_fd = data->node->pipefd[1];
+    data->node->right->input_fd = data->node->pipefd[0];
+    data->node->right->output_fd = data->node->output_fd;
 
-	node->left_pid = fork();
-	if (node->left_pid == -1 )
+	data->node->left_pid = fork();
+	if (data->node->left_pid == -1 )
 		return (perror("fork"), 1);
-	else if (node->left_pid == 0)
-		left(node);
+	else if (data->node->left_pid == 0)
+		left(data->node);
 
-	node->right_pid = fork();
-	if (node->right_pid == -1)
+	data->node->right_pid = fork();
+	if (data->node->right_pid == -1)
 		return (perror("fork"), 1);
-	else if (node->right_pid == 0)
-		right(node);
+	else if (data->node->right_pid == 0)
+		right(data->node);
 
-	close(node->pipefd[0]);
-	close(node->pipefd[1]);
-	waitpid(node->left_pid, NULL, 0);
-	waitpid(node->right_pid, NULL, 0);
+	close(data->node->pipefd[0]);
+	close(data->node->pipefd[1]);
+	waitpid(data->node->left_pid, NULL, 0);
+	waitpid(data->node->right_pid, NULL, 0);
 }

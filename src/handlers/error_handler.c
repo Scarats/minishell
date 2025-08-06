@@ -15,7 +15,10 @@ int	check_error(t_main_data *data)
 
 // Set the error flag with error code in t_main_data
 // Store the str_error in the t_main_data
-int	set_error(t_main_data *data,int error_code, char str_error)
+// str_error is the contextual part of the error message :
+// cewogowjkn
+// bash: cewogowjkn: command not found
+int	set_error(t_main_data *data, int error_code, char str_error)
 {
 
 }
