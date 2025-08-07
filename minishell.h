@@ -97,5 +97,6 @@ int traverse_tree(t_node *node, t_main_data *data);
 int exec_cmd(t_node *node, t_main_data *data);
 int or_or(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
+int exec_cmd(t_node *node, t_main_data *data);
 
 #endif
