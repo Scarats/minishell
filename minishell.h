@@ -42,7 +42,6 @@ typedef struct s_output
 {
 	char *filename;
 	int fd;
-	bool append; // for >>
 } t_output;
 
 typedef struct s_cmd
@@ -65,23 +64,12 @@ typedef struct s_node
 	pid_t left_pid;
 	pid_t right_pid;
 
-	int input_fd;
-	int output_fd;
-
 	t_cmd *cmd;
 	t_input *input;
 	t_output *output;
+
+	int exit_status;
 } t_node;
-
-typedef struct s_main_data
-{
-	t_node *node;
-	t_list *malloc_list;
-	
-	int error;
-	char *str_error;
-} t_main_data;
-
 
 
 typedef struct s_token
@@ -102,30 +90,33 @@ typedef struct s_arg_node {
     struct s_arg_node *next;
 } t_arg_node;
 
+typedef struct s_main_data
+{
+	t_node *node;
+	t_list *malloc_list;
+
+	char **argv;
+	int argc;
+	
+	int error;
+	char *str_error;
+
+	int last_exit_status;
+} t_main_data;
+
 typedef struct s_command
 {
-	char **args;
-	t_arg_node *args_first;
-	t_arg_node *args_last;
-	int argc;
-	char *file_in;
-	char *file_out;
-	int append_out;
-	int exit_status;
+	char **argv; // node->input->args; this one is for each node
+	char **argv;; // data->argv; this one is for the main_data struct
+	// t_arg_node *args_first;
+	// t_arg_node *args_last;
+	int argc; // data->argc;
+	char *file_in; // = node->input->filename;
+	char *file_out; // = node->output->filename;
+	// int append_out;
+	int exit_status; // = node->exit_status; 
+	int final_exit_status; // data->final_exit_status; for the main_data struct
 } t_command;
-
-typedef struct s_cmd_node
-{
-	t_node_type type;
-	union {
-		t_command *command;
-		struct {
-			struct s_cmd_node *left;
-			struct s_cmd_node *right;
-		};
-	};
-	int exit_status;
-} t_cmd_node;
 
 // FUNCTIONS
 int pipex(t_node *node, t_main_data *data);
@@ -148,7 +139,7 @@ t_token *get_next_token(t_tokenizer *tok);
 
 t_cmd_node *command_node_init(void);
 t_cmd_node *operator_node_init(t_node_type type, t_cmd_node *left, t_cmd_node *right);
-void *argument(t_command *cmd, char *args);
+void add_argument(t_command *cmd, char *args);
 char **args_to_array(t_command *cmd);
 
 t_cmd_node* parse_command(t_tokenizer *tok);

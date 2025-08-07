@@ -28,10 +28,10 @@ int pipex(t_node *node, t_main_data *data)
 	if (pipe(node->pipefd) == -1)
 		return (perror("pipe"), 1);
 	
-	node->left->input_fd = node->input_fd;
-    node->left->output_fd = node->pipefd[1];
-    node->right->input_fd = node->pipefd[0];
-    node->right->output_fd = node->output_fd;
+	node->left->input->fd = node->input->fd;
+    node->left->output->fd = node->pipefd[1];
+    node->right->input->fd = node->pipefd[0];
+    node->right->output->fd = node->output->fd;
 
 	node->left_pid = fork();
 	if (node->left_pid == -1 )

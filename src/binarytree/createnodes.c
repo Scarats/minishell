@@ -29,7 +29,7 @@ t_cmd_node *operator_node_init(t_node_type type, t_cmd_node *left, t_cmd_node *r
     return(node);
 }
 
-void *argument(t_command *cmd, char *args)
+void add_argument(t_command *cmd, char *args)
 {
     t_arg_node *new_node; 
     new_node = malloc(sizeof(t_arg_node));
@@ -46,7 +46,6 @@ void *argument(t_command *cmd, char *args)
         cmd->args_last->next = new_node;
         cmd->args_last = new_node;
     }
-    
     cmd->argc++;
 }
 

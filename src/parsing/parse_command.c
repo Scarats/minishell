@@ -10,7 +10,7 @@ t_cmd_node* parse_command(t_tokenizer *tok)
     t_cmd_node *node;
     t_token *token;
 
-    node = create_command_node();
+    node = command_node_init();
     while((token = get_next_token(tok)))
     {
         if(token->type == TOKEN_EOF || 
@@ -76,7 +76,7 @@ t_cmd_node* parse_pipe(t_tokenizer *tok)
         free(token->value);
         free(token);
         t_cmd_node *right = parse_pipe(tok);
-        return create_operator_node(NODE_PIPE, left, right);
+        return operator_node_init(NODE_PIPE, left, right);
     }
     if (token)
     {
@@ -107,7 +107,7 @@ t_cmd_node* parse_and_or(t_tokenizer *tok)
         free(token->value);
         free(token);
         t_cmd_node *right = parse_pipe(tok);
-        left = create_operator_node(operation, left, right);
+        left = operator_node_init(operation, left, right);
         token = get_next_token(tok);
         looping = (token != NULL && (token->type == TOKEN_AND || token->type == TOKEN_OR));
         if(!looping && token)
@@ -143,7 +143,7 @@ t_cmd_node *parse_command_line(char *input)
     t_tokenizer *tok;
     t_cmd_node *tree;
 
-    tok = init_tokenizer(input);
+    tok = tokenizer_initializer(input);
     tree = parse_expression(tok);
     free(tok->input);
     free(tok);

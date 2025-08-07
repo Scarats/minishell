@@ -19,7 +19,10 @@ t_token *checktoken(t_tokenizer *tok)
 
 void ft_skipspace(t_tokenizer *tok)
 {
-    while (tok->pos < tok->length && ft_isspace(tok->input[tok->pos]))
+    int isspace;
+    
+    isspace = ft_isspace(&tok->input[tok->pos]);
+    while (tok->pos < tok->length && isspace)
         tok->pos++;
 }
 

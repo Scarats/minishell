@@ -20,6 +20,7 @@ SRCS	= ft_isalpha.c ft_isdigit.c ft_isalnum.c \
         ./get_next_line/get_next_line_utils_bonus.c \
         ./get_next_line/get_next_line_utils.c \
 		arraylen.c ft_strcpy.c my_malloc.c get_extension.c \
+		ft_isspace.c \
 		check_access.c find_bin.c
 
 FLAGS	= -Wall -Wextra -Werror 
