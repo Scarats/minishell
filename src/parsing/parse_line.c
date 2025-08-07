@@ -17,7 +17,7 @@ t_token *checktoken(t_tokenizer *tok)
 }
 
 
-void skipspace(t_tokenizer *tok)
+void ft_skipspace(t_tokenizer *tok)
 {
     while (tok->pos < tok->length && ft_isspace(tok->input[tok->pos]))
         tok->pos++;
@@ -182,7 +182,31 @@ t_token *token_word(t_tokenizer *tok)
 
 t_token *get_next_token(t_tokenizer *tok)
 {
-    skipspace(tok);
-
-    token_pipe(tok);
+    t_token *token;
+    
+    if (!tok || tok->pos >= tok->length)
+        return(NULL);
+    ft_skipspace(tok);
+    if (tok->pos >= tok->length)
+        return(NULL);
+    token = token_and_or(tok);
+    if (token)
+        return(token);
+    token = token_append_heredoc(tok);
+    if (token)
+        return(token);
+    token = token_pipe(tok);
+    if (token)
+        return(token);
+    token = token_redirect_io(tok);
+    if (token)
+        return(token);
+    token = token_quote(tok);
+    if (token)
+        return(token);
+    token = token_word(tok);
+    if (token)
+        return(token);
+    tok->pos++;
+    return(get_next_token(tok));
 }
