@@ -1,29 +1,29 @@
 #include "../../minishell.h"
 
 // Will call the left node.
-int left(t_node *node)
+int left(t_node *node, t_main_data *data)
 {
 	close(node->pipefd[0]);
 	if (node->pipefd[1] != STDOUT_FILENO)
 		dup2(node->pipefd[1], STDOUT_FILENO);
 	close(node->pipefd[1]);
-	traverse_tree(node->left);
+	traverse_tree(node->left, data);
 	exit(0);
 }
 
 // Will call the right node.
-int right(t_node *node)
+int right(t_node *node, t_main_data *data)
 {
 	close(node->pipefd[1]);
 	if (node->pipefd[1] != STDOUT_FILENO)
 		dup2(node->pipefd[1], STDOUT_FILENO);
 	close(node->pipefd[0]);
-	traverse_tree(node->right);
+	traverse_tree(node->right, data);
 	exit(0);
 }
 
 // Will create two childs, left and right, for each end of the pipe.
-int pipex(t_node *node)
+int pipex(t_node *node, t_main_data *data)
 {
 	if (pipe(node->pipefd) == -1)
 		return (perror("pipe"), 1);
@@ -37,16 +37,17 @@ int pipex(t_node *node)
 	if (node->left_pid == -1 )
 		return (perror("fork"), 1);
 	else if (node->left_pid == 0)
-		left(node);
+		left(node, data);
 
 	node->right_pid = fork();
 	if (node->right_pid == -1)
 		return (perror("fork"), 1);
 	else if (node->right_pid == 0)
-		right(node);
+		right(node, data);
 
 	close(node->pipefd[0]);
 	close(node->pipefd[1]);
 	waitpid(node->left_pid, NULL, 0);
 	waitpid(node->right_pid, NULL, 0);
+	return (0);
 }

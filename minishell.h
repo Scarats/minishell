@@ -9,6 +9,20 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+typedef enum e_token_type{
+    TOKEN_WORD,
+    TOKEN_PIPE,
+    TOKEN_REDIRECT_OUT, // >
+    TOKEN_REDIRECT_IN, // <
+    TOKEN_APPEND, // >>
+	TOKEN_HEREDOC, // <<
+    TOKEN_AND,
+    TOKEN_OR,
+    TOKEN_LPAREN,
+    TOKEN_RPAREN,
+    TOKEN_EOF
+} t_token_type;
+
 typedef enum e_node_type
 {
 	NODE_COMMAND,
@@ -33,7 +47,8 @@ typedef struct s_output
 typedef struct s_cmd
 {
 	char **tokens;	// Store the full command.
-
+	
+	t_token_type redirection;
 	int error; // To catch excve errors.
 } t_cmd;
 
@@ -61,22 +76,12 @@ typedef struct s_main_data
 {
 	t_node *node;
 	t_list *malloc_list;
+	
+	int error;
+	char *str_error;
 } t_main_data;
 
-typedef enum e_token_type
-{
-    TOKEN_WORD,
-    TOKEN_PIPE,
-    TOKEN_REDIRECT_OUT,
-    TOKEN_REDIRECT_IN,
-    TOKEN_APPEND,
-	TOKEN_HEREDOC,
-    TOKEN_AND,
-    TOKEN_OR,
-    TOKEN_LPAREN,
-    TOKEN_RPAREN,
-    TOKEN_EOF
-} t_token_type;
+
 
 typedef struct s_token
 {
@@ -122,7 +127,11 @@ typedef struct s_cmd_node
 } t_cmd_node;
 
 // FUNCTIONS
-int pipex(t_node *node);
-int traverse_tree(t_node *node);
+int pipex(t_node *node, t_main_data *data);
+int traverse_tree(t_node *node, t_main_data *data);
+int exec_cmd(t_node *node, t_main_data *data);
+int or_or(t_node *node, t_main_data *data);
+int and_and(t_node *node, t_main_data *data);
+int exec_cmd(t_node *node, t_main_data *data);
 
 #endif
