@@ -97,7 +97,7 @@ t_cmd_node *parse_and_or(t_tokenizer *tok)
     
     token = get_next_token(tok);
     looping = (token != NULL && (token->type == TOKEN_AND || token->type == TOKEN_OR));
-    left = parse_pipe(tok);
+    left = parse_expression(tok);
     while (looping)
     {
         if (token->type == TOKEN_AND)
@@ -106,7 +106,7 @@ t_cmd_node *parse_and_or(t_tokenizer *tok)
             operation = NODE_OR;
         free(token->value);
         free(token);
-        t_cmd_node *right = parse_pipe(tok);
+        t_cmd_node *right = parse_expression(tok);
         left = operator_node_init(operation, left, right);
         token = get_next_token(tok);
         looping = (token != NULL && (token->type == TOKEN_AND || token->type == TOKEN_OR));
