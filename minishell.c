@@ -65,7 +65,7 @@ int main() {
         if (strcmp(input, "quit") == 0) break;
         if (strlen(input) == 0) continue;
         
-        cmd_node_t *tree = parse_command_line(input);
+        t_cmd_node *tree = parse_command_line(input);
         if (tree) {
             printf("Parse tree:\n");
             print_tree(tree, 0);
