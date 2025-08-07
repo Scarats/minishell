@@ -1,4 +1,4 @@
-#include "./minishell.h"
+#include "../../minishell.h"
 
 t_cmd_node *command_node_init(void)
 {
