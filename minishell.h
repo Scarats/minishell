@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <string.h>
 
 typedef enum e_token_type{
     TOKEN_WORD,
@@ -119,5 +120,27 @@ int exec_cmd(t_node *node, t_main_data *data);
 int or_or(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
 int exec_cmd(t_node *node, t_main_data *data);
+
+t_tokenizer *tokenizer_initializer(char *input);
+t_token *checktoken(t_tokenizer *tok);
+void ft_skipspace(t_tokenizer *tok);
+t_token *token_and_or(t_tokenizer *tok);
+t_token *token_append_heredoc(t_tokenizer *tok);
+t_token *token_pipe(t_tokenizer *tok);
+t_token *token_redirect_io(t_tokenizer *tok);
+t_token *token_quote(t_tokenizer *tok);
+t_token *token_word(t_tokenizer *tok);
+t_token *get_next_token(t_tokenizer *tok);
+
+t_cmd_node *command_node_init(void);
+t_cmd_node *operator_node_init(t_node_type type, t_cmd_node *left, t_cmd_node *right);
+void *argument(t_command *cmd, char *args);
+char **args_to_array(t_command *cmd);
+
+t_cmd_node* parse_command(t_tokenizer *tok);
+t_cmd_node* parse_pipe(t_tokenizer *tok);
+t_cmd_node* parse_and_or(t_tokenizer *tok);
+t_cmd_node *parse_expression(t_tokenizer *tok);
+t_cmd_node *parse_command_line(char *input);
 
 #endif
