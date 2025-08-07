@@ -46,7 +46,7 @@ typedef struct s_output
 
 typedef struct s_cmd
 {
-	char **tokens;	// Store the full command.
+	char **tokens;	// Store the command for excve().
 	
 	t_token_type redirection;
 	int error; // To catch excve errors.
@@ -90,24 +90,10 @@ typedef struct s_arg_node {
     struct s_arg_node *next;
 } t_arg_node;
 
-typedef struct s_main_data
-{
-	t_node *node;
-	t_list *malloc_list;
-
-	char **argv;
-	int argc;
-	
-	int error;
-	char *str_error;
-
-	int last_exit_status;
-} t_main_data;
-
 typedef struct s_command
 {
 	char **argv; // node->input->args; this one is for each node
-	char **argv;; // data->argv; this one is for the main_data struct
+	char *input;; // data->input; this one is for the main_data struct
 	// t_arg_node *args_first;
 	// t_arg_node *args_last;
 	int argc; // data->argc;
@@ -118,6 +104,24 @@ typedef struct s_command
 	int final_exit_status; // data->final_exit_status; for the main_data struct
 } t_command;
 
+typedef struct s_main_data
+{
+	t_node *node;
+	t_list *malloc_list;
+
+	char *input;
+	char **argv;
+	int argc;
+	
+	int error;
+	char *str_error;
+
+	int last_exit_status;
+
+    t_tokenizer *tok;
+} t_main_data;
+
+
 // FUNCTIONS
 int pipex(t_node *node, t_main_data *data);
 int traverse_tree(t_node *node, t_main_data *data);
@@ -126,7 +130,7 @@ int or_or(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
 int exec_cmd(t_node *node, t_main_data *data);
 
-t_tokenizer *tokenizer_initializer(char *input);
+int tokenizer_initializer(t_main_data *data);
 t_token *checktoken(t_tokenizer *tok);
 void ft_skipspace(t_tokenizer *tok);
 t_token *token_and_or(t_tokenizer *tok);
@@ -145,7 +149,7 @@ char **args_to_array(t_command *cmd);
 t_cmd_node* parse_command(t_tokenizer *tok);
 t_cmd_node* parse_pipe(t_tokenizer *tok);
 t_cmd_node* parse_and_or(t_tokenizer *tok);
-t_cmd_node *parse_expression(t_tokenizer *tok);
-t_cmd_node *parse_command_line(char *input);
+int	parse_expression(t_main_data *data);
+t_node *parse_command_line(t_main_data *data);
 
 #endif

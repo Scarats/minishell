@@ -88,7 +88,7 @@ t_cmd_node* parse_pipe(t_tokenizer *tok)
     return(left);
 }
 
-t_cmd_node* parse_and_or(t_tokenizer *tok)
+t_cmd_node *parse_and_or(t_tokenizer *tok)
 {
     int looping;
     t_node_type operation;
@@ -121,7 +121,7 @@ t_cmd_node* parse_and_or(t_tokenizer *tok)
     return(left);
 }
 
-t_cmd_node *parse_expression(t_tokenizer *tok)
+int parse_expression(t_main_data *data)
 {
     t_cmd_node *left;
     t_token *token;
@@ -135,17 +135,15 @@ t_cmd_node *parse_expression(t_tokenizer *tok)
         free(token->value);
         free(token);
     }
-    return(left);
+    return(0);
 }
 
-t_cmd_node *parse_command_line(char *input)
+t_node *parse_command_line(t_main_data *data)
 {
-    t_tokenizer *tok;
-    t_cmd_node *tree;
-
-    tok = tokenizer_initializer(input);
-    tree = parse_expression(tok);
-    free(tok->input);
-    free(tok);
+    if (tokenizer_initializer(data))
+        return (1);
+    if (parse_expression(data))
+        return (1);
+    my_free(data->malloc_list);
     return tree;
 }

@@ -1,12 +1,19 @@
 #include "../../minishell.h"
 
-t_tokenizer *tokenizer_initializer(char *input)
+int tokenizer_initializer(t_main_data *data)
 {
-    t_tokenizer *tok = malloc(sizeof(t_tokenizer));
-    tok->input = ft_strdup(input);
-    tok->pos = 0;
-    tok->length = ft_strlen(input);
-    return(tok);
+    if (!data->tok)
+        data->tok = my_malloc(data->malloc_list, sizeof(t_tokenizer));
+    if (!data->input)
+    {
+        data->tok->input = ft_strdup(data->input);
+        my_addtolist(data->malloc_list, data->tok->input);
+    }
+    if (!data->tok->pos) 
+        data->tok->pos = 0;
+    if (!data->tok->length) 
+        data->tok->length = ft_strlen(data->input);
+    return(0);
 }
 
 t_token *checktoken(t_tokenizer *tok)
@@ -165,7 +172,7 @@ t_token *token_word(t_tokenizer *tok)
         return(0);
     start = tok->pos;
     while (tok->pos < tok->length && 
-           !ft_isspace(tok->input[tok->pos]) &&
+           !ft_isspace(&tok->input[tok->pos]) &&
            tok->input[tok->pos] != '|' &&
            tok->input[tok->pos] != '<' &&
            tok->input[tok->pos] != '>' &&

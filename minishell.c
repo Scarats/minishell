@@ -48,7 +48,10 @@ void print_tree(t_cmd_node *node, int depth) {
 }
 
 // Test the parser
-int main() {
+int main()
+{
+    t_main_data data;
+
     char input[1024];
     
     printf("Shell Parser with Binary Tree\n");
@@ -64,8 +67,9 @@ int main() {
         
         if (strcmp(input, "quit") == 0) break;
         if (strlen(input) == 0) continue;
-        
-        t_cmd_node *tree = parse_command_line(input);
+
+        data.input = input;
+        data.node = parse_command_line(&data);
         if (tree) {
             printf("Parse tree:\n");
             print_tree(tree, 0);
