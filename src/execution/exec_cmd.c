@@ -1,5 +1,11 @@
 #include "../../minishell.h"
 
+// Check if binary exist and if user has access.
+int binaries_check(t_node *node, t_main_data *data)
+{
+
+}
+
 // Check the redirections, change accordingly the inpout and output fds
 // If redirected, changes the fd.
 int redirections(t_node *node, t_main_data *data)
@@ -33,10 +39,10 @@ int redirections(t_node *node, t_main_data *data)
 	return (0);
 }
 
-// Check permissions and if file exists,
-// according to the type of redirection and command.
-int checks(t_node *node, t_main_data *data)
+// Check permissions for file, according to the type of redirection and command.
+int file_checks(t_node *node, t_main_data *data)
 {
+	// first check the bin access.
 	if (check_access())
 
 }
@@ -44,11 +50,11 @@ int checks(t_node *node, t_main_data *data)
 // Execute the command.
 int execution(t_node *node, t_main_data *data)
 {
-	if (checks(node, data))
-		return (1);
+
 }
 
 // Handle the execution process.
+// Should handle the bin before creating and opening the files.
 int exec_cmd(t_node *node, t_main_data *data)
 {
 	int pid;
@@ -60,7 +66,11 @@ int exec_cmd(t_node *node, t_main_data *data)
 		return (1);
 	else if (pid == 0)
 	{
-		error = redirections(node, data);
+		error = binaries_check(node, data);
+		if (error == 0)
+			error = redirections(node, data);
+		if (error == 0)
+			error = file_check(node, data);
 		if (error == 0)
 			error = execution(node, data);
 	}
