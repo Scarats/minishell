@@ -1,6 +1,7 @@
 #include "../../minishell.h"
 
 // Check the redirections, change accordingly the inpout and output fds
+// If redirected, changes the fd.
 int redirections(t_node *node, t_main_data *data)
 {
 	if (!node->cmd->redirection)
@@ -8,52 +9,67 @@ int redirections(t_node *node, t_main_data *data)
 	else if (node->cmd->redirection == TOKEN_REDIRECT_IN) // <
 	{
 		// Try to open the file.
+		node->input_fd = open(node->filename, O_RDONLY);
+		if (node->input_fd < 0)
+			return (1);
 	}
 	else if (node->cmd->redirection == TOKEN_REDIRECT_OUT) // >
 	{
 		// Will try to open the file or create it.
+		node->output_fd = open(node->filename, O_WRONLY | O_CREAT | O_TRUNC);
+		if (node->output_fd < 0)
+			return (1);
 	}
-	else if (node->cmd->redirection == TOKEN_HEREDOC) // <<
-	{
-		// Will wait for user to write text as input.
-		// idk yet how to do it, so let's see later.
-	}
-	else if (node->cmd->redirection == TOKEN_APPEND) // >>
-	{
-		// Will write after the file
-		// idk yet how to do it, so let's see later.
-	}
+	// else if (node->cmd->redirection == TOKEN_HEREDOC) // <<
+	// {
+	// 	// Will wait for user to write text as input.
+	// 	// idk yet how to do it, so let's see later.
+	// }
+	// else if (node->cmd->redirection == TOKEN_APPEND) // >>
+	// {
+	// 	// Will write after the file
+	// 	// idk yet how to do it, so let's see later.
+	// }
+	return (0);
 }
 
-// // Check permissions, if file exists etc...
-// int checks(t_node *node, t_main_data *data)
-// {
-// 	if ()
+// Check permissions and if file exists,
+// according to the type of redirection and command.
+int checks(t_node *node, t_main_data *data)
+{
+	if (check_access())
 
-// }
+}
 
 // Execute the command.
 int execution(t_node *node, t_main_data *data)
 {
+	if (checks(node, data))
+		return (1);
 }
 
 // Handle the execution process.
 int exec_cmd(t_node *node, t_main_data *data)
 {
 	int pid;
+	int error;
 
+	error = 0;
 	pid = fork();
 	if (pid == -1)
 		return (1);
 	else if (pid == 0)
 	{
-		if (redirections(node, data))
-			return (1);
-		else if (checks(node, data))
-			return (1);
-		else if (execution(node, data))
-			return (1);
+		error = redirections(node, data);
+		if (error == 0)
+			error = execution(node, data);
 	}
+	if (node->input_fd)
+		close(node->input_fd);
+	if (node->input_fd)
+		close(node->input_fd);
 	waitpid(pid, NULL, 0);
+	if (error != 0)
+		return (error);
 	return (0);
 }

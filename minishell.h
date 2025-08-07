@@ -31,19 +31,6 @@ typedef enum e_node_type
 	NODE_OR
 } t_node_type;
 
-typedef struct s_input
-{
-	char *filename;
-	int fd;
-} t_input;
-
-typedef struct s_output
-{
-	char *filename;
-	int fd;
-	bool append; // for >>
-} t_output;
-
 typedef struct s_cmd
 {
 	char **tokens;	// Store the full command.
@@ -54,22 +41,21 @@ typedef struct s_cmd
 
 typedef struct s_node
 {
-	t_node_type type;
-
 	struct s_node *left;
 	struct s_node *right;
 	struct s_node *parent; // Might be useless, let's see later.
-
-	int pipefd[2];
+	
 	pid_t left_pid;
 	pid_t right_pid;
+	
+	t_node_type type;
+	t_cmd *cmd;
 
+	int pipefd[2];
 	int input_fd;
 	int output_fd;
-
-	t_cmd *cmd;
-	t_input *input;
-	t_output *output;
+	
+	char *filename;
 } t_node;
 
 typedef struct s_main_data
