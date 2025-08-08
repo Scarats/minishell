@@ -10,3 +10,9 @@ It's not mandatory, just simplify everything imo.
 
 src/execution/execution.c  src/execution/pipes.c \
 		src/execution/and_and.c src/execution/or_or.c src/execution/exec_cmd.c \
+
+
+# TODO
+1. Tokenize
+2. Find the highest operator of the tokens
+3. Recursively call this function each time there is no more sub operators.
