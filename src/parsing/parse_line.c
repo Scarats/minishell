@@ -1,16 +1,59 @@
 #include "../../minishell.h"
 
-// Will check each char if it is a special char such as:
-// < > << >> $ "" '' "SPACE" ...
-int check_char()
+// Assign type as a void, so it can be done directly in a return(assign_type, 1);
+void	assign_type(t_token_type *curr_tok_type, t_token_type type)
 {
-
+	curr_tok_type = type;
 }
 
-// Tokenize the input.
-// Find 
+// Will check each char if it is a special char such as:
+// < > << >> $ "" '' ...
+// Assign the corresponding type to curr_tok_type
+// returns 0 if not detected and if space
+// returns 1 if detected
+int check_char(char c, t_main_data *data)
+{
+	if (c == " ")
+	{
+		data->tok->pos++;
+		data->tok->prev_pos++;
+		return (0);
+	}
+	else if (c == "<")
+		return (assign_type(data->tok->curr_tok_type, TOKEN_REDIRECT_OUT), 1);
+	// else if ...
+}
+
+// Create a new token in the list from tok->prev_pos to tok->pos
+// Increases token_list_size and prev_pos
+// Check the next char since it can be && and ||
+int create_token(t_main_data *data)
+{
+
+	data->tok->prev_pos++;
+}
+
+// Make each word a token.
+// Add a type to each token.
+// Be careful with spaces to ignore them.
+int tokenizer(t_main_data *data)
+{
+	while (data->tok->pos < data->tok->length)
+	{
+		if (check_char(data->tok->input[data->tok->pos], data))
+			create_token(data);
+
+		data->tok->pos++;
+	}
+}
+
+// Parse the input.
+// Tokenize it, then create a binary tree.
 int parser(t_main_data *data)
 {
-    
-    return (0);
+	if (tokenizer(data))
+		return (1);
+	if (build_tree(data))
+		return (1);
+	return (0);
 }

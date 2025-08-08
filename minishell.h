@@ -79,17 +79,22 @@ typedef struct s_token
     t_token_type type;
     char *value;
 
-	s_token *prev_token;
-	s_token *next_token;
+	struct s_token *prev_token;
+	struct s_token *next_token;
 } t_token;
 
 typedef struct s_tokenizer
 {
     char *input;
     int pos;
+	int prev_pos;
     int length;
 	int depth;
+
+	t_token_type curr_tok_type;
+
 	t_token *token_list;
+	int token_list_size; // Keep track of the number of tokens
 } t_tokenizer;
 
 typedef struct s_main_data
