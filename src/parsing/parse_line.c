@@ -19,10 +19,10 @@ void assign_type(t_token_type *curr_tok_type, t_token_type type, int action)
 // < > << >> $ "" '' ...
 // Assign the corresponding type to curr_tok_type
 // returns 0 if not detected (or it's a space)
-// returns 1 if detected
+// returns 1 if detected, create new token
 int check_char(char c, t_main_data *data)
 {
-	// If space, not in a word. But in a word and space, then end of word.
+	// If space, not in a word. But if in a word and space, then end of word.
 	if (c == " ")
 	{
 		if (data->tok->in_word = 0)
@@ -35,7 +35,11 @@ int check_char(char c, t_main_data *data)
 	}
 	else if (c == "\0")
 		return (assign_type(data->tok->curr_tok_type, TOKEN_NULL, 1), 1);
-	// else if ...
+}
+
+// Generate the new token.
+int new_token(t_main_data *data)
+{
 }
 
 // Create a new token in the list from tok->prev_pos to tok->pos - 1
@@ -49,6 +53,7 @@ int create_token(t_main_data *data)
 		// Create the previous word
 		// Create the current word (<< >> && ||)
 	}
+	// Create normal token
 	data->tok->prev_pos = data->tok->pos;
 }
 
