@@ -1,7 +1,10 @@
 #include "../../minishell.h"
 
 // Assign type as a void, so it can be done directly in a return(assign_type, 1);
-void	assign_type(t_token_type *curr_tok_type, t_token_type type)
+// action:
+// 	1 = assign the given type.
+//	2 = assign the duplicate type (&&, ||, <<, >>) of the current sign.
+void assign_type(t_token_type *curr_tok_type, t_token_type type, int action)
 {
 	curr_tok_type = type;
 }
@@ -9,7 +12,7 @@ void	assign_type(t_token_type *curr_tok_type, t_token_type type)
 // Will check each char if it is a special char such as:
 // < > << >> $ "" '' ...
 // Assign the corresponding type to curr_tok_type
-// returns 0 if not detected and if space
+// returns 0 if not detected (or it's a space)
 // returns 1 if detected
 int check_char(char c, t_main_data *data)
 {
@@ -26,11 +29,14 @@ int check_char(char c, t_main_data *data)
 
 // Create a new token in the list from tok->prev_pos to tok->pos
 // Increases token_list_size and prev_pos
-// Check the next char since it can be && and ||
+// Check the next char since it can be &&, ||, <<, >>, $something etc...
 int create_token(t_main_data *data)
 {
+	// Check if the next char is the same
+	if (data->tok->input[data->tok->pos + 1] && (data->tok->input[data->tok->pos + 1] == data->tok->input[data->tok->pos]))
+		s
 
-	data->tok->prev_pos++;
+			data->tok->prev_pos++;
 }
 
 // Make each word a token.

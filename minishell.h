@@ -12,25 +12,27 @@
 
 typedef enum e_token_type
 {
-    TOKEN_WORD,
-    TOKEN_PIPE, // |
-    TOKEN_REDIRECT_OUT, // >
-    TOKEN_REDIRECT_IN, // <
-    TOKEN_APPEND, // >>
-	TOKEN_HEREDOC, // <<
-    TOKEN_AND, // &&
-    TOKEN_OR, // ||
-    TOKEN_LPAREN, // (
-    TOKEN_RPAREN, // )
-    TOKEN_EOF
+	TOKEN_CMD,			// ex: cat, sleep, ls ...
+	TOKEN_ARGUMENT,		// ex: -a, -l, file.txt ... (a file without a redirection)
+	TOKEN_FILE,			// ex: > file.txt, < file.txt ... (file with redirection)
+	TOKEN_PIPE,			// |
+	TOKEN_REDIRECT_OUT, // >
+	TOKEN_REDIRECT_IN,	// <
+	TOKEN_APPEND,		// >>
+	TOKEN_HEREDOC,		// <<
+	TOKEN_AND,			// &&
+	TOKEN_OR,			// ||
+	TOKEN_LPAREN,		// (
+	TOKEN_RPAREN,		// )
+	TOKEN_EOF
 } t_token_type;
 
 typedef enum e_node_type
 {
 	NODE_COMMAND,
-	NODE_PIPE, // |
-	NODE_AND, // &&
-	NODE_OR, // ||
+	NODE_PIPE,	  // |
+	NODE_AND,	  // &&
+	NODE_OR,	  // ||
 	NODE_SUBSHELL // ()
 } t_node_type;
 
@@ -48,8 +50,8 @@ typedef struct s_output
 
 typedef struct s_cmd
 {
-	char **tokens;	// Store the command for excve().
-	
+	char **tokens; // Store the command for excve().
+
 	t_token_type redirection;
 	int error; // To catch excve errors.
 } t_cmd;
@@ -73,11 +75,10 @@ typedef struct s_node
 	int exit_status;
 } t_node;
 
-
 typedef struct s_token
 {
-    t_token_type type;
-    char *value;
+	t_token_type type;
+	char *value;
 
 	struct s_token *prev_token;
 	struct s_token *next_token;
@@ -85,16 +86,18 @@ typedef struct s_token
 
 typedef struct s_tokenizer
 {
-    char *input;
-    int pos;
+	char *input;
+	int pos;
 	int prev_pos;
-    int length;
+	int length;
 	int depth;
 
 	t_token_type curr_tok_type;
 
 	t_token *token_list;
 	int token_list_size; // Keep track of the number of tokens
+
+	t_list *malloc_tok;
 } t_tokenizer;
 
 typedef struct s_main_data
@@ -105,13 +108,13 @@ typedef struct s_main_data
 	char *input;
 	char **argv;
 	int argc;
-	
+
 	int error;
 	char *str_error;
 
 	int last_exit_status;
 
-    t_tokenizer *tok;
+	t_tokenizer *tok;
 } t_main_data;
 
 #endif
