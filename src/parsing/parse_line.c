@@ -1,6 +1,7 @@
 #include "../../minishell.h"
 
 // Determine if the word is a command, argument, filename etc...
+// It will be done according to the previous tokens created.
 t_char_type get_word_type()
 {
 
