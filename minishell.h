@@ -10,12 +10,19 @@
 #include <unistd.h>
 #include <string.h>
 
+typedef enum e_quote_state {
+    QUOTE_NONE,
+    QUOTE_SINGLE,
+    QUOTE_DOUBLE
+} t_quote_state;
+
 typedef enum e_char_type
 {
-	CHAR_WORD,
+	CHAR_TEXT,
 	CHAR_OPERATOR,
 	CHAR_SPACE,
-	CHAR_QUOTE,
+	CHAR_QUOTE_SINGLE,
+	CHAR_QUOTE_DOUBLE,
 	CHAR_NULL
 } t_char_type;
 
@@ -93,6 +100,7 @@ typedef struct s_token
 {
 	t_token_type type;
 	char *value;
+	t_quote_state quote;
 
 	struct s_token *prev_token;
 	struct s_token *next_token;
@@ -110,8 +118,10 @@ typedef struct s_tokenizer
 	t_token_type prev_type;
 	t_token_type curr_tok_type;
 
-	t_char_type curr_char;
-	t_char_type prev_char;
+	t_char_type curr_char_type;
+	t_char_type prev_char_type;
+
+	t_quote_state quote_state;
 
 	t_token *token_list;
 	int token_list_size; // Keep track of the number of tokens

@@ -15,11 +15,15 @@ t_char_type	get_char_type(char c)
 {
 	if (c == '\0')
 		return (CHAR_NULL);
-	if (c == ' ')
+	else if (c == ' ')
 		return (CHAR_SPACE);
-	if (c == '|' || c == '&' || c == '<' || c == '>' || c == '(' || c == ')')
+	else if (c == '|' || c == '&' || c == '<' || c == '>' || c == '(' || c == ')')
 		return (CHAR_OPERATOR);
-	return (CHAR_WORD);
+	else if (c == '\'')
+		return (CHAR_QUOTE_SINGLE);
+	else if (c == '"')
+		return (CHAR_QUOTE_DOUBLE);
+	return (CHAR_TEXT);
 }
 
 t_token_type	get_tok_type(char c, char next)
@@ -53,6 +57,26 @@ t_token_type	get_tok_type(char c, char next)
 
 int	tokenizer(t_main_data *data)
 {
+	while (data->tok->pos < data->tok->length)
+	{
+		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+		// Handle the quote system.
+		if (data->tok->curr_char_type == CHAR_QUOTE_DOUBLE)
+		else if (data->tok->curr_char_type == CHAR_QUOTE_SINGLE)
+
+		// Normal behavior, also be careful of the $
+		else if (data->tok->quote_state == QUOTE_NONE)
+		{
+			if (data->tok->curr_char_type != data->tok->prev_char_type)
+			{
+				create_token();
+				data->tok->prev_pos = data->tok->pos;
+			}
+
+		}
+
+		data->tok->pos++;
+	}
 }
 
 // Parse the input.

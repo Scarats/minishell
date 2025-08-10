@@ -4,6 +4,7 @@ int init(t_main_data *data)
 {
 	ft_memset(data, 0, sizeof(data));
 	data->input = "This is a test";
+	data->tok->quote_state = QUOTE_NONE;
 	data->tok->length = ft_strlen(data->tok->input);
 }
 
