@@ -69,6 +69,7 @@ int	tokenizer(t_main_data *data)
 		{
 			if (data->tok->curr_char_type != data->tok->prev_char_type)
 			{
+				// Create with previous_char_type
 				create_token();
 				data->tok->prev_pos = data->tok->pos;
 			}

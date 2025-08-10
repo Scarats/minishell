@@ -126,7 +126,7 @@ typedef struct s_tokenizer
 	t_token *token_list;
 	int token_list_size; // Keep track of the number of tokens
 
-	t_list *malloc_tok;
+	t_list *malloc_tree;
 } t_tokenizer;
 
 typedef struct s_main_data
