@@ -1,5 +1,11 @@
 #include "../../minishell.h"
 
+// Determine if the word is a command, argument, filename etc...
+t_char_type get_word_type()
+{
+
+}
+
 int	create_token(t_main_data *data, int start, int end, t_token_type type)
 {
 }
