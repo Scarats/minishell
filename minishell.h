@@ -10,6 +10,15 @@
 #include <unistd.h>
 #include <string.h>
 
+typedef enum e_char_type
+{
+	CHAR_WORD,
+	CHAR_OPERATOR,
+	CHAR_SPACE,
+	CHAR_QUOTE,
+	CHAR_NULL
+} t_char_type;
+
 // Used for tokens but also during the token creation to type each char.
 typedef enum e_token_type
 {
@@ -28,7 +37,7 @@ typedef enum e_token_type
 	TOKEN_RPAREN,		// )
 	TOKEN_SPACE,		// " "
 	TOKEN_NULL,			// \0
-	TOKEN_CHAR,			// Random letter
+	TOKEN_TEXT,
 	TOKEN_EOF
 } t_token_type;
 
@@ -100,6 +109,9 @@ typedef struct s_tokenizer
 
 	t_token_type prev_type;
 	t_token_type curr_tok_type;
+
+	t_char_type curr_char;
+	t_char_type prev_char;
 
 	t_token *token_list;
 	int token_list_size; // Keep track of the number of tokens
