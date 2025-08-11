@@ -29,6 +29,7 @@ typedef enum e_char_type
 // Used for tokens but also during the token creation to type each char.
 typedef enum e_token_type
 {
+	TOKEN_ERROR,
 	TOKEN_CMD,			// ex: cat, sleep, ls ...
 	TOKEN_ARGUMENT,		// ex: -a, -l, file.txt ... (a file without a redirection)
 	TOKEN_FILE,			// ex: > file.txt, < file.txt ... (file with redirection)
@@ -154,5 +155,7 @@ typedef struct s_main_data
 t_token_type	get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
 t_token *add_to_list(t_main_data *data,	t_token *prev, int start, int end);
+int parser(t_main_data *data);
+int traverse_tree(t_node *node ,t_main_data *data);
 
 #endif

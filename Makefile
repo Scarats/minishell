@@ -1,5 +1,6 @@
-SRCS = minishell.c src/binarytree/createnodes.c \
-		src/parsing/parse_command.c src/parsing/parse_line.c src/parsing/parse_words.c \
+SRCS = minishell.c \
+	   src/parsing/parse_line.c \
+	   src/parsing/parse_utils.c
 
 FLAGS = -Wall -Wextra -Werror 
 CC    = cc

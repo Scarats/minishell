@@ -2,7 +2,7 @@
 
 // Determine if the word is a command, argument, filename etc...
 // It will be done according to the previous tokens created.
-t_char_type get_word_type(t_main_data *data)
+t_token_type get_word_type(t_main_data *data)
 {
 	t_token_type prev_type;
 
@@ -16,6 +16,8 @@ t_char_type get_word_type(t_main_data *data)
 		return (TOKEN_CMD);
 	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_SPARAM)
 		return (TOKEN_ARGUMENT);
+	else
+		return(TOKEN_ERROR);
 }
 
 int create_token(t_main_data *data, int start, int end, t_token_type type)
@@ -23,9 +25,12 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 	t_token *lst;
 
 	lst = add_to_list(data, data->tok->last_token, start, end);
+	if(!lst)
+		return(1);
 	if (type == TOKEN_TEXT)
 		type = get_word_type(data);
 	lst->type = type;
+	return(0);
 }
 
 t_char_type get_char_type(char c)
@@ -100,6 +105,7 @@ int tokenizer(t_main_data *data)
 		}
 		data->tok->pos++;
 	}
+	return(0);
 }
 
 // Parse the input.
@@ -108,7 +114,7 @@ int parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
-	if (build_tree(data))
-		return (1);
+	// if (build_tree(data))
+		// return (1);
 	return (0);
 }
