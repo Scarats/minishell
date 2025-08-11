@@ -26,9 +26,12 @@ t_token *add_to_list(t_main_data *data,	t_token *prev, int start, int end)
 		prev->next_token = new;
 		new->prev_token = prev;
 	}
+	data->tok->last_token = new;
 	new->next_token = NULL;
 	new->word = ft_substr(data->tok->input, start, end - start);
 	my_addtolist(data->malloc_list, new->word);
 	data->tok->token_list_size++;
 	return (new);
 }
+
+

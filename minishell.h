@@ -44,6 +44,7 @@ typedef enum e_token_type
 	TOKEN_RPAREN,		// )
 	TOKEN_SPACE,		// " "
 	TOKEN_NULL,			// \0
+	TOKEN_SPARAM, // $
 	TOKEN_TEXT,
 	TOKEN_EOF
 } t_token_type;
@@ -100,7 +101,7 @@ typedef struct s_token
 {
 	t_token_type type;
 	char *word;
-	t_quote_state quote;
+	// t_quote_state quote;
 
 	struct s_token *prev_token;
 	struct s_token *next_token;
@@ -117,15 +118,17 @@ typedef struct s_tokenizer
 
 	char next_char;
 
-	t_token_type prev_type;
 	t_token_type curr_tok_type;
+	t_token_type prev_type;
 
 	t_char_type curr_char_type;
 	t_char_type prev_char_type;
 
 	t_quote_state quote_state;
 
-	t_token **token_list;
+	t_token *token_list;
+	t_token *last_token;
+
 	int token_list_size; // Keep track of the number of tokens
 
 	t_list *malloc_tree;
@@ -150,5 +153,6 @@ typedef struct s_main_data
 
 t_token_type	get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
+t_token *add_to_list(t_main_data *data,	t_token *prev, int start, int end);
 
 #endif

@@ -4,28 +4,28 @@
 // It will be done according to the previous tokens created.
 t_char_type get_word_type(t_main_data *data)
 {
+	t_token_type prev_type;
+
+	// It's the first node, then COMMAND
+	if (data->tok->last_token->prev_token == NULL)
+		return (TOKEN_CMD);
+	prev_type = data->tok->last_token->type;
+	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN || prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
+		return (TOKEN_FILE);
+	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR)
+		return (TOKEN_CMD);
+	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_SPARAM)
+		return (TOKEN_ARGUMENT);
 }
 
 int create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-	t_token *lst;// Will have to call get_word_type
+	t_token *lst;
 
+	lst = add_to_list(data, data->tok->last_token, start, end);
 	if (type == TOKEN_TEXT)
 		type = get_word_type(data);
-	if (data->tok->token_list_size == 0)
-	{
-		// First node
-		lst = my_malloc(data->malloc_list, sizeof(t_token));
-		if(!lst)
-			return(NULL);
-		lst->type = data->tok->curr_tok_type;
-		lst->word = ft_substr(data->tok->input, start, end - start);
-		my_addtolist(data->malloc_list, lst->word);
-	}
-	else
-	{
-
-	}
+	lst->type = type;
 }
 
 t_char_type get_char_type(char c)
@@ -34,7 +34,7 @@ t_char_type get_char_type(char c)
 		return (CHAR_NULL);
 	else if (c == ' ')
 		return (CHAR_SPACE);
-	else if (c == '|' || c == '&' || c == '<' || c == '>' || c == '(' || c == ')')
+	else if (c == '|' || c == '&' || c == '<' || c == '>' || c == '(' || c == ')' || c == '$')
 		return (CHAR_OPERATOR);
 	else if (c == '\'')
 		return (CHAR_QUOTE_SINGLE);
@@ -55,6 +55,8 @@ t_token_type get_tok_type(char c, char next)
 		return (TOKEN_HEREDOC);
 	else if (c == '>' && next == '>')
 		return (TOKEN_APPEND);
+	else if (c == '$')
+		return (TOKEN_SPARAM);
 	else if (c == '&')
 		return (TOKEN_AND);
 	else if (c == '|')
