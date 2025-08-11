@@ -2,16 +2,33 @@
 
 // Determine if the word is a command, argument, filename etc...
 // It will be done according to the previous tokens created.
-t_char_type get_word_type()
-{
-
-}
-
-int	create_token(t_main_data *data, int start, int end, t_token_type type)
+t_char_type get_word_type(t_main_data *data)
 {
 }
 
-t_char_type	get_char_type(char c)
+int create_token(t_main_data *data, int start, int end, t_token_type type)
+{
+	t_token *lst;// Will have to call get_word_type
+
+	if (type == TOKEN_TEXT)
+		type = get_word_type(data);
+	if (data->tok->token_list_size == 0)
+	{
+		// First node
+		lst = my_malloc(data->malloc_list, sizeof(t_token));
+		if(!lst)
+			return(NULL);
+		lst->type = data->tok->curr_tok_type;
+		lst->word = ft_substr(data->tok->input, start, end - start);
+		my_addtolist(data->malloc_list, lst->word);
+	}
+	else
+	{
+
+	}
+}
+
+t_char_type get_char_type(char c)
 {
 	if (c == '\0')
 		return (CHAR_NULL);
@@ -26,7 +43,7 @@ t_char_type	get_char_type(char c)
 	return (CHAR_TEXT);
 }
 
-t_token_type	get_tok_type(char c, char next)
+t_token_type get_tok_type(char c, char next)
 {
 	if (c == '\0')
 		return (TOKEN_NULL);
@@ -52,38 +69,40 @@ t_token_type	get_tok_type(char c, char next)
 		return (TOKEN_RPAREN);
 	else if (c == ' ')
 		return (TOKEN_SPACE);
-	
 	return (TOKEN_TEXT);
 }
 
-int	tokenizer(t_main_data *data)
+int tokenizer(t_main_data *data)
 {
 	while (data->tok->pos < data->tok->length)
 	{
 		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
 		// Handle the quote system.
-		if (data->tok->curr_char_type == CHAR_QUOTE_DOUBLE)
-		else if (data->tok->curr_char_type == CHAR_QUOTE_SINGLE)
-
+		// if (data->tok->curr_char_type == CHAR_QUOTE_DOUBLE)
+		// else if (data->tok->curr_char_type == CHAR_QUOTE_SINGLE)
 		// Normal behavior, also be careful of the $
-		else if (data->tok->quote_state == QUOTE_NONE)
+		if (data->tok->quote_state == QUOTE_NONE)
 		{
 			if (data->tok->curr_char_type != data->tok->prev_char_type)
 			{
-				// Create with previous_char_type
-				create_token();
-				data->tok->prev_pos = data->tok->pos;
+				if (data->tok->prev_char_type != CHAR_SPACE)
+				{
+					// Create with previous_char_type
+					create_token(data, data->tok->prev_pos, data->tok->pos,
+								 get_tok_type(data->tok->input[data->tok->pos],
+											  check_next_char(data->tok->input,
+															  data->tok->pos)));
+					data->tok->prev_pos = data->tok->pos;
+				}
 			}
-
 		}
-
 		data->tok->pos++;
 	}
 }
 
 // Parse the input.
 // Tokenize it, then create a binary tree.
-int	parser(t_main_data *data)
+int parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
