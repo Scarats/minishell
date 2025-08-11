@@ -99,7 +99,7 @@ typedef struct s_node
 typedef struct s_token
 {
 	t_token_type type;
-	char *value;
+	char *word;
 	t_quote_state quote;
 
 	struct s_token *prev_token;
@@ -115,6 +115,8 @@ typedef struct s_tokenizer
 	int depth;
 	bool in_word;
 
+	char next_char;
+
 	t_token_type prev_type;
 	t_token_type curr_tok_type;
 
@@ -123,7 +125,7 @@ typedef struct s_tokenizer
 
 	t_quote_state quote_state;
 
-	t_token *token_list;
+	t_token **token_list;
 	int token_list_size; // Keep track of the number of tokens
 
 	t_list *malloc_tree;
@@ -145,5 +147,8 @@ typedef struct s_main_data
 
 	t_tokenizer *tok;
 } t_main_data;
+
+t_token_type	get_tok_type(char c, char next);
+char check_next_char(char *str, int pos);
 
 #endif
