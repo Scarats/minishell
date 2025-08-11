@@ -28,30 +28,31 @@ t_char_type	get_char_type(char c)
 
 t_token_type	get_tok_type(char c, char next)
 {
-	if (c == '&' && next == '&')
-		return (TOKEN_AND_AND);
-	if (c == '|' && next == '|')
-		return (TOKEN_OR);
-	if (c == '<' && next == '<')
-		return (TOKEN_HEREDOC);
-	if (c == '>' && next == '>')
-		return (TOKEN_APPEND);
-	if (c == '&')
-		return (TOKEN_AND);
-	if (c == '|')
-		return (TOKEN_PIPE);
-	if (c == '<')
-		return (TOKEN_REDIRECT_IN);
-	if (c == '>')
-		return (TOKEN_REDIRECT_OUT);
-	if (c == '(')
-		return (TOKEN_LPAREN);
-	if (c == ')')
-		return (TOKEN_RPAREN);
-	if (c == ' ')
-		return (TOKEN_SPACE);
 	if (c == '\0')
 		return (TOKEN_NULL);
+	else if (c == '&' && next == '&')
+		return (TOKEN_AND_AND);
+	else if (c == '|' && next == '|')
+		return (TOKEN_OR);
+	else if (c == '<' && next == '<')
+		return (TOKEN_HEREDOC);
+	else if (c == '>' && next == '>')
+		return (TOKEN_APPEND);
+	else if (c == '&')
+		return (TOKEN_AND);
+	else if (c == '|')
+		return (TOKEN_PIPE);
+	else if (c == '<')
+		return (TOKEN_REDIRECT_IN);
+	else if (c == '>')
+		return (TOKEN_REDIRECT_OUT);
+	else if (c == '(')
+		return (TOKEN_LPAREN);
+	else if (c == ')')
+		return (TOKEN_RPAREN);
+	else if (c == ' ')
+		return (TOKEN_SPACE);
+	
 	return (TOKEN_TEXT);
 }
 
