@@ -18,9 +18,9 @@ typedef enum e_quote_state {
 
 typedef enum e_char_type
 {
+	CHAR_SPACE,
 	CHAR_TEXT,
 	CHAR_OPERATOR,
-	CHAR_SPACE,
 	CHAR_QUOTE_SINGLE,
 	CHAR_QUOTE_DOUBLE,
 	CHAR_NULL

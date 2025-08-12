@@ -50,6 +50,7 @@ int init(t_main_data *data)
     data->tok->token_list = NULL;
     data->tok->last_token = NULL;
     data->tok->token_list_size = 0;
+    data->tok->prev_char_type = CHAR_SPACE;
     
     // Initialize previous character type to avoid initial issues
     

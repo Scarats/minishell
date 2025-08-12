@@ -85,6 +85,7 @@ int tokenizer(t_main_data *data)
 {
 	t_token_type tok_type;
 
+	tok_type = TOKEN_NULL;
 	while (data->tok->pos < data->tok->length)
 	{
 		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
@@ -99,16 +100,23 @@ int tokenizer(t_main_data *data)
 				if (data->tok->prev_char_type != CHAR_SPACE)
 				{
 					// Create with previous_char_type
-					tok_type = get_tok_type(data->tok->input[data->tok->pos], check_next_char(data->tok->input, data->tok->pos));
+					tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
 					if (tok_type == TOKEN_HEREDOC || tok_type == TOKEN_AND_AND || tok_type == TOKEN_OR || tok_type == TOKEN_APPEND)
-						data->tok->pos++;
+						data->tok->pos += 2;
 					create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
 					data->tok->prev_pos = data->tok->pos;
 				}
+				data->tok->prev_pos = data->tok->pos;
 			}
 		}
 		data->tok->prev_char_type = data->tok->curr_char_type;
 		data->tok->pos++;
+	}
+	// Handle the final token if needed
+	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+	{
+		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
 	}
 	return(0);
 }
