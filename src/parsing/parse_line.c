@@ -102,7 +102,7 @@ int tokenizer(t_main_data *data)
 					// Create with previous_char_type
 					tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
 					if (tok_type == TOKEN_HEREDOC || tok_type == TOKEN_AND_AND || tok_type == TOKEN_OR || tok_type == TOKEN_APPEND)
-						data->tok->pos += 2;
+						data->tok->pos++;
 					create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
 					data->tok->prev_pos = data->tok->pos;
 				}
