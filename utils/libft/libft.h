@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42luxembourg    +#+  +:+       +#+        */
+/*   By: albertadeikalam <albertadeikalam@studen    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/07/20 18:35:15 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/08/07 15:51:30 by albertadeik      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ int					ft_isalpha(int c);
 int					ft_isdigit(int c);
 int					ft_isalnum(int c);
 int					ft_isascii(int c);
+int					ft_isspace(char *str);
 // Checks if the character is printable
 int					ft_isprint(int c);
 

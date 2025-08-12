@@ -1,212 +1,130 @@
 #include "../../minishell.h"
 
-t_tokenizer *tokenizer_initializer(char *input)
+// Determine if the word is a command, argument, filename etc...
+// It will be done according to the previous tokens created.
+t_token_type get_word_type(t_main_data *data)
 {
-    t_tokenizer *tok = malloc(sizeof(t_tokenizer));
-    tok->input = ft_strdup(input);
-    tok->pos = 0;
-    tok->length = ft_strlen(input);
-    return(tok);
+	t_token_type prev_type;
+
+	// It's the first node, then COMMAND
+	if (data->tok->last_token->prev_token == NULL)
+		return (TOKEN_CMD);
+	prev_type = data->tok->last_token->prev_token->type;
+	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN || prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
+		return (TOKEN_FILE);
+	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR)
+		return (TOKEN_CMD);
+	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_SPARAM || prev_type == TOKEN_ARGUMENT)
+		return (TOKEN_ARGUMENT);
+	else
+		return(TOKEN_ERROR);
 }
 
-t_token *checktoken(t_tokenizer *tok)
+int create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-    if (!tok || !tok->input)
-        return(0);
-    return(t_token *)1;
+	t_token *lst;
+
+	if (type == TOKEN_SPACE)
+		return (0);
+	lst = add_to_list(data, data->tok->last_token, start, end);
+	if(!lst)
+		return(1);
+	if (type == TOKEN_TEXT)
+		type = get_word_type(data);
+	lst->type = type;
+	return(0);
 }
 
-
-void ft_skipspace(t_tokenizer *tok)
+t_char_type get_char_type(char c)
 {
-    while (tok->pos < tok->length && ft_isspace(tok->input[tok->pos]))
-        tok->pos++;
+	if (c == '\0')
+		return (CHAR_NULL);
+	else if (c == ' ')
+		return (CHAR_SPACE);
+	else if (c == '|' || c == '&' || c == '<' || c == '>' || c == '(' || c == ')' || c == '$')
+		return (CHAR_OPERATOR);
+	else if (c == '\'')
+		return (CHAR_QUOTE_SINGLE);
+	else if (c == '"')
+		return (CHAR_QUOTE_DOUBLE);
+	return (CHAR_TEXT);
 }
 
-t_token *token_and_or(t_tokenizer *tok)
+t_token_type get_tok_type(char c, char next)
 {
-    char c;
-    
-    if (!checktoken(tok))
-        return(0);
-    t_token *token = malloc(sizeof(t_token));
-    c = tok->input[tok->pos];
-    if(c == '&' && tok->pos +1 < tok->length && tok->input[tok->pos + 1] == '&')
-    {
-        token->type = TOKEN_AND;
-        token->value = ft_strdup("&&");
-        tok->pos += 2;
-        return(token);
-    }
-    if(c == '|' && tok->pos +1 < tok->length && tok->input[tok->pos + 1] == '|')
-    {
-        token->type = TOKEN_OR;
-        token->value = ft_strdup("||");
-        tok->pos += 2;
-        return(token);
-    }
-    return(0);
+	if (c == '\0')
+		return (TOKEN_NULL);
+	else if (c == '&' && next == '&')
+		return (TOKEN_AND_AND);
+	else if (c == '|' && next == '|')
+		return (TOKEN_OR);
+	else if (c == '<' && next == '<')
+		return (TOKEN_HEREDOC);
+	else if (c == '>' && next == '>')
+		return (TOKEN_APPEND);
+	else if (c == '$')
+		return (TOKEN_SPARAM);
+	else if (c == '&')
+		return (TOKEN_AND);
+	else if (c == '|')
+		return (TOKEN_PIPE);
+	else if (c == '<')
+		return (TOKEN_REDIRECT_IN);
+	else if (c == '>')
+		return (TOKEN_REDIRECT_OUT);
+	else if (c == '(')
+		return (TOKEN_LPAREN);
+	else if (c == ')')
+		return (TOKEN_RPAREN);
+	else if (c == ' ')
+		return (TOKEN_SPACE);
+	return (TOKEN_TEXT);
 }
 
-t_token *token_append_heredoc(t_tokenizer *tok)
+int tokenizer(t_main_data *data)
 {
-    char c;
-    
-    if (!checktoken(tok))
-        return(0);
-    t_token *token = malloc(sizeof(t_token));
-    c = tok->input[tok->pos];
-    if(c == '<' && tok->pos +1 < tok->length && tok->input[tok->pos + 1] == '<')
-    {
-        token->type = TOKEN_HEREDOC;
-        token->value = ft_strdup("<<");
-        tok->pos += 2;
-        return(token);
-    }
-    if(c == '>' && tok->pos +1 < tok->length && tok->input[tok->pos + 1] == '>')
-    {
-        token->type = TOKEN_APPEND;
-        token->value = ft_strdup(">>");
-        tok->pos += 2;
-        return(token);
-    }
-    return(0);
+	t_token_type tok_type;
+
+	tok_type = TOKEN_NULL;
+	while (data->tok->pos < data->tok->length)
+	{
+		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+		// Handle the quote system.
+		// if (data->tok->curr_char_type == CHAR_QUOTE_DOUBLE)
+		// else if (data->tok->curr_char_type == CHAR_QUOTE_SINGLE)
+		// Normal behavior, also be careful of the $
+		if (data->tok->quote_state == QUOTE_NONE)
+		{
+			if (data->tok->curr_char_type != data->tok->prev_char_type)
+			{
+				if (data->tok->prev_char_type != CHAR_SPACE)
+				{
+					// Create with previous_char_type
+					tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+					create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+				}
+				data->tok->prev_pos = data->tok->pos;
+			}
+		}
+		data->tok->prev_char_type = data->tok->curr_char_type;
+		data->tok->pos++;
+	}
+	// Handle the final token if needed
+	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+	{
+		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+	}
+	return(0);
 }
 
-t_token *token_pipe(t_tokenizer *tok)
+// Parse the input.
+// Tokenize it, then create a binary tree.
+int parser(t_main_data *data)
 {
-    char c;
-    
-    if (!checktoken(tok))
-        return(0);
-    t_token *token = malloc(sizeof(t_token));
-    c = tok->input[tok->pos];
-    if(c == '|')
-    {
-        token->type = TOKEN_PIPE;
-        token->value = ft_strdup("|");
-        tok->pos += 1;
-        return(token);
-    }
-    return(0);
-}
-
-t_token *token_redirect_io(t_tokenizer *tok)
-{
-    char c;
-    
-    if (!checktoken(tok))
-        return(0);
-    t_token *token = malloc(sizeof(t_token));
-    c = tok->input[tok->pos];
-    if(c == '<')
-    {
-        token->type = TOKEN_REDIRECT_IN;
-        token->value = ft_strdup("<");
-        tok->pos += 1;
-        return(token);
-    }
-    if(c == '>')
-    {
-        token->type = TOKEN_REDIRECT_OUT;
-        token->value = ft_strdup(">");
-        tok->pos += 1;
-        return(token);
-    }
-    return(0);
-}
-
-t_token *token_quote(t_tokenizer *tok)
-{
-    char c;
-    char q;
-    int start;
-    int len;
-    
-    if (!checktoken(tok))
-        return(0);
-    t_token *token = malloc(sizeof(t_token));
-    c = tok->input[tok->pos];
-    if (c == '"')
-    {
-        q = c;
-        tok->pos++;
-        start = tok->pos;
-        while (tok->pos < tok->length && tok->input[tok->pos] != q)
-            tok->pos++;
-        if (tok->pos >= tok->length)
-        {
-            ft_printf(stderr, "Error: Unmatched quote\n");
-            free(token);
-            return(0);
-        }
-        len = tok->pos - start;
-        token->type = TOKEN_WORD;
-        token->value = malloc(len + 1);
-        ft_strncpy(token->value, &tok->input[start], len);
-        token->value[len] = '\0';
-        tok->pos++;
-        return(token);
-    }
-    free(token);
-    return(0);
-}
-
-t_token *token_word(t_tokenizer *tok)
-{
-    int start;
-    int len;
-    t_token *token;
-    
-    if (!checktoken(tok))
-        return(0);
-    start = tok->pos;
-    while (tok->pos < tok->length && 
-           !ft_isspace(tok->input[tok->pos]) &&
-           tok->input[tok->pos] != '|' &&
-           tok->input[tok->pos] != '<' &&
-           tok->input[tok->pos] != '>' &&
-           tok->input[tok->pos] != '&' &&
-           tok->input[tok->pos] != '"')
-        tok->pos++;
-    len = tok->pos - start;
-    if (len == 0)
-        return(0);
-    token = malloc(sizeof(t_token));
-    token->type = TOKEN_WORD;
-    token->value = malloc(len + 1);
-    ft_strncpy(token->value, &tok->input[start], len);
-    token->value[len] = '\0';
-    return(token);
-}
-
-t_token *get_next_token(t_tokenizer *tok)
-{
-    t_token *token;
-    
-    if (!tok || tok->pos >= tok->length)
-        return(NULL);
-    ft_skipspace(tok);
-    if (tok->pos >= tok->length)
-        return(NULL);
-    token = token_and_or(tok);
-    if (token)
-        return(token);
-    token = token_append_heredoc(tok);
-    if (token)
-        return(token);
-    token = token_pipe(tok);
-    if (token)
-        return(token);
-    token = token_redirect_io(tok);
-    if (token)
-        return(token);
-    token = token_quote(tok);
-    if (token)
-        return(token);
-    token = token_word(tok);
-    if (token)
-        return(token);
-    tok->pos++;
-    return(get_next_token(tok));
+	if (tokenizer(data))
+		return (1);
+	// if (build_tree(data))
+		// return (1);
+	return (0);
 }
