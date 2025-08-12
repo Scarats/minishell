@@ -1,28 +1,5 @@
 #include "minishell.h"
 
-/* int init(t_main_data *data)
-{
-	ft_memset(data, 0, sizeof(data));
-	data->input = "This is a test";
-	data->tok->quote_state = QUOTE_NONE;
-	data->tok->length = ft_strlen(data->tok->input);
-}
-
-int main()
-{
-	t_main_data data;
-	t_token curr;
-
-	init(&data);
-	traverse_tree(data.node, &data);
-	while (data.tok->token_list->next_token != NULL)
-	{
-		printf();
-	}
-	return(0);
-} */
-
-
 int init(t_main_data *data)
 {
     // Allocate memory for the token structure
@@ -30,16 +7,8 @@ int init(t_main_data *data)
     if (!data->tok)
         return (1);
     
-    data->malloc_list = malloc(sizeof(t_token));
-    if (!data->malloc_list)
-    {
-        free(data->tok);
-        return (1);
-    }
-    
     // Initialize values
     ft_memset(data->tok, 0, sizeof(t_tokenizer));
-    ft_memset(data->malloc_list, 0, sizeof(t_token));
     
     // Set input string
     data->tok->input = "echo hello | grep h > output.txt && ls -la";
@@ -50,9 +19,11 @@ int init(t_main_data *data)
     data->tok->token_list = NULL;
     data->tok->last_token = NULL;
     data->tok->token_list_size = 0;
-    data->tok->prev_char_type = CHAR_SPACE;
     
-    // Initialize previous character type to avoid initial issues
+    // Initialize other data fields
+    data->node = NULL;
+    data->malloc_list = NULL;
+    data->error = 0;
     
     return (0);
 }
@@ -80,10 +51,29 @@ void print_token_type(t_token_type type)
         case TOKEN_CMD: type_str = "CMD"; break;
         case TOKEN_ARGUMENT: type_str = "ARGUMENT"; break;
         case TOKEN_FILE: type_str = "FILE"; break;
+        case TOKEN_ERROR: type_str = "ERROR"; break;
         default: type_str = "UNKNOWN"; break;
     }
     
     printf("%-12s", type_str);
+}
+
+void cleanup_tokens(t_main_data *data)
+{
+    t_token *current = data->tok->token_list;
+    t_token *next;
+    
+    while (current)
+    {
+        next = current->next_token;
+        if (current->word)
+            free(current->word);
+        free(current);
+        current = next;
+    }
+    
+    if (data->tok)
+        free(data->tok);
 }
 
 int main()
@@ -92,9 +82,11 @@ int main()
     t_token *current;
     int token_count = 0;
     
+    printf("=== MINISHELL TOKENIZER TEST ===\n\n");
+    
     if (init(&data) != 0)
     {
-        printf("Initialization failed.\n");
+        printf("❌ Initialization failed.\n");
         return (1);
     }
     
@@ -103,7 +95,16 @@ int main()
     // Parse input into tokens
     if (parser(&data) != 0)
     {
-        printf("Parsing failed.\n");
+        printf("❌ Parsing failed.\n");
+        cleanup_tokens(&data);
+        return (1);
+    }
+    
+    // Check if we have any tokens
+    if (!data.tok->token_list)
+    {
+        printf("❌ No tokens were created!\n");
+        cleanup_tokens(&data);
         return (1);
     }
     
@@ -117,21 +118,14 @@ int main()
     {
         printf("%-4d | ", ++token_count);
         print_token_type(current->type);
-        printf(" | \"%s\"\n", current->word);
+        printf(" | \"%s\"\n", current->word ? current->word : "(null)");
         current = current->next_token;
     }
     
     printf("\nTotal tokens: %d\n", token_count);
     
-    // If you have a tree structure, traverse and print it
-    if (data.node)
-    {
-        printf("\nTree traversal:\n");
-        //traverse_tree(data.node, &data);
-    }
-    
-    // Free memory - implement your cleanup function
-    // cleanup_memory(&data);
+    // Clean up memory
+    cleanup_tokens(&data);
     
     return (0);
 }
