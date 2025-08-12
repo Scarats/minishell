@@ -52,7 +52,6 @@ int init(t_main_data *data)
     data->tok->token_list_size = 0;
     
     // Initialize previous character type to avoid initial issues
-    data->tok->prev_char_type = CHAR_SPACE;
     
     return (0);
 }

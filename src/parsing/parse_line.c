@@ -81,6 +81,8 @@ t_token_type get_tok_type(char c, char next)
 
 int tokenizer(t_main_data *data)
 {
+	t_tok_type tok_type;
+
 	while (data->tok->pos < data->tok->length)
 	{
 		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
@@ -95,10 +97,9 @@ int tokenizer(t_main_data *data)
 				if (data->tok->prev_char_type != CHAR_SPACE)
 				{
 					// Create with previous_char_type
-					create_token(data, data->tok->prev_pos, data->tok->pos,
-								 get_tok_type(data->tok->input[data->tok->pos],
-											  check_next_char(data->tok->input,
-															  data->tok->pos)));
+					tok_type = get_tok_type(data->tok->input[data->tok->pos], check_next_char(data->tok->input, data->tok->pos));
+					if (tok_type == TOKEN_HER)
+					create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
 					data->tok->prev_pos = data->tok->pos;
 				}
 			}
