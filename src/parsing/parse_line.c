@@ -9,12 +9,12 @@ t_token_type get_word_type(t_main_data *data)
 	// It's the first node, then COMMAND
 	if (data->tok->last_token->prev_token == NULL)
 		return (TOKEN_CMD);
-	prev_type = data->tok->last_token->type;
+	prev_type = data->tok->last_token->prev_token->type;
 	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN || prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
 		return (TOKEN_FILE);
 	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR)
 		return (TOKEN_CMD);
-	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_SPARAM)
+	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_SPARAM || prev_type == TOKEN_ARGUMENT)
 		return (TOKEN_ARGUMENT);
 	else
 		return(TOKEN_ERROR);
