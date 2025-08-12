@@ -12,10 +12,12 @@ t_token_type get_word_type(t_main_data *data)
 	prev_type = data->tok->last_token->prev_token->type;
 	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN || prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
 		return (TOKEN_FILE);
-	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR)
+	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR || prev_type == TOKEN_LPAREN || prev_type == TOKEN_RPAREN)
 		return (TOKEN_CMD);
-	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_SPARAM || prev_type == TOKEN_ARGUMENT)
+	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_ARGUMENT)
 		return (TOKEN_ARGUMENT);
+	else if (prev_type == TOKEN_DOLLAR)
+		return (TOKEN_ENV_VAR);
 	else
 		return(TOKEN_ERROR);
 }
@@ -41,12 +43,14 @@ t_char_type get_char_type(char c)
 		return (CHAR_NULL);
 	else if (c == ' ')
 		return (CHAR_SPACE);
-	else if (c == '|' || c == '&' || c == '<' || c == '>' || c == '(' || c == ')' || c == '$')
+	else if (c == '|' || c == '&' || c == '<' || c == '>' || c == '$')
 		return (CHAR_OPERATOR);
+	else if (c == '(' || c == ')')
+		return (CHAR_PARENTHESIS);
 	else if (c == '\'')
-		return (CHAR_QUOTE_SINGLE);
+		return (CHAR_SINGLE_QUOTE);
 	else if (c == '"')
-		return (CHAR_QUOTE_DOUBLE);
+		return (CHAR_DOUBLE_QUOTE);
 	return (CHAR_TEXT);
 }
 
@@ -63,7 +67,7 @@ t_token_type get_tok_type(char c, char next)
 	else if (c == '>' && next == '>')
 		return (TOKEN_APPEND);
 	else if (c == '$')
-		return (TOKEN_SPARAM);
+		return (TOKEN_DOLLAR);
 	else if (c == '&')
 		return (TOKEN_AND);
 	else if (c == '|')
@@ -83,39 +87,42 @@ t_token_type get_tok_type(char c, char next)
 
 int tokenizer(t_main_data *data)
 {
-	t_token_type tok_type;
+    t_token_type tok_type;
 
-	tok_type = TOKEN_NULL;
-	while (data->tok->pos < data->tok->length)
-	{
-		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
-		// Handle the quote system.
-		// if (data->tok->curr_char_type == CHAR_QUOTE_DOUBLE)
-		// else if (data->tok->curr_char_type == CHAR_QUOTE_SINGLE)
-		// Normal behavior, also be careful of the $
-		if (data->tok->quote_state == QUOTE_NONE)
-		{
-			if (data->tok->curr_char_type != data->tok->prev_char_type)
-			{
-				if (data->tok->prev_char_type != CHAR_SPACE)
-				{
-					// Create with previous_char_type
-					tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
-					create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-				}
-				data->tok->prev_pos = data->tok->pos;
-			}
-		}
-		data->tok->prev_char_type = data->tok->curr_char_type;
-		data->tok->pos++;
-	}
-	// Handle the final token if needed
-	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
-	{
-		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
-		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-	}
-	return(0);
+    tok_type = TOKEN_NULL;
+    while (data->tok->pos < data->tok->length)
+    {
+        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+        // Handle the quote system.
+        if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE)
+            data->tok->double_quote = !data->tok->double_quote;
+        else if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE)
+            data->tok->single_quote = !data->tok->single_quote;
+
+        if (data->tok->single_quote == 0 && data->tok->double_quote == 0)
+        {
+            // For operators, always create a token when the character type changes OR when we have consecutive operators
+            if (data->tok->curr_char_type != data->tok->prev_char_type)
+            {
+                if (data->tok->prev_char_type != CHAR_SPACE)
+                {
+                    // Create with previous_char_type
+                    tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+                    create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+                }
+                data->tok->prev_pos = data->tok->pos;
+            }
+        }
+        data->tok->prev_char_type = data->tok->curr_char_type;
+        data->tok->pos++;
+    }
+    // Handle the final token if needed
+    if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+    {
+        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+    }
+    return(0);
 }
 
 // Parse the input.

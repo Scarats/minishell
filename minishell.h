@@ -10,19 +10,20 @@
 #include <unistd.h>
 #include <string.h>
 
-typedef enum e_quote_state {
-    QUOTE_NONE,
-    QUOTE_SINGLE,
-    QUOTE_DOUBLE
-} t_quote_state;
+// typedef enum e_quote_state {
+//     QUOTE_NONE,
+//     QUOTE_SINGLE,
+//     QUOTE_DOUBLE
+// } t_quote_state;
 
 typedef enum e_char_type
 {
 	CHAR_SPACE,
 	CHAR_TEXT,
 	CHAR_OPERATOR,
-	CHAR_QUOTE_SINGLE,
-	CHAR_QUOTE_DOUBLE,
+	CHAR_PARENTHESIS,
+	CHAR_SINGLE_QUOTE,
+	CHAR_DOUBLE_QUOTE,
 	CHAR_NULL
 } t_char_type;
 
@@ -45,7 +46,8 @@ typedef enum e_token_type
 	TOKEN_RPAREN,		// )
 	TOKEN_SPACE,		// " "
 	TOKEN_NULL,			// \0
-	TOKEN_SPARAM, // $
+	TOKEN_DOLLAR, // $
+	TOKEN_ENV_VAR, //$variable
 	TOKEN_TEXT,
 	TOKEN_EOF
 } t_token_type;
@@ -125,7 +127,8 @@ typedef struct s_tokenizer
 	t_char_type curr_char_type;
 	t_char_type prev_char_type;
 
-	t_quote_state quote_state;
+	bool double_quote;
+	bool single_quote;
 
 	t_token *token_list;
 	t_token *last_token;

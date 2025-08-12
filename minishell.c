@@ -11,11 +11,11 @@ int init(t_main_data *data)
     ft_memset(data->tok, 0, sizeof(t_tokenizer));
     
     // Set input string
-    data->tok->input = "echo hello | grep h > output.txt && ls -la";
+    data->tok->input = "echo hello | grep h > output.txt && ls -la $test";
+    data->tok->input = "for file \"in\" $(find /etc -type f 2>/dev/null | head -n 10) && do echo";
     data->tok->length = ft_strlen(data->tok->input);
     data->tok->pos = 0;
     data->tok->prev_pos = 0;
-    data->tok->quote_state = QUOTE_NONE;
     data->tok->token_list = NULL;
     data->tok->last_token = NULL;
     data->tok->token_list_size = 0;
@@ -47,7 +47,8 @@ void print_token_type(t_token_type type)
         case TOKEN_HEREDOC: type_str = "HEREDOC"; break;
         case TOKEN_LPAREN: type_str = "LPAREN"; break;
         case TOKEN_RPAREN: type_str = "RPAREN"; break;
-        case TOKEN_SPARAM: type_str = "SPARAM"; break;
+        case TOKEN_DOLLAR: type_str = "DOLLAR"; break;
+        case TOKEN_ENV_VAR: type_str = "ENV_VAR"; break;
         case TOKEN_CMD: type_str = "CMD"; break;
         case TOKEN_ARGUMENT: type_str = "ARGUMENT"; break;
         case TOKEN_FILE: type_str = "FILE"; break;
