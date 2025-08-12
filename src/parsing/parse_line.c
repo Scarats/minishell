@@ -24,6 +24,8 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 {
 	t_token *lst;
 
+	if (type == TOKEN_SPACE)
+		return (0);
 	lst = add_to_list(data, data->tok->last_token, start, end);
 	if(!lst)
 		return(1);
@@ -81,7 +83,7 @@ t_token_type get_tok_type(char c, char next)
 
 int tokenizer(t_main_data *data)
 {
-	t_tok_type tok_type;
+	t_token_type tok_type;
 
 	while (data->tok->pos < data->tok->length)
 	{
@@ -98,12 +100,14 @@ int tokenizer(t_main_data *data)
 				{
 					// Create with previous_char_type
 					tok_type = get_tok_type(data->tok->input[data->tok->pos], check_next_char(data->tok->input, data->tok->pos));
-					if (tok_type == TOKEN_HER)
+					if (tok_type == TOKEN_HEREDOC || tok_type == TOKEN_AND_AND || tok_type == TOKEN_OR || tok_type == TOKEN_APPEND)
+						data->tok->pos++;
 					create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
 					data->tok->prev_pos = data->tok->pos;
 				}
 			}
 		}
+		data->tok->prev_char_type = data->tok->curr_char_type;
 		data->tok->pos++;
 	}
 	return(0);
