@@ -160,5 +160,6 @@ char check_next_char(char *str, int pos);
 t_token *add_to_list(t_main_data *data,	t_token *prev, int start, int end);
 int parser(t_main_data *data);
 int traverse_tree(t_node *node ,t_main_data *data);
+int handle_quotes(t_main_data *data);
 
 #endif

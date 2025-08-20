@@ -8,11 +8,12 @@ char check_next_char(char *str, int pos)
 		return (str[pos + 1]);
 }
 
+// Create token, add to the list, malloc.
 // if first node, set prev to NULL
-t_token *add_to_list(t_main_data *data,	t_token *prev, int start, int end)
+t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end)
 {
 	t_token *new;
-	
+
 	new = my_malloc(&data->malloc_list, sizeof(t_token));
 	if (!new)
 		return (NULL);
@@ -34,4 +35,31 @@ t_token *add_to_list(t_main_data *data,	t_token *prev, int start, int end)
 	return (new);
 }
 
-
+// Set quote flags.
+int handle_quotes(t_main_data *data)
+{
+    if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE)
+    {
+		// if (data->tok->double_quote)
+			// flag double quote
+        // Toggle quote state
+        data->tok->double_quote = !data->tok->double_quote;
+        
+        // Trick the tokenizer by treating quotes as spaces (token boundaries)
+        data->tok->curr_char_type = CHAR_SPACE;
+    }
+    else if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE)
+    {
+        // Toggle quote state
+        data->tok->single_quote = !data->tok->single_quote;
+        
+        // Trick the tokenizer by treating quotes as spaces (token boundaries)
+        data->tok->curr_char_type = CHAR_SPACE;
+    }
+    else if (data->tok->double_quote || data->tok->single_quote)
+    {
+        // When inside quotes, treat everything as text except the closing quote
+        data->tok->curr_char_type = CHAR_TEXT;
+    }
+    return (0);
+}

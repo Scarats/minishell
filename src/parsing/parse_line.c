@@ -19,9 +19,10 @@ t_token_type get_word_type(t_main_data *data)
 	else if (prev_type == TOKEN_DOLLAR)
 		return (TOKEN_ENV_VAR);
 	else
-		return(TOKEN_ERROR);
+		return (TOKEN_ERROR);
 }
 
+// Create token, add them to the list and add type.
 int create_token(t_main_data *data, int start, int end, t_token_type type)
 {
 	t_token *lst;
@@ -29,12 +30,12 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 	if (type == TOKEN_SPACE)
 		return (0);
 	lst = add_to_list(data, data->tok->last_token, start, end);
-	if(!lst)
-		return(1);
+	if (!lst)
+		return (1);
 	if (type == TOKEN_TEXT)
 		type = get_word_type(data);
 	lst->type = type;
-	return(0);
+	return (0);
 }
 
 t_char_type get_char_type(char c)
@@ -87,42 +88,35 @@ t_token_type get_tok_type(char c, char next)
 
 int tokenizer(t_main_data *data)
 {
-    t_token_type tok_type;
+	t_token_type tok_type;
 
-    tok_type = TOKEN_NULL;
-    while (data->tok->pos < data->tok->length)
-    {
-        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
-        // Handle the quote system.
-        if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE)
-            data->tok->double_quote = !data->tok->double_quote;
-        else if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE)
-            data->tok->single_quote = !data->tok->single_quote;
-
-        if (data->tok->single_quote == 0 && data->tok->double_quote == 0)
-        {
-            // For operators, always create a token when the character type changes OR when we have consecutive operators
-            if (data->tok->curr_char_type != data->tok->prev_char_type)
-            {
-                if (data->tok->prev_char_type != CHAR_SPACE)
-                {
-                    // Create with previous_char_type
-                    tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
-                    create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-                }
-                data->tok->prev_pos = data->tok->pos;
-            }
-        }
-        data->tok->prev_char_type = data->tok->curr_char_type;
-        data->tok->pos++;
-    }
-    // Handle the final token if needed
-    if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
-    {
-        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
-        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-    }
-    return(0);
+	tok_type = TOKEN_NULL;
+	while (data->tok->pos < data->tok->length)
+	{
+		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+		handle_quotes(data);
+		// For operators, always create a token when the character type changes OR when we have consecutive operators
+		if (data->tok->curr_char_type != data->tok->prev_char_type)
+		{
+			if (data->tok->prev_char_type != CHAR_SPACE)
+			{
+				// Create with previous_char_type
+				// Can be done in one line lol
+				tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+				create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+			}
+			data->tok->prev_pos = data->tok->pos;
+		}
+		data->tok->prev_char_type = data->tok->curr_char_type;
+		data->tok->pos++;
+	}
+	// Handle the final token if needed
+	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+	{
+		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+	}
+	return (0);
 }
 
 // Parse the input.
@@ -132,6 +126,6 @@ int parser(t_main_data *data)
 	if (tokenizer(data))
 		return (1);
 	// if (build_tree(data))
-		// return (1);
+	// return (1);
 	return (0);
 }

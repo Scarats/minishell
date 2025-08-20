@@ -12,7 +12,7 @@ int init(t_main_data *data)
     
     // Set input string
     data->tok->input = "echo hello | grep h > output.txt && ls -la $test";
-    data->tok->input = "for file \"in\" $(find /etc -type f 2>/dev/null | head -n 10) && do echo";
+    data->tok->input = "for file\"Hello World!\"\"test\"$(find /etc -type f 2>/dev/null | head -n 10) && do echo   ";
     data->tok->length = ft_strlen(data->tok->input);
     data->tok->pos = 0;
     data->tok->prev_pos = 0;
