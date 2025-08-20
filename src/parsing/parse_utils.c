@@ -1,5 +1,27 @@
 #include "../../minishell.h"
 
+// Removes quotes.
+char *clean_string(char *input)
+{
+	char *output;
+	int i;
+	int y;
+
+	if (!input)
+		return (NULL);
+	output = input;
+	i = 0;
+	y = 0;
+	while (input[i])
+	{
+		if (input[i] != '"' && input[i] != '\'')
+			output[y++] = input[i];
+		i++;
+	}
+	output[y] = '\0';
+	return (output);
+}
+
 char check_next_char(char *str, int pos)
 {
 	if (!str[pos] || !str[pos + 1])
@@ -38,27 +60,41 @@ t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end)
 // Set quote flags.
 int handle_quotes(t_main_data *data)
 {
+    /* If we see a quote, toggle its state.
+       Always treat quote characters and their contents as TEXT (transparent).
+       If the quote opens and it does not follow TEXT, start the token at the first
+       character inside the quote (pos + 1). */
     if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE)
     {
-		// if (data->tok->double_quote)
-			// flag double quote
-        // Toggle quote state
+        /* Toggle double-quote state */
         data->tok->double_quote = !data->tok->double_quote;
-        
-        // Trick the tokenizer by treating quotes as spaces (token boundaries)
-        data->tok->curr_char_type = CHAR_SPACE;
+
+        if (data->tok->double_quote)
+        {
+            /* Opening double-quote: if previous char wasn't text, start token inside quote */
+            if (data->tok->prev_char_type != CHAR_TEXT)
+                data->tok->prev_pos = data->tok->pos + 1;
+        }
+        /* Treat quote itself as text (no token boundary) */
+        data->tok->curr_char_type = CHAR_TEXT;
     }
     else if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE)
     {
-        // Toggle quote state
+        /* Toggle single-quote state */
         data->tok->single_quote = !data->tok->single_quote;
-        
-        // Trick the tokenizer by treating quotes as spaces (token boundaries)
-        data->tok->curr_char_type = CHAR_SPACE;
+
+        if (data->tok->single_quote)
+        {
+            /* Opening single-quote: if previous char wasn't text, start token inside quote */
+            if (data->tok->prev_char_type != CHAR_TEXT)
+                data->tok->prev_pos = data->tok->pos + 1;
+        }
+        /* Treat quote itself as text (no token boundary) */
+        data->tok->curr_char_type = CHAR_TEXT;
     }
     else if (data->tok->double_quote || data->tok->single_quote)
     {
-        // When inside quotes, treat everything as text except the closing quote
+        /* Inside quotes, treat everything as text */
         data->tok->curr_char_type = CHAR_TEXT;
     }
     return (0);

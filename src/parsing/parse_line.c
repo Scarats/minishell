@@ -35,6 +35,7 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 	if (type == TOKEN_TEXT)
 		type = get_word_type(data);
 	lst->type = type;
+	lst->word = clean_string(lst->word);
 	return (0);
 }
 
