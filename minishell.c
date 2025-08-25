@@ -22,7 +22,7 @@ int init(t_main_data *data)
     
     // Initialize other data fields
     data->node = NULL;
-    data->malloc_list = NULL;
+    data->malloc_tok = NULL;
     data->error = 0;
     
     return (0);

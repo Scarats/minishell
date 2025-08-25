@@ -126,7 +126,8 @@ int parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
-	// if (build_tree(data))
-	// return (1);
+	if (build_tree(data))
+		return (1);
+	my_free(data->malloc_tok); // Token memory can be freed.
 	return (0);
 }

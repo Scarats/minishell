@@ -134,14 +134,13 @@ typedef struct s_tokenizer
 	t_token *last_token;
 
 	int token_list_size; // Keep track of the number of tokens
-
-	t_list *malloc_tree;
 } t_tokenizer;
 
 typedef struct s_main_data
 {
 	t_node *node;
-	t_list *malloc_list;
+	t_list *malloc_tok;
+	t_list *malloc_tree;
 
 	char *input;
 	char **argv;

@@ -36,7 +36,7 @@ t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end)
 {
 	t_token *new;
 
-	new = my_malloc(&data->malloc_list, sizeof(t_token));
+	new = my_malloc(&data->malloc_tok, sizeof(t_token));
 	if (!new)
 		return (NULL);
 	if (prev == NULL)
@@ -52,7 +52,7 @@ t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end)
 	data->tok->last_token = new;
 	new->next_token = NULL;
 	new->word = ft_substr(data->tok->input, start, end - start);
-	my_addtolist(&data->malloc_list, new->word);
+	my_addtolist(&data->malloc_tok, new->word);
 	data->tok->token_list_size++;
 	return (new);
 }
