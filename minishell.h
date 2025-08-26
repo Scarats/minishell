@@ -77,7 +77,6 @@ typedef struct s_cmd
 {
 	char **tokens; // Store the command for excve().
 
-	t_token_type redirection;
 	int error; // To catch excve errors.
 } t_cmd;
 
@@ -94,6 +93,7 @@ typedef struct s_node
 	pid_t right_pid;
 
 	t_cmd *cmd;
+	t_token_type redirection;
 	t_input *input;
 	t_output *output;
 
