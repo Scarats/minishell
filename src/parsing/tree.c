@@ -24,6 +24,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 
 	i = -1;
 	cmd_toks = 0;
+	node->cmd = my_malloc(data->malloc_tree, sizeof(t_cmd));
 	while (++i < size)
 	{
 		if (tok_list[i].type == TOKEN_CMD || tok_list[i].type == TOKEN_ARGUMENT)
@@ -33,12 +34,13 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 			node->cmd->tokens = my_malloc(data->malloc_tree, sizeof(char *) * cmd_toks);
 			while (cmd_toks > 0)
 			{
-				node->cmd->tokens[cmd_toks--] = ft_strdup(&tok_list[cmd_toks].word);
-				my_addtolist(data->malloc_tree, node->cmd->tokens[cmd_toks]);
+				node->cmd->tokens[cmd_toks] = ft_strdup(tok_list[cmd_toks].word);
+				my_addtolist(data->malloc_tree, node->cmd->tokens[cmd_toks--]);
 			}
+			node->cmd->tokens[cmd_toks] = '\0';
 		}
 		if (tok_list[i].type == TOKEN_REDIRECT_IN || TOKEN_REDIRECT_OUT || TOKEN_APPEND || TOKEN_HEREDOC)
-			node->redirection = &tok_list[i].type;
+			node->redirection = tok_list[i].type;
 		else if (tok_list[i].type == TOKEN_FILE)
 			add_file(data, node, &tok_list[i]);
 	}
@@ -70,7 +72,7 @@ int find_operator(t_token *tok_list, int size)
 // create a node from it.
 // Call itself from the first token of the left part, and call itself from the first token of the right part.
 // Continue until no operator is found.
-t_node *build_tree(t_main_data *data, t_node *node, t_token *tok_list, int size)
+t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 {
 	int i;
 	char **cmd;
