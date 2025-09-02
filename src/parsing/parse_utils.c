@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "../minishell.h"
 
 // Removes quotes.
 char *clean_string(char *input)
@@ -99,3 +99,4 @@ int handle_quotes(t_main_data *data)
     }
     return (0);
 }
+

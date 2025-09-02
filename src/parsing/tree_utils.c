@@ -1,0 +1,13 @@
+#include "../minishell.h"
+
+// take token type and return node type.
+t_node_type map_token_to_node(t_token_type t)
+{
+    if (t == TOKEN_PIPE)
+        return (NODE_PIPE);
+    if (t == TOKEN_AND_AND)
+        return (NODE_AND);
+    if (t == TOKEN_OR)
+        return (NODE_OR);
+    return (NODE_COMMAND);
+}

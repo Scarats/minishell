@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "../minishell.h"
 
 // Determine if the word is a command, argument, filename etc...
 // It will be done according to the previous tokens created.

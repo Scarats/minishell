@@ -1,7 +1,7 @@
 #ifndef MINISHELL_H
 #define MINISHELL_H
 
-#include "./utils/libft/libft.h"
+#include "../utils/libft/libft.h"
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -161,5 +161,6 @@ int parser(t_main_data *data);
 int traverse_tree(t_node *node ,t_main_data *data);
 int handle_quotes(t_main_data *data);
 char *clean_string(char *input);
+t_node_type map_token_to_node(t_token_type t);
 
 #endif

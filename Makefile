@@ -1,6 +1,5 @@
-SRCS = minishell.c \
-	   src/parsing/parse_line.c \
-	   src/parsing/parse_utils.c
+SRCS = src/minishell.c \
+	   src/parsing/parse_line.c src/parsing/parse_utils.c src/parsing/tree_utils.c
 
 FLAGS = -Wall -Wextra -Werror 
 CC    = cc
