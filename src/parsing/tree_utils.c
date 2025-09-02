@@ -11,3 +11,10 @@ t_node_type map_token_to_node(t_token_type t)
         return (NODE_OR);
     return (NODE_COMMAND);
 }
+
+int add_redirection(t_token_type)
+{
+	// Check if it's the first redirection of the list.
+	// Add the new redirection to the list.
+
+}

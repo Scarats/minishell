@@ -46,7 +46,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 			node->cmd->tokens[cmd_toks] = '\0';
 		}
 		else if (tok_list[i].type == TOKEN_REDIRECT_IN || TOKEN_REDIRECT_OUT || TOKEN_APPEND || TOKEN_HEREDOC)
-			node->redirection = tok_list[i].type;
+			node->redirection = add_redirection();
 		else if (tok_list[i].type == TOKEN_FILE)
 			add_file(data, node, &tok_list[i]);
 	}

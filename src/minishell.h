@@ -73,6 +73,12 @@ typedef struct s_output
 	int fd;
 } t_output;
 
+typedef struct s_redir {
+    t_token_type type;
+    char *filename;
+    struct s_redir *next;
+} t_redir;
+
 typedef struct s_cmd
 {
 	char **tokens; // Store the command for excve().
@@ -93,7 +99,7 @@ typedef struct s_node
 	pid_t right_pid;
 
 	t_cmd *cmd;
-	t_token_type redirection;
+	t_redir *redirection;
 	t_input *input;
 	t_output *output;
 
