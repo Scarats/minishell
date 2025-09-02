@@ -54,11 +54,10 @@ t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type,
 	t_node *node;
 
 	node = my_malloc(data->malloc_tree, sizeof(t_node));
-	ft_memset(node, 0, sizeof(node));
+	ft_memset(node, 0, sizeof(t_node));
 	node->type = type;
-	if (type != NODE_COMMAND)
-		return (&node);
-	create_node_cmd(data, tok_list, node, size);
+	if (type == NODE_COMMAND && tok_list)
+		create_node_cmd(data, tok_list, node, size);
 	return (node);
 }
 
@@ -84,21 +83,16 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 	{
 		// end of recursion. add the full command to the node not only one token.
 		// each token->word to command.
-		cmd = my_malloc(data->malloc_tree, sizeof(char *) * size);
-		while (++i < size)
-			cmd[i] = ft_strdup(tok_list[i].word);
-		my_array_addtolist(data->malloc_tree, cmd);
-		node = create_node(tok_list[0].type, cmd, size);
+		node = create_node(data, tok_list, tok_list[0].type, size);
 		return (node);
 	}
 	else
 	{
 		// Create the new node in the call of each side.
-		node = create_node(tok_list[i].type, tok_list[i].word, size);
+		node = create_node(data, tok_list, tok_list[i].type, size);
 
 		node->left = build_tree(data, &tok_list[0], i);
 		node->right = build_tree(data, &tok_list[i], size - i);
-			return (1);
 		return (node);
 	}
 }
