@@ -1,5 +1,20 @@
 #include "../minishell.h"
 
+int add_cmd_argv(t_main_data *data, t_node *node, int cmd_argv, t_token *tok_list)
+{
+	int y;
+
+	y = -1;
+	node->argv_cmd = my_malloc(data->malloc_tree, sizeof(char *) * (cmd_argv + 1));
+	while (++y < cmd_argv)
+	{
+		node->argv_cmd[y] = ft_strdup(tok_list[y].word);
+		my_addtolist(data->malloc_tree, node->argv_cmd[y]);
+	}
+	node->argv_cmd[cmd_argv] = NULL;
+	return (0);
+}
+
 int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
 {
 	if (token->type != TOKEN_FILE || !curr_redir)
@@ -12,29 +27,20 @@ int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
 int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size)
 {
 	int i;
-	int y;
-	int cmd_toks;
+	int cmd_argv;
 	t_redir *curr_redir;
 
 	curr_redir = NULL;
-	cmd_toks = 0;
-	while (tok_list[cmd_toks].type == TOKEN_CMD || tok_list[cmd_toks].type == TOKEN_ARGUMENT)
-		cmd_toks++;
+	cmd_argv = 0;
+	while (tok_list[cmd_argv].type == TOKEN_CMD || tok_list[cmd_argv].type == TOKEN_ARGUMENT)
+		cmd_argv++;
+	if (cmd_argv > 0)
+		add_cmd_argv(data, node, cmd_argv, tok_list);
+	// Redirection handling
 	i = -1;
 	while (++i < size)
 	{
-		if (cmd_toks > 0)
-		{
-			y = -1;
-			node->argv_cmd = my_malloc(data->malloc_tree, sizeof(char *) * cmd_toks + 1);
-			while (++y < cmd_toks)
-			{
-				node->argv_cmd[y] = ft_strdup(tok_list[y].word);
-				my_addtolist(data->malloc_tree, node->argv_cmd[y]);
-			}
-			node->argv_cmd[cmd_toks] = NULL;
-		}
-		else if (is_redir(tok_list[i].type))
+		if (is_redir(tok_list[i].type))
 			curr_redir = add_redirection(data, node, tok_list[i].type);
 		else if (tok_list[i].type == TOKEN_FILE)
 			add_file(data, curr_redir, &tok_list[i]); // Add the file to curr_redir
@@ -60,7 +66,7 @@ t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type,
 // If none found, return (-1);
 int find_operator(t_token *tok_list, int size)
 {
-	// make 2 funcions
+	// make 2 functions
 	// pos = find_and_or())
 	// if (pos)
 	// 	return (pos);
