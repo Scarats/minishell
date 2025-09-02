@@ -3,28 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   my_malloc.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42luxembourg    +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:08:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/07/20 18:29:44 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/02 17:27:01 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-// How to use ?
-// 1. Ininitialize
-//      list = NULL;
-//      list = my_malloc(list, sizeof(t_list *));
-//
-//      or
-//
-//      list = NULL;
-//      something = my_malloc(&list, sizeof(t_list *));
-//
-// 2. Free
-//      if(list)
-//          my_free(list);
+// Same usage as malloc, but keep track of allocated memory in list.
+// memset memory.
 void	*my_malloc(t_list **list, size_t size)
 {
 	void	*ptr;
@@ -42,6 +31,7 @@ void	*my_malloc(t_list **list, size_t size)
 	return (ptr);
 }
 
+// Free the allocated memory of the list.
 void	my_free(t_list **list)
 {
 	if (list && *list)
@@ -51,6 +41,7 @@ void	my_free(t_list **list)
 	}
 }
 
+// Check if it has already been allocated and added to the list (avoid double free).
 int	check_list(t_list **list, void *data)
 {
 	t_list	*temp;
@@ -67,6 +58,7 @@ int	check_list(t_list **list, void *data)
 	return (0);
 }
 
+// Add already allocated memory to the list.
 void	my_addtolist(t_list **list, void *data)
 {
 	t_list	*temp;

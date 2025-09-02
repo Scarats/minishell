@@ -8,7 +8,7 @@ int init(t_main_data *data)
         return (1);
     
     // Initialize values
-    ft_memset(data->tok, 0, sizeof(t_tokenizer));
+    // ft_memset(data->tok, 0, sizeof(t_tokenizer));
     
     // Set input string
     data->tok->input = "echo hello | grep h > output.txt && ls -la $test";

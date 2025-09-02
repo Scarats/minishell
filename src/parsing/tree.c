@@ -1,22 +1,12 @@
 #include "../minishell.h"
 
-int add_file(t_main_data *data, t_node *node, t_token *token)
+int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
 {
-	if (token->type != TOKEN_FILE)
+	if (token->type != TOKEN_FILE || !curr_redir)
 		return (1);
-	else if (node->redirection == TOKEN_REDIRECT_OUT)
-	{
-		node->output = ft_strdup(token->word);
-		my_addtolist(data->malloc_tree, node->output);
-		return (0);
-	}
-	else if (node->redirection == TOKEN_REDIRECT_IN)
-	{
-		node->input = ft_strdup(token->word);
-		my_addtolist(data->malloc_tree, node->input);
-		return (0);
-	}
-	return (1);
+	curr_redir->filename = ft_strdup(token->word);
+	my_addtolist(data->malloc_tree, curr_redir->filename);
+	return (0);
 }
 
 int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size)
@@ -24,31 +14,30 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 	int i;
 	int y;
 	int cmd_toks;
+	t_redir *curr_redir;
 
+	curr_redir = NULL;
 	cmd_toks = 0;
 	while (tok_list[cmd_toks].type == TOKEN_CMD || tok_list[cmd_toks].type == TOKEN_ARGUMENT)
 		cmd_toks++;
-	node->cmd = my_malloc(data->malloc_tree, sizeof(t_cmd));
 	i = -1;
 	while (++i < size)
 	{
-
-		else if (cmd_toks > 0)
+		if (cmd_toks > 0)
 		{
-			y = 0;
-			node->cmd->tokens = my_malloc(data->malloc_tree, sizeof(char *) * cmd_toks);
-			while (y < cmd_toks)
+			y = -1;
+			node->argv_cmd = my_malloc(data->malloc_tree, sizeof(char *) * cmd_toks + 1);
+			while (++y < cmd_toks)
 			{
-				node->cmd->tokens[y] = ft_strdup(tok_list[y].word);
-				my_addtolist(data->malloc_tree, node->cmd->tokens[y]);
-				y++;
+				node->argv_cmd[y] = ft_strdup(tok_list[y].word);
+				my_addtolist(data->malloc_tree, node->argv_cmd[y]);
 			}
-			node->cmd->tokens[cmd_toks] = '\0';
+			node->argv_cmd[cmd_toks] = NULL;
 		}
-		else if (tok_list[i].type == TOKEN_REDIRECT_IN || TOKEN_REDIRECT_OUT || TOKEN_APPEND || TOKEN_HEREDOC)
-			node->redirection = add_redirection();
+		else if (is_redir(tok_list[i].type))
+			curr_redir = add_redirection(data, node, tok_list[i].type);
 		else if (tok_list[i].type == TOKEN_FILE)
-			add_file(data, node, &tok_list[i]);
+			add_file(data, curr_redir, &tok_list[i]); // Add the file to curr_redir
 	}
 	return (0);
 }
@@ -60,7 +49,6 @@ t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type,
 	t_node *node;
 
 	node = my_malloc(data->malloc_tree, sizeof(t_node));
-	ft_memset(node, 0, sizeof(t_node));
 	node->type = type;
 	if (type == NODE_COMMAND && tok_list)
 		create_node_cmd(data, tok_list, node, size);
@@ -95,14 +83,15 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 	{
 		// end of recursion. add the full command to the node not only one token.
 		// each token->word to command.
-		node = create_node(data, tok_list, map_tok_to_node(tok_list[0].type), size);
+		node = create_node(data, tok_list, map_tok_to_node(tok_list[0].type),
+						   size);
 		return (node);
 	}
 	else
 	{
 		// Create the new node in the call of each side.
-		node = create_node(data, tok_list, map_token_to_node(tok_list[i].type), size);
-
+		node = create_node(data, tok_list, map_token_to_node(tok_list[i].type),
+						   size);
 		node->left = build_tree(data, tok_list, i);
 		node->right = build_tree(data, tok_list + i + 1, size - (i + 1));
 		return (node);
