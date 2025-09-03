@@ -49,8 +49,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 }
 
 // While size, add token, check its type and add it to the node.
-t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type,
-					int size)
+t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type, int size)
 {
 	t_node *node;
 
@@ -89,15 +88,12 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 	{
 		// end of recursion. add the full command to the node not only one token.
 		// each token->word to command.
-		node = create_node(data, tok_list, map_tok_to_node(tok_list[0].type),
-						   size);
+		node = create_node(data, tok_list, map_tok_to_node(tok_list[0].type), size);
 		return (node);
 	}
 	else
 	{
-		// Create the new node in the call of each side.
-		node = create_node(data, tok_list, map_token_to_node(tok_list[i].type),
-						   size);
+		node = create_node(data, tok_list, map_token_to_node(tok_list[i].type), size);
 		node->left = build_tree(data, tok_list, i);
 		node->right = build_tree(data, tok_list + i + 1, size - (i + 1));
 		return (node);

@@ -14,12 +14,10 @@ t_token_type get_word_type(t_main_data *data)
 		return (TOKEN_FILE);
 	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR || prev_type == TOKEN_LPAREN || prev_type == TOKEN_RPAREN)
 		return (TOKEN_CMD);
-	else if (prev_type == TOKEN_CMD || prev_type == TOKEN_ARGUMENT)
-		return (TOKEN_ARGUMENT);
 	else if (prev_type == TOKEN_DOLLAR)
 		return (TOKEN_ENV_VAR);
 	else
-		return (TOKEN_ERROR);
+		return (TOKEN_ARGUMENT);
 }
 
 // Create token, add them to the list and add type.
@@ -126,8 +124,8 @@ int parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
-	if (build_tree(data))
-		return (1);
-	my_free(data->malloc_tok); // Token memory can be freed.
+	// if (build_tree(data))
+		// return (1);
+	// my_free(&data->malloc_tok); // Token memory can be freed.
 	return (0);
 }

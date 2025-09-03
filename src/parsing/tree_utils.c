@@ -17,6 +17,8 @@ t_node_type	map_token_to_node(t_token_type t)
 	return (NODE_COMMAND);
 }
 
+// Create new node to the list, malloc and memset it.
+// If first, initialize the list.
 t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type)
 {
 	t_redir *redirection;
