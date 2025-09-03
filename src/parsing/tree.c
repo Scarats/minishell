@@ -1,24 +1,11 @@
 #include "../minishell.h"
 
-// Add argument to the argv array (for execve)
-char *add_cmd_argv(t_list *malloc_tree, char *src)
-{
-	char *dup;
-
-	dup = ft_strdup(src);
-	if (!dup)
-		return (NULL);
-	my_addtolist(malloc_tree, dup);
-	return (dup);
-}
-
 // Add the file to the current redirection node.
 int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
 {
 	if (token->type != TOKEN_FILE || !curr_redir)
 		return (1);
-	curr_redir->filename = ft_strdup(token->word);
-	my_addtolist(data->malloc_tree, curr_redir->filename);
+	curr_redir->filename = my_strdup(data->malloc_tree, token->word);
 	return (0);
 }
 
@@ -44,12 +31,11 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 		{
 			if (i + 1 > size || !tok_list[i + 1].type == TOKEN_FILE)
 				return (1);
-			curr_redir = add_redirection(data, node, tok_list[i].type);
-			curr_redir->filename = ft_strdup
-			// add_file(data, curr_redir, &tok_list[++i]);
+			curr_redir = add_redirection(data, node, tok_list[i++].type);
+			curr_redir->filename = my_strdup(data->malloc_tree, tok_list[i].word);
 		}
 		else if ((tok_list[i].type == TOKEN_CMD || tok_list[i].type == TOKEN_ARGUMENT) && j < cmd_argc)
-			node->cmd_argv[j++] = add_cmd_argv(data->malloc_tree, tok_list[i].word);
+			node->cmd_argv[j++] = my_strdup(data->malloc_tree, tok_list[i].word);
 	}
 	return (0);
 }
