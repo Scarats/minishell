@@ -1,20 +1,18 @@
 #include "../minishell.h"
 
-int add_cmd_argv(t_main_data *data, t_node *node, int cmd_argv, t_token *tok_list)
+// Add argument to the argv array (for execve)
+char *add_cmd_argv(t_list *malloc_tree, char *src)
 {
-	int y;
+	char *dup;
 
-	y = -1;
-	node->argv_cmd = my_malloc(data->malloc_tree, sizeof(char *) * (cmd_argv + 1));
-	while (++y < cmd_argv)
-	{
-		node->argv_cmd[y] = ft_strdup(tok_list[y].word);
-		my_addtolist(data->malloc_tree, node->argv_cmd[y]);
-	}
-	node->argv_cmd[cmd_argv] = NULL;
-	return (0);
+	dup = ft_strdup(src);
+	if (!dup)
+		return (NULL);
+	my_addtolist(malloc_tree, dup);
+	return (dup);
 }
 
+// Add the file to the current redirection node.
 int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
 {
 	if (token->type != TOKEN_FILE || !curr_redir)
@@ -24,30 +22,30 @@ int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
 	return (0);
 }
 
+// Create the excve argv, add cmd and args to it, set redirections.
 int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size)
 {
 	int i;
-	int cmd_argv;
+	int j;
+	int cmd_argc;
 	t_redir *curr_redir;
 
 	curr_redir = NULL;
-	cmd_argv = 0;
-	cmd_argv = get_cmd_argv();
-	while (tok_list[cmd_argv].type == TOKEN_CMD || tok_list[cmd_argv].type == TOKEN_ARGUMENT)
-		cmd_argv++;
-	if (cmd_argv > 0)
-		// malloc here
-		// add_cmd_argv(data, node, cmd_argv, tok_list);
-	// Redirection handling
+	cmd_argc = get_cmd_argc(tok_list, size);
+
+	if (cmd_argc > 0)
+		node->cmd_argv = my_malloc(data->malloc_tree, sizeof(char *) * (cmd_argc + 1));
+
 	i = -1;
+	j = 0;
 	while (++i < size)
 	{
 		if (is_redir(tok_list[i].type))
 			curr_redir = add_redirection(data, node, tok_list[i].type);
 		else if (tok_list[i].type == TOKEN_FILE)
-			add_file(data, curr_redir, &tok_list[i]); // Add the file to curr_redir
-		else if (tok_list[cmd_argv].type == TOKEN_CMD || tok_list[cmd_argv].type == TOKEN_ARGUMENT)
-
+			add_file(data, curr_redir, &tok_list[i]);
+		else if ((tok_list[i].type == TOKEN_CMD || tok_list[i].type == TOKEN_ARGUMENT) && j < cmd_argc)
+			node->cmd_argv[j++] = add_cmd_argv(data->malloc_tree, tok_list[i].word);
 	}
 	return (0);
 }
@@ -92,7 +90,7 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 	{
 		// end of recursion. add the full command to the node not only one token.
 		// each token->word to command.
-		node = create_node(data, tok_list, map_tok_to_node(tok_list[0].type), size);
+		node = create_node(data, tok_list, map_token_to_node(tok_list[0].type), size);
 		return (node);
 	}
 	else

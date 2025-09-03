@@ -81,7 +81,7 @@ typedef struct s_node
 	pid_t left_pid;
 	pid_t right_pid;
 
-	char **argv_cmd;
+	char **cmd_argv;
 	t_redir *redirection;
 
 	int last_input_fd;
@@ -152,5 +152,6 @@ int handle_quotes(t_main_data *data);
 char *clean_string(char *input);
 t_node_type map_token_to_node(t_token_type t);
 int	is_redir(t_token_type type);
+t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type);
 
 #endif
