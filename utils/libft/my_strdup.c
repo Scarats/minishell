@@ -1,27 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strncpy.c                                       :+:      :+:    :+:   */
+/*   my_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/03 15:20:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/03 15:20:36 by tcardair         ###   ########.fr       */
+/*   Created: 2025/09/03 15:12:02 by tcardair          #+#    #+#             */
+/*   Updated: 2025/09/03 15:18:34 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_strncpy(char *dest, char *src, size_t n)
+// strdup and add the allocated memory to the list.
+char	*my_strdup(t_list *malloc_list, char *src)
 {
-	size_t	i;
+	char	*dup;
 
-	i = 0;
-	while (src[i] && i < n)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
+	dup = ft_strdup(src);
+	if (!dup)
+		return (NULL);
+	my_addtolist(malloc_list, dup);
+	return (dup);
 }

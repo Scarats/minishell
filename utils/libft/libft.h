@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: albertadeikalam <albertadeikalam@studen    +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/08/07 15:51:30 by albertadeik      ###   ########.fr       */
+/*   Updated: 2025/09/03 15:24:52 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,10 +167,12 @@ char				*ft_strstr(const char *source, const char *target);
 void				*my_malloc(t_list **list, size_t size);
 void				my_free(t_list **list);
 void				my_addtolist(t_list **list, void *data);
+char				*my_strdup(t_list *malloc_list, char *src);
 char				*get_extension(const char *source, const char *target);
 
 // Check access to a file.
-int					check_access(char *path, int r, int w, int x, int silent);
+int					check_access(char *path, int r, int w, int x);
+/*, int silent*/
 char				*find_bin(char *bin);
 // Add full array to the garbadge collector.
 void				my_array_addtolist(t_list **list, void **data);

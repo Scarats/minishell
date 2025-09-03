@@ -41,9 +41,13 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 	while (++i < size)
 	{
 		if (is_redir(tok_list[i].type))
+		{
+			if (i + 1 > size || !tok_list[i + 1].type == TOKEN_FILE)
+				return (1);
 			curr_redir = add_redirection(data, node, tok_list[i].type);
-		else if (tok_list[i].type == TOKEN_FILE)
-			add_file(data, curr_redir, &tok_list[i]);
+			curr_redir->filename = ft_strdup
+			// add_file(data, curr_redir, &tok_list[++i]);
+		}
 		else if ((tok_list[i].type == TOKEN_CMD || tok_list[i].type == TOKEN_ARGUMENT) && j < cmd_argc)
 			node->cmd_argv[j++] = add_cmd_argv(data->malloc_tree, tok_list[i].word);
 	}

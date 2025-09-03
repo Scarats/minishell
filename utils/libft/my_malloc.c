@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:08:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/02 17:27:01 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/03 15:18:54 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ void	my_free(t_list **list)
 	}
 }
 
-// Check if it has already been allocated and added to the list (avoid double free).
+// Check if it has already been allocated
+// and added to the list (avoid double free).
 int	check_list(t_list **list, void *data)
 {
 	t_list	*temp;
@@ -74,13 +75,13 @@ void	my_addtolist(t_list **list, void *data)
 // Add the ptr of the array and each element of the array to the list.
 void	my_array_addtolist(t_list **list, void **data)
 {
-	unsigned long index;
+	unsigned long	index;
 
 	if (!(list && data))
 		return ;
 	index = 0;
 	my_addtolist(list, data);
-	while(data[index])
+	while (data[index])
 	{
 		my_addtolist(list, data[index]);
 		index++;
