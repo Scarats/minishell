@@ -1,27 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   to_hexa.c                                          :+:      :+:    :+:   */
+/*   my_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/07 14:30:26 by tcardair          #+#    #+#             */
-/*   Updated: 2024/11/11 16:10:19 by tcardair         ###   ########.fr       */
+/*   Created: 2025/09/03 15:12:02 by tcardair          #+#    #+#             */
+/*   Updated: 2025/09/03 15:18:34 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "libft.h"
 
-unsigned long long	to_hexa(unsigned long long addr)
+// strdup and add the allocated memory to the list.
+char	*my_strdup(t_list *malloc_list, char *src)
 {
-	unsigned long long	count;
+	char	*dup;
 
-	count = 0;
-	if (addr >= 16)
-	{
-		count += to_hexa(addr / 16);
-	}
-	type_c(HEXA[addr % 16]);
-	count += 1;
-	return (count);
+	dup = ft_strdup(src);
+	if (!dup)
+		return (NULL);
+	my_addtolist(malloc_list, dup);
+	return (dup);
 }

@@ -21,7 +21,7 @@ SRCS	= ft_isalpha.c ft_isdigit.c ft_isalnum.c \
         ./get_next_line/get_next_line_utils.c \
 		arraylen.c ft_strcpy.c my_malloc.c get_extension.c \
 		ft_isspace.c \
-		check_access.c find_bin.c
+		check_access.c find_bin.c my_strdup.c \
 
 FLAGS	= -Wall -Wextra -Werror 
 
