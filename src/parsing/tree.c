@@ -1,14 +1,5 @@
 #include "../minishell.h"
 
-// Add the file to the current redirection node.
-int add_file(t_main_data *data, t_redir *curr_redir, t_token *token)
-{
-	if (token->type != TOKEN_FILE || !curr_redir)
-		return (1);
-	curr_redir->filename = my_strdup(data->malloc_tree, token->word);
-	return (0);
-}
-
 // Create the excve argv, add cmd and args to it, set redirections.
 int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size)
 {
@@ -29,7 +20,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 	{
 		if (is_redir(tok_list[i].type))
 		{
-			if (i + 1 > size || !tok_list[i + 1].type == TOKEN_FILE)
+			if (i + 1 >= size || tok_list[i + 1].type != TOKEN_FILE)
 				return (1);
 			curr_redir = add_redirection(data, node, tok_list[i++].type);
 			curr_redir->filename = my_strdup(data->malloc_tree, tok_list[i].word);
