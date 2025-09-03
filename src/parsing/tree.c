@@ -32,10 +32,12 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 
 	curr_redir = NULL;
 	cmd_argv = 0;
+	cmd_argv = get_cmd_argv();
 	while (tok_list[cmd_argv].type == TOKEN_CMD || tok_list[cmd_argv].type == TOKEN_ARGUMENT)
 		cmd_argv++;
 	if (cmd_argv > 0)
-		add_cmd_argv(data, node, cmd_argv, tok_list);
+		// malloc here
+		// add_cmd_argv(data, node, cmd_argv, tok_list);
 	// Redirection handling
 	i = -1;
 	while (++i < size)
@@ -44,6 +46,8 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 			curr_redir = add_redirection(data, node, tok_list[i].type);
 		else if (tok_list[i].type == TOKEN_FILE)
 			add_file(data, curr_redir, &tok_list[i]); // Add the file to curr_redir
+		else if (tok_list[cmd_argv].type == TOKEN_CMD || tok_list[cmd_argv].type == TOKEN_ARGUMENT)
+
 	}
 	return (0);
 }
