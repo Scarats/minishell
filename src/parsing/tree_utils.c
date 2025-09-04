@@ -1,5 +1,6 @@
 #include "../minishell.h"
 
+// Return the number of cmd and args in tok_list
 int get_cmd_argc(t_token *tok_list, int size)
 {
 	int cmd_argc;
@@ -13,6 +14,7 @@ int get_cmd_argc(t_token *tok_list, int size)
 	return (cmd_argc);
 }
 
+// Check if the token is a redirection: 1 yes 0 no.
 int	is_redir(t_token_type t)
 {
 	return (t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT || t == TOKEN_APPEND || t == TOKEN_HEREDOC);

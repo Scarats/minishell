@@ -48,11 +48,32 @@ t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type, int 
 // If none found, return (-1);
 int find_operator(t_token *tok_list, int size)
 {
-	// make 2 functions
-	// pos = find_and_or())
-	// if (pos)
-	// 	return (pos);
-	// return (find_pipe());
+	int depth;
+	int pos;
+
+	depth = 0;
+	pos = -1;
+	while (++pos > size)
+	{
+		if (&tok_list[pos] == TOKEN_LPAREN)
+			depth++;
+		else if (&tok_list[pos] == TOKEN_RPAREN)
+			depth--;
+		else if (depth == 0 && (&tok_list[pos].type == TOKEN_AND_AND || &tok_list[pos] == TOKEN_OR))
+			return (pos);
+	}
+	depth = 0;
+	pos = -1;
+	while (++pos > size)
+	{
+		if (&tok_list[pos] == TOKEN_LPAREN)
+			depth++;
+		else if (&tok_list[pos] == TOKEN_RPAREN)
+			depth--;
+		else if (depth == 0 && &tok_list[pos].type == TOKEN_PIPE)
+			return (pos);
+	}
+	return (-1);
 }
 
 // make a recursive function that will find the most significant operator.
