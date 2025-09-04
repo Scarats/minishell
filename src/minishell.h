@@ -72,10 +72,10 @@ typedef struct s_redir
 typedef struct s_node
 {
 	t_node_type type;
+	bool subshell;
 
 	struct s_node *left;
 	struct s_node *right;
-	// struct s_node *parent; // Might be useless, let's see later.
 
 	int pipefd[2];
 	pid_t left_pid;
