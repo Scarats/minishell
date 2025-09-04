@@ -1,5 +1,57 @@
 #include "../minishell.h"
 
+// Check for (a)(b), (((a) && b errors.
+int check_paren_error(t_token *tok_list, int size)
+{
+	int i;
+	int depth;
+	bool left;
+	bool right;
+
+	left = false;
+	right = false;
+	depth = 0;
+	while (++i < size)
+	{
+		if (tok_list[i].type == TOKEN_LPAREN)
+		{
+			depth++;
+			if (i != 0 && (tok_list[i - 1].type == TOKEN_AND_AND || tok_list[i - 1].type == TOKEN_OR))
+				left = !left;
+		}			
+	}
+
+
+	if (depth != 0)
+		return (1); // Error.
+}
+
+// Check all the tokens are in parenthesis (tokens).
+int wrapped_in_parren(t_token *tok_list, int size)
+{
+	int i;
+	int depth;
+
+	i = -1;
+	depth = 0;
+	if (size < 2 || !tok_list[0].type == TOKEN_LPAREN || !tok_list[size - 1].type == TOKEN_RPAREN) 
+		return (0);
+	// What happens if size == 2 and it's just () ?
+	if (size == 2)
+		return (-1);
+	while (++i < size - 1)
+	{
+		if (tok_list[i].type == TOKEN_LPAREN)
+			depth++;
+		else if (tok_list[i].type == TOKEN_RPAREN)
+			depth--;
+		if (depth == 0 && i != size - 2)
+			return (0);
+	}
+	return (depth == 1); // Depth should be at 1 since we stopped before the last one.
+}
+
+
 // Return the number of cmd and args in tok_list
 int get_cmd_argc(t_token *tok_list, int size)
 {

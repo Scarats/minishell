@@ -89,9 +89,9 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 	cmd = NULL;
 	node = NULL;
 	
-	if (size <= 0 || !tok_list)
-		return (NULL);
-	else if (size >= 2 && tok_list[0].type == TOKEN_LPAREN && tok_list[size - 1].type == TOKEN_RPAREN)
+	if (size <= 0 || !tok_list || check_paren_error(tok_list, size)) // (a)(b), (((((a) && b are errors
+		return (NULL); // Error.
+	else if (wrapped_in_paren(tok_list, size))
 		return (build_tree(data, tok_list + 1, size - 2));
 	i = find_operator(tok_list, size);
 	if (i < 0)
