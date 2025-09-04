@@ -3,13 +3,16 @@
 // Return the number of cmd and args in tok_list
 int get_cmd_argc(t_token *tok_list, int size)
 {
+	int i;
 	int cmd_argc;
 
+	i = 0;
 	cmd_argc = 0;
-	while (size--)
+	while (i < size)
 	{
-		if (tok_list[size].type == TOKEN_CMD || tok_list[size].type == TOKEN_ARGUMENT)
+		if (tok_list[i].type == TOKEN_CMD || tok_list[i].type == TOKEN_ARGUMENT)
 			cmd_argc++;
+		i++;
 	}
 	return (cmd_argc);
 }

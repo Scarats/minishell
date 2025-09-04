@@ -55,22 +55,22 @@ int find_operator(t_token *tok_list, int size)
 	pos = -1;
 	while (++pos < size)
 	{
-		if (&tok_list[pos] == TOKEN_LPAREN)
+		if (tok_list[pos].type == TOKEN_LPAREN)
 			depth++;
-		else if (&tok_list[pos] == TOKEN_RPAREN)
+		else if (tok_list[pos].type == TOKEN_RPAREN)
 			depth--;
-		else if (depth == 0 && (&tok_list[pos].type == TOKEN_AND_AND || &tok_list[pos] == TOKEN_OR))
+		else if (depth == 0 && (tok_list[pos].type == TOKEN_AND_AND || tok_list[pos].type == TOKEN_OR))
 			return (pos);
 	}
 	depth = 0;
 	pos = -1;
 	while (++pos < size)
 	{
-		if (&tok_list[pos] == TOKEN_LPAREN)
+		if (tok_list[pos].type == TOKEN_LPAREN)
 			depth++;
-		else if (&tok_list[pos] == TOKEN_RPAREN)
+		else if (tok_list[pos].type == TOKEN_RPAREN)
 			depth--;
-		else if (depth == 0 && &tok_list[pos].type == TOKEN_PIPE)
+		else if (depth == 0 && tok_list[pos].type == TOKEN_PIPE)
 			return (pos);
 	}
 	return (-1);
@@ -87,17 +87,23 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size)
 	t_node *node;
 
 	cmd = NULL;
+	node = NULL;
+	
+	if (size <= 0 || !tok_list)
+		return (NULL);
+	else if (size >= 2 && tok_list[0].type == TOKEN_LPAREN && tok_list[size - 1].type == TOKEN_RPAREN)
+		return (build_tree(data, tok_list + 1, size - 2));
 	i = find_operator(tok_list, size);
 	if (i < 0)
 	{
 		// end of recursion. add the full command to the node not only one token.
 		// each token->word to command.
-		node = create_node(data, tok_list, map_token_to_node(tok_list[0].type), size);
+		node = create_node(data, tok_list, map_token_to_node(tok_list[0].type), size); // Could pass node command directly.
 		return (node);
 	}
 	else
 	{
-		node = create_node(data, tok_list, map_token_to_node(tok_list[i].type), size);
+		node = create_node(data, NULL, map_token_to_node(tok_list[i].type), 0);
 		node->left = build_tree(data, tok_list, i);
 		node->right = build_tree(data, tok_list + i + 1, size - (i + 1));
 		return (node);
