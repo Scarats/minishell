@@ -53,7 +53,7 @@ int find_operator(t_token *tok_list, int size)
 
 	depth = 0;
 	pos = -1;
-	while (++pos > size)
+	while (++pos < size)
 	{
 		if (&tok_list[pos] == TOKEN_LPAREN)
 			depth++;
@@ -64,7 +64,7 @@ int find_operator(t_token *tok_list, int size)
 	}
 	depth = 0;
 	pos = -1;
-	while (++pos > size)
+	while (++pos < size)
 	{
 		if (&tok_list[pos] == TOKEN_LPAREN)
 			depth++;
