@@ -1,5 +1,35 @@
 #include "../minishell.h"
 
+int	is_operator(t_token_type t)
+{
+    return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR
+        || t == TOKEN_AND);
+}
+
+int	is_word_token(t_token_type t)
+{
+    return (t == TOKEN_CMD || t == TOKEN_ARGUMENT || t == TOKEN_FILE
+        || t == TOKEN_ENV_VAR || t == TOKEN_TEXT);
+}
+
+// Check the conditions of what comes before and after '('
+// returns 1 for error and 0 for no error.
+int check_left_par()
+{
+	// Next token can be:
+	// '(' , or a word token
+
+}
+
+// Check the conditions of what comes before and after ')'
+// returns 1 for error and 0 for no error.
+int check_right_par()
+{
+	// Previous token cannot be an operator.
+	// Can be a word or ')'
+
+}
+
 // Check for (a)(b), (((a) && b errors.
 int check_paren_error(t_token *tok_list, int size)
 {
@@ -10,15 +40,21 @@ int check_paren_error(t_token *tok_list, int size)
 
 	left = false;
 	right = false;
+	i = -1;
 	depth = 0;
 	while (++i < size)
 	{
-		if (tok_list[i].type == TOKEN_LPAREN)
+		if (depth < 0)
+			return (1);
+		else if (tok_list[i - 1].type == TOKEN_LPAREN && tok_list[i].type == TOKEN_RPAREN)
+			return (1); // Syntax error.
+		else if (tok_list[i].type == TOKEN_LPAREN && !check_left_par())
 		{
 			depth++;
 			if (i != 0 && (tok_list[i - 1].type == TOKEN_AND_AND || tok_list[i - 1].type == TOKEN_OR))
 				left = !left;
-		}			
+		}
+		else if (tok_list[i].type == TOKEN_RPAREN && !check_right_par())
 	}
 
 
