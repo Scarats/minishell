@@ -77,13 +77,13 @@ int check_paren_error(t_token *tok_list, int size)
 			return (1);
 		else if (tok_list[i].type == TOKEN_LPAREN)
 		{
-			if (check_left_par(&tok_list, i, size))
+			if (check_left_par(tok_list, i, size))
 				return (1);
 			depth++;
 		}
 		else if (tok_list[i].type == TOKEN_RPAREN)
 		{
-			if (check_right_par(&tok_list, i, size))
+			if (check_right_par(tok_list, i, size))
 				return (1);
 			depth--;
 		}
@@ -94,7 +94,7 @@ int check_paren_error(t_token *tok_list, int size)
 }
 
 // Check all the tokens are in parenthesis (tokens).
-int wrapped_in_parren(t_token *tok_list, int size)
+int wrapped_in_paren(t_token *tok_list, int size)
 {
 	int i;
 	int depth;
@@ -157,7 +157,7 @@ t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type)
 	t_redir *redirection;
 	t_redir *last;
 
-	redirection = my_malloc(data->malloc_tree, sizeof(t_redir));
+	redirection = my_malloc(&data->malloc_tree, sizeof(t_redir));
 	if (!node->redirection)
 		node->redirection = redirection;
 	else

@@ -12,7 +12,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_list, t_node *node, int size
 	cmd_argc = get_cmd_argc(tok_list, size);
 
 	if (cmd_argc > 0)
-		node->cmd_argv = my_malloc(data->malloc_tree, sizeof(char *) * (cmd_argc + 1));
+		node->cmd_argv = my_malloc(&data->malloc_tree, sizeof(char *) * (cmd_argc + 1));
 
 	i = -1;
 	j = 0;
@@ -36,7 +36,7 @@ t_node *create_node(t_main_data *data, t_token *tok_list, t_node_type type, int 
 {
 	t_node *node;
 
-	node = my_malloc(data->malloc_tree, sizeof(t_node));
+	node = my_malloc(&data->malloc_tree, sizeof(t_node));
 	node->type = type;
 	if (type == NODE_COMMAND && tok_list)
 		create_node_cmd(data, tok_list, node, size);

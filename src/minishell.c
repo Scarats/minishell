@@ -13,6 +13,7 @@ int init(t_main_data *data)
     data->tok->single_quote = false;
     data->node = NULL;
     data->malloc_tok = NULL;
+    data->malloc_tree = NULL;
     data->error = 0;
     return (0);
 }
