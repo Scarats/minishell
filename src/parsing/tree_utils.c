@@ -20,10 +20,11 @@ int	is_word_token(t_token_type t)
 
 // Check the conditions of what comes before and after '('
 // returns 1 for error and 0 for no error.
-// Prev token can be an operator or ).
+// Prev token can be an operator or (.
 int check_left_par(t_token *tok_list, int index, int size)
 {
 	t_token_type prev;
+
 	if (index > 0)
     {
 		prev = tok_list[index - 1].type;
@@ -32,7 +33,7 @@ int check_left_par(t_token *tok_list, int index, int size)
     }
     if (index + 1 >= size)
         return (1);
-    if (!is_word_token(tok_list[index + 1].type) && tok_list[index + 1].type != TOKEN_LPAREN)
+	else if (!is_word_token(tok_list[index + 1].type) && tok_list[index + 1].type != TOKEN_LPAREN)
         return (1);
     return (0);
 }
@@ -43,15 +44,20 @@ int check_left_par(t_token *tok_list, int index, int size)
 int check_right_par(t_token *tok_list, int index, int size)
 {
 	t_token_type prev;
-	if (index > 0)
+
+	if (index == 0)
+		return (1); // Cannot start with )
+	else if (index > 0)
     {
 		// Previous token word or )
 		prev = tok_list[index - 1].type;
-		if (!is_word_token(&tok_list[-1].type) && tok_list[-1].type != TOKEN_RPAREN)
+		if (!is_word_token(prev) && prev != TOKEN_RPAREN)
 			return (1);
 	}
-	// Next token operator or ) or end-of-input
-	else if (!is_and_or(&tok_list[1].type) && tok_list[1].type != TOKEN_RPAREN || index == size)
+	if (index + 1 >= size)
+		return (0); // end-of-input after ')'
+    // Next token operator or ) or end-of-input
+	if (!is_and_or(tok_list[index + 1].type) && tok_list[index + 1].type != TOKEN_RPAREN)
 		return (1);
 	return (0);
 
@@ -62,32 +68,27 @@ int check_paren_error(t_token *tok_list, int size)
 {
 	int i;
 	int depth;
-	bool left;
-	bool right;
 
-	left = false;
-	right = false;
 	i = -1;
 	depth = 0;
 	while (++i < size)
 	{
 		if (depth < 0)
 			return (1);
-		else if (tok_list[i].type == TOKEN_LPAREN && !check_left_par(tok_list[i].type, i, size)) // Check that is's not the last char
+		else if (tok_list[i].type == TOKEN_LPAREN)
 		{
+			if (check_left_par(&tok_list, i, size))
+				return (1);
 			depth++;
-			if (i != 0 && (tok_list[i - 1].type == TOKEN_AND_AND || tok_list[i - 1].type == TOKEN_OR))
-				left = !left;
 		}
-		// Check last param
-		else if (tok_list[i].type == TOKEN_RPAREN && !check_right_par(tok_list[i].type, i, size))
+		else if (tok_list[i].type == TOKEN_RPAREN)
 		{
+			if (check_right_par(&tok_list, i, size))
+				return (1);
 			depth--;
 		}
 	}
-
-	if (depth != 0)
-		return (1); // Error.
+	return (depth); // Should be 0 if par are balanced.
 }
 
 // Check all the tokens are in parenthesis (tokens).
