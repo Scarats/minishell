@@ -21,31 +21,37 @@ int	is_word_token(t_token_type t)
 // Check the conditions of what comes before and after '('
 // returns 1 for error and 0 for no error.
 // Prev token can be an operator or ).
-int check_left_par(t_token *tok_list)
+int check_left_par(t_token *tok_list, int index, int size)
 {
-	// Previous token ( or operator
-	if (!is_and_or(tok_list[-1].type) && tok_list[-1].type != TOKEN_LPAREN)
-		return (1);
-	// Next token word or (
-	else if (!is_word_token(tok_list[1].type) && tok_list[1].type != TOKEN_LPAREN)
-		return (1);
-	return (0);
-	// Prev token can be '(' or operator.
-	// Next token can be:
-	// '(' , or a word token
-
+	t_token_type prev;
+	if (index > 0)
+    {
+		prev = tok_list[index - 1].type;
+        if (!is_and_or(prev) && prev != TOKEN_LPAREN)
+            return (1);
+    }
+    if (index + 1 >= size)
+        return (1);
+    if (!is_word_token(tok_list[index + 1].type) && tok_list[index + 1].type != TOKEN_LPAREN)
+        return (1);
+    return (0);
 }
 
 // Check the conditions of what comes before and after ')'
 // returns 1 for error and 0 for no error.
 // Prev token can be a word or ).
-int check_right_par(t_token *tok_list)
-{	
-	// Previous token word or )
-	if (!is_word_token(tok_list[-1].type) && tok_list[-1].type != TOKEN_RPAREN)
-		return (1);
+int check_right_par(t_token *tok_list, int index, int size)
+{
+	t_token_type prev;
+	if (index > 0)
+    {
+		// Previous token word or )
+		prev = tok_list[index - 1].type;
+		if (!is_word_token(&tok_list[-1].type) && tok_list[-1].type != TOKEN_RPAREN)
+			return (1);
+	}
 	// Next token operator or ) or end-of-input
-	else if (!is_and_or(tok_list[1].type) && tok_list[1].type != TOKEN_RPAREN)
+	else if (!is_and_or(&tok_list[1].type) && tok_list[1].type != TOKEN_RPAREN || index == size)
 		return (1);
 	return (0);
 
@@ -67,14 +73,14 @@ int check_paren_error(t_token *tok_list, int size)
 	{
 		if (depth < 0)
 			return (1);
-		else if (tok_list[i].type == TOKEN_LPAREN && !check_left_par(tok_list[i].type)) // Check that is's not the last char
+		else if (tok_list[i].type == TOKEN_LPAREN && !check_left_par(tok_list[i].type, i, size)) // Check that is's not the last char
 		{
 			depth++;
 			if (i != 0 && (tok_list[i - 1].type == TOKEN_AND_AND || tok_list[i - 1].type == TOKEN_OR))
 				left = !left;
 		}
 		// Check last param
-		else if (tok_list[i].type == TOKEN_RPAREN && !check_right_par(tok_list[i].type))
+		else if (tok_list[i].type == TOKEN_RPAREN && !check_right_par(tok_list[i].type, i, size))
 		{
 			depth--;
 		}
