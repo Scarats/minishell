@@ -153,5 +153,6 @@ char *clean_string(char *input);
 t_node_type map_token_to_node(t_token_type t);
 int	is_redir(t_token_type type);
 t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type);
+int	is_and_or(t_token_type t);
 
 #endif

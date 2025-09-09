@@ -59,7 +59,7 @@ int find_operator(t_token *tok_list, int size)
 			depth++;
 		else if (tok_list[pos].type == TOKEN_RPAREN)
 			depth--;
-		else if (depth == 0 && (tok_list[pos].type == TOKEN_AND_AND || tok_list[pos].type == TOKEN_OR))
+		else if (depth == 0 && is_and_or(tok_list[pos].type))
 			return (pos);
 	}
 	depth = 0;
