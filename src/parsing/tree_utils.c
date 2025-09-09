@@ -88,7 +88,9 @@ int check_paren_error(t_token *tok_list, int size)
 			depth--;
 		}
 	}
-	return (depth); // Should be 0 if par are balanced.
+	if (depth != 0)
+		return (1);
+	return (0);
 }
 
 // Check all the tokens are in parenthesis (tokens).
@@ -99,7 +101,7 @@ int wrapped_in_parren(t_token *tok_list, int size)
 
 	i = -1;
 	depth = 0;
-	if (size < 2 || !tok_list[0].type == TOKEN_LPAREN || !tok_list[size - 1].type == TOKEN_RPAREN) 
+	if (size < 2 || tok_list[0].type != TOKEN_LPAREN || tok_list[size - 1].type != TOKEN_RPAREN) 
 		return (0);
 	// What happens if size == 2 and it's just () ?
 	if (size == 2)
