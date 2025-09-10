@@ -71,9 +71,11 @@ typedef struct s_redir
 
 typedef struct s_node
 {
+	t_node_type type;
+	bool subshell;
+
 	struct s_node *left;
 	struct s_node *right;
-	// struct s_node *parent; // Might be useless, let's see later.
 
 	int pipefd[2];
 	pid_t left_pid;
@@ -120,6 +122,8 @@ typedef struct s_tokenizer
 	t_token *token_list;
 	t_token *last_token;
 
+	t_token *token_array;
+
 	int token_list_size; // Keep track of the number of tokens
 } t_tokenizer;
 
@@ -151,5 +155,10 @@ char *clean_string(char *input);
 t_node_type map_token_to_node(t_token_type t);
 int	is_redir(t_token_type type);
 t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type);
+int	is_and_or(t_token_type t);
+t_node *build_tree(t_main_data *data, t_token *tok_list, int size);
+int get_cmd_argc(t_token *tok_list, int size);
+int check_paren_error(t_token *tok_list, int size);
+int wrapped_in_paren(t_token *tok_list, int size);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/03 15:12:02 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/03 15:18:34 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/10 10:45:34 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,6 @@ char	*my_strdup(t_list *malloc_list, char *src)
 	dup = ft_strdup(src);
 	if (!dup)
 		return (NULL);
-	my_addtolist(malloc_list, dup);
+	my_addtolist(&malloc_list, dup);
 	return (dup);
 }
