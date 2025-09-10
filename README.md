@@ -1,6 +1,9 @@
-minishell
-
 # Guideline
+
+## Testing
+
+You can test the minishell with this input:
+(echo "build" | tee log.txt && grep build log.txt) || (echo "fallback" | tee log.txt && cat log.txt) && (rm -f log.txt || echo "could not remove")
 
 ## Return values
 
@@ -13,7 +16,4 @@ src/execution/execution.c src/execution/pipes.c \
 
 # TODO
 
-1. Tokenize
-   - When
-2. Find the highest operator of the tokens
-3. Recursively call this function each time there is no more sub operators.
+- [ ] Execution
