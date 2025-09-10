@@ -16,4 +16,7 @@ It's not mandatory, just simplify everything imo.
 
 # TODO
 
-- [ ] Execution
+- [ ] Execution.
+- [ ] Error handling system.
+- [ ] Heredoc.
+- [ ] Readline & continuous input system (it's currently a AI generated one for testing)
