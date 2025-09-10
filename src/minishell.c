@@ -103,7 +103,7 @@ int main(void)
         if (parser(&data) != 0)
         {
             fprintf(stderr, "parse error\n");
-            my_free(&data.malloc_tok);
+            // my_free(&data.malloc_tok);
             data.malloc_tok = NULL;
             continue;
         }
@@ -122,11 +122,12 @@ int main(void)
         printf("\nTotal tokens: %d\n\n", token_count);
 
         // Free tokens + words allocated via my_malloc
-        my_free(&data.malloc_tok);
+        // my_free(&data.malloc_tok);
         data.malloc_tok = NULL;
     }
-
-    free(line);
-    free(data.tok);
+	my_free(&data.malloc_tok);
+	my_free(&data.malloc_tree);
+    // free(line);
+    // free(data.tok);
     return 0;
 }

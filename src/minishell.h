@@ -122,6 +122,8 @@ typedef struct s_tokenizer
 	t_token *token_list;
 	t_token *last_token;
 
+	t_token *token_array;
+
 	int token_list_size; // Keep track of the number of tokens
 } t_tokenizer;
 

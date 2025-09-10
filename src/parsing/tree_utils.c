@@ -21,19 +21,19 @@ int	is_word_token(t_token_type t)
 // Check the conditions of what comes before and after '('
 // returns 1 for error and 0 for no error.
 // Prev token can be an operator or (.
-int check_left_par(t_token *tok_list, int index, int size)
+int check_left_par(t_token *tok_array, int index, int size)
 {
 	t_token_type prev;
 
 	if (index > 0)
     {
-		prev = tok_list[index - 1].type;
+		prev = tok_array[index - 1].type;
         if (!is_and_or(prev) && prev != TOKEN_LPAREN)
             return (1);
     }
     if (index + 1 >= size)
         return (1);
-	else if (!is_word_token(tok_list[index + 1].type) && tok_list[index + 1].type != TOKEN_LPAREN)
+	else if (!is_word_token(tok_array[index + 1].type) && tok_array[index + 1].type != TOKEN_LPAREN)
         return (1);
     return (0);
 }
@@ -41,7 +41,7 @@ int check_left_par(t_token *tok_list, int index, int size)
 // Check the conditions of what comes before and after ')'
 // returns 1 for error and 0 for no error.
 // Prev token can be a word or ).
-int check_right_par(t_token *tok_list, int index, int size)
+int check_right_par(t_token *tok_array, int index, int size)
 {
 	t_token_type prev;
 
@@ -50,21 +50,21 @@ int check_right_par(t_token *tok_list, int index, int size)
 	else if (index > 0)
     {
 		// Previous token word or )
-		prev = tok_list[index - 1].type;
+		prev = tok_array[index - 1].type;
 		if (!is_word_token(prev) && prev != TOKEN_RPAREN)
 			return (1);
 	}
 	if (index + 1 >= size)
 		return (0); // end-of-input after ')'
     // Next token operator or ) or end-of-input
-	if (!is_and_or(tok_list[index + 1].type) && tok_list[index + 1].type != TOKEN_RPAREN)
+	if (!is_and_or(tok_array[index + 1].type) && tok_array[index + 1].type != TOKEN_RPAREN)
 		return (1);
 	return (0);
 
 }
 
 // Check for (a)(b), (((a) && b errors.
-int check_paren_error(t_token *tok_list, int size)
+int check_paren_error(t_token *tok_array, int size)
 {
 	int i;
 	int depth;
@@ -75,15 +75,15 @@ int check_paren_error(t_token *tok_list, int size)
 	{
 		if (depth < 0)
 			return (1);
-		else if (tok_list[i].type == TOKEN_LPAREN)
+		else if (tok_array[i].type == TOKEN_LPAREN)
 		{
-			if (check_left_par(tok_list, i, size))
+			if (check_left_par(tok_array, i, size))
 				return (1);
 			depth++;
 		}
-		else if (tok_list[i].type == TOKEN_RPAREN)
+		else if (tok_array[i].type == TOKEN_RPAREN)
 		{
-			if (check_right_par(tok_list, i, size))
+			if (check_right_par(tok_array, i, size))
 				return (1);
 			depth--;
 		}
@@ -94,23 +94,23 @@ int check_paren_error(t_token *tok_list, int size)
 }
 
 // Check all the tokens are in parenthesis (tokens).
-int wrapped_in_paren(t_token *tok_list, int size)
+int wrapped_in_paren(t_token *tok_array, int size)
 {
 	int i;
 	int depth;
 
 	i = -1;
 	depth = 0;
-	if (size < 2 || tok_list[0].type != TOKEN_LPAREN || tok_list[size - 1].type != TOKEN_RPAREN) 
+	if (size < 2 || tok_array[0].type != TOKEN_LPAREN || tok_array[size - 1].type != TOKEN_RPAREN) 
 		return (0);
 	// What happens if size == 2 and it's just () ?
 	if (size == 2)
 		return (-1);
 	while (++i < size - 1)
 	{
-		if (tok_list[i].type == TOKEN_LPAREN)
+		if (tok_array[i].type == TOKEN_LPAREN)
 			depth++;
-		else if (tok_list[i].type == TOKEN_RPAREN)
+		else if (tok_array[i].type == TOKEN_RPAREN)
 			depth--;
 		if (depth == 0 && i != size - 2)
 			return (0);
@@ -119,8 +119,8 @@ int wrapped_in_paren(t_token *tok_list, int size)
 }
 
 
-// Return the number of cmd and args in tok_list
-int get_cmd_argc(t_token *tok_list, int size)
+// Return the number of cmd and args in tok_array
+int get_cmd_argc(t_token *tok_array, int size)
 {
 	int i;
 	int cmd_argc;
@@ -129,7 +129,7 @@ int get_cmd_argc(t_token *tok_list, int size)
 	cmd_argc = 0;
 	while (i < size)
 	{
-		if (tok_list[i].type == TOKEN_CMD || tok_list[i].type == TOKEN_ARGUMENT)
+		if (tok_array[i].type == TOKEN_CMD || tok_array[i].type == TOKEN_ARGUMENT)
 			cmd_argc++;
 		i++;
 	}

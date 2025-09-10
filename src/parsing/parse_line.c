@@ -118,13 +118,36 @@ int tokenizer(t_main_data *data)
 	return (0);
 }
 
+// Turn the token linked list in an array, easier for AST.
+int list_to_array(t_main_data *data, t_token *token_list, int size)
+{
+	t_token *curr_tok;
+	int i;
+
+	i = 0;
+	if (size <= 0)
+		return (1);
+	curr_tok = token_list;
+	data->tok->token_array = my_malloc(&data->malloc_tok, sizeof(t_token) * size); // Just t_token not a ptr
+	while (curr_tok && i < size)
+	{
+		data->tok->token_array[i] = *curr_tok;
+		i++;
+		curr_tok = curr_tok->next_token;
+	}
+	return (0);
+}
+
 // Parse the input.
 // Tokenize it, then create a binary tree.
 int parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
-	if (build_tree(data, data->tok->token_list, data->tok->length))
+	if (list_to_array(data, data->tok->token_list, data->tok->token_list_size))
+		return (1);
+	data->node = build_tree(data, data->tok->token_array, data->tok->token_list_size);
+	if (!data->node)
 		return (1);
 	// my_free(&data->malloc_tok); // Token memory can be freed.
 	return (0);
