@@ -54,24 +54,24 @@ int find_operator(t_token *tok_array, int size)
 	int pos;
 
 	depth = 0;
-	pos = -1;
-	while (++pos < size)
+	pos = size;
+	while (--pos >= 0)
 	{
 		if (tok_array[pos].type == TOKEN_LPAREN)
-			depth++;
-		else if (tok_array[pos].type == TOKEN_RPAREN)
 			depth--;
+		else if (tok_array[pos].type == TOKEN_RPAREN)
+			depth++;
 		else if (depth == 0 && is_and_or(tok_array[pos].type))
 			return (pos);
 	}
 	depth = 0;
-	pos = -1;
-	while (++pos < size)
+	pos = size;
+	while (--pos >= 0)
 	{
 		if (tok_array[pos].type == TOKEN_LPAREN)
-			depth++;
-		else if (tok_array[pos].type == TOKEN_RPAREN)
 			depth--;
+		else if (tok_array[pos].type == TOKEN_RPAREN)
+			depth++;
 		else if (depth == 0 && tok_array[pos].type == TOKEN_PIPE)
 			return (pos);
 	}

@@ -105,7 +105,7 @@ int wrapped_in_paren(t_token *tok_array, int size)
 		return (0);
 	// What happens if size == 2 and it's just () ?
 	if (size == 2)
-		return (-1);
+		return (0); // Error
 	while (++i < size - 1)
 	{
 		if (tok_array[i].type == TOKEN_LPAREN)
