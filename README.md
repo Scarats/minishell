@@ -3,7 +3,10 @@
 ## Testing
 
 You can test the minishell with this input:
+
+```
 (echo "build" | tee log.txt && grep build log.txt) || (echo "fallback" | tee log.txt && cat log.txt) && (rm -f log.txt || echo "could not remove")
+```
 
 ## Return values
 
