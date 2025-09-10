@@ -158,15 +158,15 @@ t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type)
 	t_redir *last;
 
 	redirection = my_malloc(&data->malloc_tree, sizeof(t_redir));
+	redirection->type = type;
 	if (!node->redirection)
 		node->redirection = redirection;
 	else
 	{
 		last = node->redirection;
-		while (last->next != NULL)
+		while (last->next)
 			last = last->next;
 		last->next = redirection;
 	}
-	redirection->type = type;
 	return (redirection);
 }

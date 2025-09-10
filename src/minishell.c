@@ -47,6 +47,141 @@ void print_token_type(t_token_type type)
     printf("%-12s", type_str);
 }
 
+// ---- AST printer helpers (pretty) ----
+static const char *node_type_str(t_node_type t)
+{
+    if (t == NODE_COMMAND) return "CMD";
+    if (t == NODE_PIPE)    return "PIPE";
+    if (t == NODE_AND)     return "AND";
+    if (t == NODE_OR)      return "OR";
+    return "UNKNOWN";
+}
+
+static const char *redir_type_str(t_token_type t)
+{
+    if (t == TOKEN_REDIRECT_IN)  return "<";
+    if (t == TOKEN_REDIRECT_OUT) return ">";
+    if (t == TOKEN_APPEND)       return ">>";
+    if (t == TOKEN_HEREDOC)      return "<<";
+    return "?";
+}
+
+static void print_cmd_inline(const t_node *node)
+{
+    int i = 0;
+    if (node->cmd_argv && node->cmd_argv[0])
+    {
+        while (node->cmd_argv[i])
+        {
+            if (i) printf(" ");
+            printf("%s", node->cmd_argv[i]);
+            i++;
+        }
+    }
+    else
+    {
+        printf("(empty)");
+    }
+    // Append redirs inline for quick glance
+    t_redir *r = node->redirection;
+    while (r)
+    {
+        printf(" [%s %s]", redir_type_str(r->type), r->filename ? r->filename : "(null)");
+        r = r->next;
+    }
+}
+
+static void print_ast_pretty_rec(t_node *node, const char *prefix, int is_last)
+{
+    if (!node) return;
+
+    // Branch characters
+    const char *branch = is_last ? "└── " : "├── ";
+    const char *pad    = is_last ? "    " : "│   ";
+
+    // Current line
+    printf("%s%s", prefix, branch);
+    if (node->type == NODE_COMMAND)
+    {
+        printf("CMD: ");
+        print_cmd_inline(node);
+        printf("\n");
+
+        // If you prefer redirs on their own lines (instead of inline),
+        // uncomment below and remove them from print_cmd_inline above.
+        /*
+        int count = 0;
+        for (t_redir *tmp = node->redirection; tmp; tmp = tmp->next) count++;
+        int idx = 0;
+        for (t_redir *r = node->redirection; r; r = r->next, idx++)
+        {
+            char next_prefix[1024];
+            snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, pad);
+            int r_last = (idx == count - 1);
+            printf("%s%sredir %s %s\n",
+                   next_prefix,
+                   r_last ? "└── " : "├── ",
+                   redir_type_str(r->type),
+                   r->filename ? r->filename : "(null)");
+        }
+        */
+        return; // command has no tree children
+    }
+    else
+    {
+        printf("%s\n", node_type_str(node->type));
+    }
+
+    // Prepare child prefix
+    char next_prefix[1024];
+    snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, pad);
+
+    // Collect real children (left/right)
+    t_node *children[2];
+    int n = 0;
+    if (node->left)  children[n++] = node->left;
+    if (node->right) children[n++] = node->right;
+
+    for (int i = 0; i < n; i++)
+    {
+        int child_is_last = (i == n - 1);
+        print_ast_pretty_rec(children[i], next_prefix, child_is_last);
+    }
+}
+
+static void print_ast(t_node *root)
+{
+    if (!root)
+    {
+        printf("(empty AST)\n");
+        return;
+    }
+    // Root line without a leading branch
+    printf("%s\n", node_type_str(root->type));
+    // Then its children (so the root looks like a top header)
+    t_node *children[2];
+    int n = 0;
+    if (root->type == NODE_COMMAND)
+    {
+        // For a single command root, print details as children-like lines
+        // to keep a consistent visual shape.
+        // Inline form (same as node line) for brevity:
+        printf("└── ");
+        print_cmd_inline(root);
+        printf("\n");
+        return;
+    }
+    if (root->left)  children[n++] = root->left;
+    if (root->right) children[n++] = root->right;
+
+    for (int i = 0; i < n; i++)
+    {
+        int child_is_last = (i == n - 1);
+        print_ast_pretty_rec(children[i], "", child_is_last);
+    }
+}
+// ---- end AST printer helpers ----
+
 static void reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 {
     tok->input = line;
@@ -121,12 +256,17 @@ int main(void)
         }
         printf("\nTotal tokens: %d\n\n", token_count);
 
+        // Print AST
+        printf("AST:\n");
+        print_ast(data.node);
+        printf("\n");
+
         // Free tokens + words allocated via my_malloc
         // my_free(&data.malloc_tok);
         data.malloc_tok = NULL;
     }
-	my_free(&data.malloc_tok);
-	my_free(&data.malloc_tree);
+    my_free(&data.malloc_tok);
+    my_free(&data.malloc_tree);
     // free(line);
     // free(data.tok);
     return 0;
