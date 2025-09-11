@@ -4,9 +4,6 @@
 int left(t_node *node, t_main_data *data)
 {
 	close(node->pipefd[0]);
-	if (node->pipefd[1] != STDOUT_FILENO)
-		dup2(node->pipefd[1], STDOUT_FILENO);
-	close(node->pipefd[1]);
 	traverse_tree(node->left, data);
 	exit(0);
 }
@@ -15,9 +12,6 @@ int left(t_node *node, t_main_data *data)
 int right(t_node *node, t_main_data *data)
 {
 	close(node->pipefd[1]);
-	if (node->pipefd[1] != STDOUT_FILENO)
-		dup2(node->pipefd[1], STDOUT_FILENO);
-	close(node->pipefd[0]);
 	traverse_tree(node->right, data);
 	exit(0);
 }

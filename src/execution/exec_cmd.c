@@ -10,47 +10,38 @@ int binaries_check(t_node *node, t_main_data *data)
 // If redirected, changes the fd.
 int redirections(t_node *node, t_main_data *data)
 {
-	if (!node->cmd->redirection)
-		return (0);
-	else if (node->cmd->redirection == TOKEN_REDIRECT_IN) // <
+	t_redir *redir;
+
+	redir = node->redirection;
+	while (redir)
 	{
-		// Try to open the file.
-		node->input_fd = open(node->filename, O_RDONLY);
-		if (node->input_fd < 0)
-			return (1);
+		if (redir->type == TOKEN_REDIRECT_IN)
+		else if (redir->type == TOKEN_REDIRECT_OUT)
+		else if (redir->type == TOKEN_APPEND)
+		redir = redir->next;
 	}
-	else if (node->cmd->redirection == TOKEN_REDIRECT_OUT) // >
-	{
-		// Will try to open the file or create it.
-		node->output_fd = open(node->filename, O_WRONLY | O_CREAT | O_TRUNC);
-		if (node->output_fd < 0)
-			return (1);
-	}
-	// else if (node->cmd->redirection == TOKEN_HEREDOC) // <<
-	// {
-	// 	// Will wait for user to write text as input.
-	// 	// idk yet how to do it, so let's see later.
-	// }
-	// else if (node->cmd->redirection == TOKEN_APPEND) // >>
-	// {
-	// 	// Will write after the file
-	// 	// idk yet how to do it, so let's see later.
-	// }
 	return (0);
-}
-
-// Check permissions for file, according to the type of redirection and command.
-int file_checks(t_node *node, t_main_data *data)
-{
-	// first check the bin access.
-	if (check_access())
-
 }
 
 // Execute the command.
 int execution(t_node *node, t_main_data *data)
 {
 
+}
+
+int set_io_fds(t_node *node, t_main_data *data)
+{
+	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+	{
+    	dup2(node->input_fd, STDIN_FILENO);
+		close(node->input_fd);
+	}
+	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+	{	
+		dup2(node->output_fd, STDOUT_FILENO);
+		close(node->output_fd);
+	}
+	return (0);
 }
 
 // Handle the execution process.
@@ -68,16 +59,12 @@ int exec_cmd(t_node *node, t_main_data *data)
 	{
 		error = binaries_check(node, data);
 		if (error == 0)
-			error = redirections(node, data);
+			error = set_io_fds(node, data);
 		if (error == 0)
-			error = file_check(node, data);
+			error = redirections(node, data);
 		if (error == 0)
 			error = execution(node, data);
 	}
-	if (node->input_fd)
-		close(node->input_fd);
-	if (node->input_fd)
-		close(node->input_fd);
 	waitpid(pid, NULL, 0);
 	return (error);
 }
