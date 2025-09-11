@@ -84,8 +84,8 @@ typedef struct s_node
 	char **cmd_argv;
 	t_redir *redirection;
 
-	int last_input_fd;
-	int last_output_fd;
+	int input_fd;
+	int output_fd;
 
 	int exit_status;
 } t_node;

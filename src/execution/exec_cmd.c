@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "../minishell.h"
 
 // Check if binary exist and if user has access.
 int binaries_check(t_node *node, t_main_data *data)
@@ -79,7 +79,5 @@ int exec_cmd(t_node *node, t_main_data *data)
 	if (node->input_fd)
 		close(node->input_fd);
 	waitpid(pid, NULL, 0);
-	if (error != 0)
-		return (error);
-	return (0);
+	return (error);
 }

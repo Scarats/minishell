@@ -20,3 +20,4 @@ It's not mandatory, just simplify everything imo.
 - [ ] Error handling system.
 - [ ] Heredoc.
 - [ ] Readline & continuous input system (it's currently a AI generated one for testing)
+- [ ] See for subshell creation.

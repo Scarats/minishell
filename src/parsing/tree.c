@@ -40,6 +40,8 @@ t_node *create_node(t_main_data *data, t_token *tok_array, t_node_type type, int
 
 	node = my_malloc(&data->malloc_tree, sizeof(t_node));
 	node->type = type;
+	node->input_fd = -1;
+	node->output_fd = -1;
 	if (type == NODE_COMMAND && tok_array)
 		create_node_cmd(data, tok_array, node, size);
 	return (node);

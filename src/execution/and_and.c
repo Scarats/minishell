@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "../minishell.h"
 
 int and_and(t_node *node, t_main_data *data)
 {

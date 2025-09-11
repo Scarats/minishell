@@ -1,4 +1,4 @@
-#include "../../minishell.h"
+#include "../minishell.h"
 
 // Will check the type of the node.
 // Then redirect to the according type function.
@@ -6,6 +6,7 @@
 // The recursion breakpoint is reached when a NODE_COMMAND is reached.
 int traverse_tree(t_node *node ,t_main_data *data)
 {
+	// Maybe add the check for subshell here.
 	if (data->node->type == NODE_COMMAND)
 		return (exec_cmd(node, data));
 	else if (data->node->type == NODE_PIPE)
