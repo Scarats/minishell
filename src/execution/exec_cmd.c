@@ -6,6 +6,29 @@ int binaries_check(t_node *node, t_main_data *data)
 
 }
 
+// Open with accrding flags to action number.
+int open_file(char *filename, int action)
+{
+	int fd;
+
+	fd = -1;
+	if (action == 1)
+		fd = open(filename, O_RDONLY);
+	else if (action == 2)
+		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+	else if (action == 3)
+		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND);
+
+	if (fd < 0)
+		return (1); // Error.
+	if (action == 1 && dup2(fd, STDIN_FILENO) == -1)
+		return (close(fd), 1); // Error.
+	else if (action > 1 && dup2(fd, STDOUT_FILENO) == -1)
+		return (close(fd), 1);
+	close(fd);
+	return (0);
+}
+
 // Check the redirections, change accordingly the inpout and output fds
 // If redirected, changes the fd.
 int redirections(t_node *node, t_main_data *data)
@@ -15,9 +38,12 @@ int redirections(t_node *node, t_main_data *data)
 	redir = node->redirection;
 	while (redir)
 	{
-		if (redir->type == TOKEN_REDIRECT_IN)
-		else if (redir->type == TOKEN_REDIRECT_OUT)
-		else if (redir->type == TOKEN_APPEND)
+		if (redir->type == TOKEN_REDIRECT_IN && open_file(redir->filename, 1))
+			return (1);
+		else if (redir->type == TOKEN_REDIRECT_OUT && open_file(redir->filename, 2))
+			return (1);
+		else if (redir->type == TOKEN_APPEND && open_file(redir->filename, 3))
+			return (1);
 		redir = redir->next;
 	}
 	return (0);
