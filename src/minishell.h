@@ -83,6 +83,7 @@ typedef struct s_node
 
 	char **cmd_argv;
 	t_redir *redirection;
+	char *path;
 
 	int input_fd;
 	int output_fd;
@@ -139,6 +140,8 @@ typedef struct s_main_data
 
 	int error;
 	char *str_error;
+
+	bool in_child;
 
 	int last_exit_status;
 

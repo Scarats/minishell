@@ -1,9 +1,12 @@
 #include "../minishell.h"
 
 // Check if binary exist and if user has access.
-int binaries_check(t_node *node, t_main_data *data)
+int get_bin_path(t_node *node, t_main_data *data)
 {
-
+	node->path = find_bin(node->cmd_argv[0]);
+	if (node->path)
+		return (0);
+	return (1);
 }
 
 // Open with accrding flags to action number.
@@ -50,9 +53,9 @@ int redirections(t_node *node, t_main_data *data)
 }
 
 // Execute the command.
+// Should not return since the program will be replaced by execve.
 int execution(t_node *node, t_main_data *data)
 {
-
 }
 
 int set_io_fds(t_node *node, t_main_data *data)
@@ -70,27 +73,40 @@ int set_io_fds(t_node *node, t_main_data *data)
 	return (0);
 }
 
+// Call step by step each function for clean execution.
+int child_exec(t_main_data *data, t_node *node)
+{
+	int error;
+
+	error = 0;
+	error = get_bin_path(node, data);
+	if (error == 0)
+		error = set_io_fds(node, data);
+	if (error == 0)
+		error = redirections(node, data);
+	if (error == 0)
+	{
+		execution(node, data);
+		error = 1; // Should not arrive here.
+	}
+	return (error);
+}
+
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
 int exec_cmd(t_node *node, t_main_data *data)
 {
 	int pid;
-	int error;
 
-	error = 0;
+	pid = -1;
+	if (data->in_child)
+		return (child_exec(data, node));
+	
 	pid = fork();
 	if (pid == -1)
 		return (1);
-	else if (pid == 0)
-	{
-		error = binaries_check(node, data);
-		if (error == 0)
-			error = set_io_fds(node, data);
-		if (error == 0)
-			error = redirections(node, data);
-		if (error == 0)
-			error = execution(node, data);
-	}
-	waitpid(pid, NULL, 0);
-	return (error);
+	
+	if (pid == 0)
+		child_exec(data, node);
+	return (waitpid(pid, NULL, 0) == -1);
 }

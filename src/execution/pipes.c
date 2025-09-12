@@ -4,6 +4,7 @@
 int left(t_node *node, t_main_data *data)
 {
 	close(node->pipefd[0]);
+	data->in_child = true;
 	traverse_tree(node->left, data);
 	exit(0);
 }
@@ -12,6 +13,7 @@ int left(t_node *node, t_main_data *data)
 int right(t_node *node, t_main_data *data)
 {
 	close(node->pipefd[1]);
+	data->in_child = true;
 	traverse_tree(node->right, data);
 	exit(0);
 }
@@ -41,7 +43,7 @@ int pipex(t_node *node, t_main_data *data)
 
 	close(node->pipefd[0]);
 	close(node->pipefd[1]);
-	waitpid(node->left_pid, NULL, 0);
-	waitpid(node->right_pid, NULL, 0);
+	if (waitpid(node->left_pid, NULL, 0) == -1 || waitpid(node->right_pid, NULL, 0) == -1)
+		return (1);
 	return (0);
 }
