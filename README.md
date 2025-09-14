@@ -4,14 +4,20 @@
 
 You can test the minishell with this inputs:
 
+test 1:
 ```
 touch file1 && touch file2
 ```
-
+test 2:
 ```
 rm file3 || rm file1
 ```
+or do this as test 2:
+```
+rm file3 || (rm file1 && rm file2)
+```
 
+test 3:
 ```
 echo "Hello mgl" | cat > output
 ```
