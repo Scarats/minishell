@@ -5,7 +5,7 @@ int get_bin_path(t_node *node, t_main_data *data)
 {
 	if (!data)
 		data = NULL;
-	
+
 	node->path = find_bin(node->cmd_argv[0]);
 	if (node->path)
 		return (0);
@@ -73,14 +73,13 @@ int set_io_fds(t_node *node, t_main_data *data)
 	if (!data)
 		data = NULL;
 
-
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
 	{
-    	dup2(node->input_fd, STDIN_FILENO);
+		dup2(node->input_fd, STDIN_FILENO);
 		close(node->input_fd);
 	}
 	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-	{	
+	{
 		dup2(node->output_fd, STDOUT_FILENO);
 		close(node->output_fd);
 	}
@@ -115,17 +114,17 @@ int exec_cmd(t_node *node, t_main_data *data)
 	pid = -1;
 	if (data->in_child)
 		return (child_exec(data, node));
-	
+
 	pid = fork();
 	if (pid == -1)
 		return (1);
-	
+
 	if (pid == 0)
 		child_exec(data, node);
-	
+
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-        close(node->input_fd);
-    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-        close(node->output_fd);
+		close(node->input_fd);
+	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+		close(node->output_fd);
 	return (waitpid(pid, NULL, 0) == -1);
 }

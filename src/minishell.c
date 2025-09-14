@@ -15,6 +15,7 @@ int init(t_main_data *data)
     data->malloc_tok = NULL;
     data->malloc_tree = NULL;
     data->error = 0;
+    data->in_child = false;
     return (0);
 }
 
@@ -216,6 +217,7 @@ int main(void)
     {
         printf("minishell> ");
         fflush(stdout);
+        // init(&data);  // REMOVE: this re-mallocs data->tok and leaks the previous one
 
         nread = getline(&line, &cap, stdin);
         if (nread == -1)
@@ -238,8 +240,10 @@ int main(void)
         if (parser(&data) != 0)
         {
             fprintf(stderr, "parse error\n");
-            // my_free(&data.malloc_tok);
-            data.malloc_tok = NULL;
+            // Free anything allocated for this line (tokens/tree) before continuing
+            my_free(&data.malloc_tok);
+            my_free(&data.malloc_tree);
+            data.node = NULL;
             continue;
         }
 
@@ -267,13 +271,16 @@ int main(void)
             printf("traverse_tree returned: %d\n\n", exec_ret);
         }
 
-        // Free tokens + words allocated via my_malloc
-        // my_free(&data.malloc_tok);
-        data.malloc_tok = NULL;
+        // Free allocations for this iteration (tokens + AST) tracked by my_malloc
+        my_free(&data.malloc_tok);
+        my_free(&data.malloc_tree);
+        data.node = NULL;
     }
+
+    // Free global resources
     my_free(&data.malloc_tok);
     my_free(&data.malloc_tree);
-    // free(line);
-    // free(data.tok);
+    free(line);
+    free(data.tok);
     return 0;
 }
