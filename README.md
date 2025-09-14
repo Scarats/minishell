@@ -2,7 +2,7 @@
 
 ## Testing
 
-You can test the minishell with this input:
+You can test the minishell with this inputs:
 
 ```
 touch file1 && touch file2
