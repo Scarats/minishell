@@ -3,6 +3,9 @@
 // Check if binary exist and if user has access.
 int get_bin_path(t_node *node, t_main_data *data)
 {
+	if (!data)
+		data = NULL;
+	
 	node->path = find_bin(node->cmd_argv[0]);
 	if (node->path)
 		return (0);
@@ -37,6 +40,8 @@ int open_file(char *filename, int action)
 int redirections(t_node *node, t_main_data *data)
 {
 	t_redir *redir;
+	if (!data)
+		data = NULL;
 
 	redir = node->redirection;
 	while (redir)
@@ -56,10 +61,19 @@ int redirections(t_node *node, t_main_data *data)
 // Should not return since the program will be replaced by execve.
 int execution(t_node *node, t_main_data *data)
 {
+	if (!data)
+		data = NULL;
+
+	execve(node->path, node->cmd_argv, NULL);
+	return (1);
 }
 
 int set_io_fds(t_node *node, t_main_data *data)
 {
+	if (!data)
+		data = NULL;
+
+
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
 	{
     	dup2(node->input_fd, STDIN_FILENO);

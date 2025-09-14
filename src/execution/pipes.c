@@ -19,7 +19,7 @@ int right(t_node *node, t_main_data *data)
 }
 
 // Will create two childs, left and right, for each end of the pipe.
-int pipex(t_node *node, t_main_data *data)
+int pipes(t_node *node, t_main_data *data)
 {
 	if (pipe(node->pipefd) == -1)
 		return (perror("pipe"), 1);

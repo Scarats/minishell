@@ -261,6 +261,12 @@ int main(void)
         print_ast(data.node);
         printf("\n");
 
+        // Call traverse_tree to test execution/traversal
+        {
+            int exec_ret = traverse_tree(data.node, &data);
+            printf("traverse_tree returned: %d\n\n", exec_ret);
+        }
+
         // Free tokens + words allocated via my_malloc
         // my_free(&data.malloc_tok);
         data.malloc_tok = NULL;

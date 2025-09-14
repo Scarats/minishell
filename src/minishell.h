@@ -163,5 +163,10 @@ t_node *build_tree(t_main_data *data, t_token *tok_list, int size);
 int get_cmd_argc(t_token *tok_list, int size);
 int check_paren_error(t_token *tok_list, int size);
 int wrapped_in_paren(t_token *tok_list, int size);
+int traverse_tree(t_node *node ,t_main_data *data);
+int exec_cmd(t_node *node, t_main_data *data);
+int and_and(t_node *node, t_main_data *data);
+int or_or(t_node *node, t_main_data *data);
+int pipes(t_node *node, t_main_data *data);
 
 #endif
