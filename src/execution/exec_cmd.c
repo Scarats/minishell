@@ -110,7 +110,10 @@ int child_exec(t_main_data *data, t_node *node)
 int exec_cmd(t_node *node, t_main_data *data)
 {
 	int pid;
+	int error;
+	int status;
 
+	error = 0;
 	pid = -1;
 	if (data->in_child)
 		return (child_exec(data, node));
@@ -120,11 +123,21 @@ int exec_cmd(t_node *node, t_main_data *data)
 		return (1);
 
 	if (pid == 0)
-		child_exec(data, node);
+	{
+		error = child_exec(data, node);
+		exit(error);
+	}
 
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
 		close(node->input_fd);
 	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
 		close(node->output_fd);
-	return (waitpid(pid, NULL, 0) == -1);
+	if (waitpid(pid, &status, 0) == -1)
+		error = 1;
+
+	if (WIFEXITED(status))
+		return WEXITSTATUS(status);
+	if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
+	return (error);
 }

@@ -16,6 +16,7 @@ It's not mandatory, just simplify everything imo.
 
 # TODO
 
+- [ ] Add the function swap_list(from, to) to optimize memory usage at parsing.
 - [ ] Execution.
 - [ ] Error handling system.
 - [ ] Heredoc.
