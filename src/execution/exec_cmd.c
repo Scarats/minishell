@@ -21,9 +21,9 @@ int open_file(char *filename, int action)
 	if (action == 1)
 		fd = open(filename, O_RDONLY);
 	else if (action == 2)
-		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC);
+		fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else if (action == 3)
-		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND);
+		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 
 	if (fd < 0)
 		return (1); // Error.
