@@ -87,35 +87,50 @@ t_token_type get_tok_type(char c, char next)
 
 int tokenizer(t_main_data *data)
 {
-	t_token_type tok_type;
+    t_token_type tok_type;
 
-	tok_type = TOKEN_NULL;
-	while (data->tok->pos < data->tok->length)
-	{
-		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
-		handle_quotes(data);
-		// For operators, always create a token when the character type changes OR when we have consecutive operators
-		if (data->tok->curr_char_type != data->tok->prev_char_type)
+    tok_type = TOKEN_NULL;
+    while (data->tok->pos < data->tok->length)
+    {
+        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+        handle_quotes(data);
+
+		// Force-split consecutive parentheses: "((" and "))"
+		if (data->tok->curr_char_type == CHAR_PARENTHESIS
+			&& data->tok->prev_char_type == CHAR_PARENTHESIS
+			&& data->tok->pos > data->tok->prev_pos)
 		{
-			if (data->tok->prev_char_type != CHAR_SPACE)
-			{
-				// Create with previous_char_type
-				// Can be done in one line lol
-				tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
-				create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-			}
+			tok_type = get_tok_type(
+				data->tok->input[data->tok->prev_pos],
+				check_next_char(data->tok->input, data->tok->prev_pos));
+			// emit the previous single parenthesis
+			create_token(data, data->tok->prev_pos, data->tok->prev_pos + 1, tok_type);
+			// start a new token at current parenthesis
 			data->tok->prev_pos = data->tok->pos;
 		}
-		data->tok->prev_char_type = data->tok->curr_char_type;
-		data->tok->pos++;
-	}
-	// Handle the final token if needed
-	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
-	{
-		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
-		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-	}
-	return (0);
+
+        // For operators, always create a token when the character type changes OR when we have consecutive operators
+        if (data->tok->curr_char_type != data->tok->prev_char_type)
+        {
+            if (data->tok->prev_char_type != CHAR_SPACE)
+            {
+                // Create with previous_char_type
+                // Can be done in one line lol
+                tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+                create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+            }
+            data->tok->prev_pos = data->tok->pos;
+        }
+        data->tok->prev_char_type = data->tok->curr_char_type;
+        data->tok->pos++;
+    }
+    // Handle the final token if needed
+    if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+    {
+        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos], check_next_char(data->tok->input, data->tok->prev_pos));
+        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+    }
+    return (0);
 }
 
 // Turn the token linked list in an array, easier for AST.

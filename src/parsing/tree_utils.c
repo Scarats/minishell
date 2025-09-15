@@ -1,21 +1,27 @@
 #include "../minishell.h"
 
-// Check if the token is a redirection: 1 yes 0 no.
+static int	is_op_or_redir(t_token_type t)
+{
+    return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR
+        || t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT
+        || t == TOKEN_APPEND || t == TOKEN_HEREDOC);
+}
+
 int	is_redir(t_token_type t)
 {
-	return (t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT || t == TOKEN_APPEND || t == TOKEN_HEREDOC);
+    return (t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT
+        || t == TOKEN_APPEND || t == TOKEN_HEREDOC);
 }
 
 // Check if && or ||
-int	is_and_or(t_token_type t)
+int is_and_or(t_token_type t)
 {
-    return (t == TOKEN_AND_AND || t == TOKEN_OR);
+	return (t == TOKEN_AND_AND || t == TOKEN_OR);
 }
 
-int	is_word_token(t_token_type t)
+int is_word_token(t_token_type t)
 {
-    return (t == TOKEN_CMD || t == TOKEN_ARGUMENT || t == TOKEN_FILE
-        || t == TOKEN_ENV_VAR || t == TOKEN_TEXT);
+	return (t == TOKEN_CMD || t == TOKEN_ARGUMENT || t == TOKEN_FILE || t == TOKEN_ENV_VAR || t == TOKEN_TEXT);
 }
 
 // Check the conditions of what comes before and after '('
@@ -26,16 +32,17 @@ int check_left_par(t_token *tok_array, int index, int size)
 	t_token_type prev;
 
 	if (index > 0)
-    {
+	{
 		prev = tok_array[index - 1].type;
-        if (!is_and_or(prev) && prev != TOKEN_LPAREN)
-            return (1);
-    }
-    if (index + 1 >= size)
-        return (1);
+		// Allow preceding: ( , any binary op, or redirection
+		if (!is_op_or_redir(prev) && prev != TOKEN_LPAREN)
+			return (1);
+	}
+	if (index + 1 >= size)
+		return (1);
 	else if (!is_word_token(tok_array[index + 1].type) && tok_array[index + 1].type != TOKEN_LPAREN)
-        return (1);
-    return (0);
+		return (1);
+	return (0);
 }
 
 // Check the conditions of what comes before and after ')'
@@ -48,7 +55,7 @@ int check_right_par(t_token *tok_array, int index, int size)
 	if (index == 0)
 		return (1); // Cannot start with )
 	else if (index > 0)
-    {
+	{
 		// Previous token word or )
 		prev = tok_array[index - 1].type;
 		if (!is_word_token(prev) && prev != TOKEN_RPAREN)
@@ -56,11 +63,10 @@ int check_right_par(t_token *tok_array, int index, int size)
 	}
 	if (index + 1 >= size)
 		return (0); // end-of-input after ')'
-    // Next token operator or ) or end-of-input
-	if (!is_and_or(tok_array[index + 1].type) && tok_array[index + 1].type != TOKEN_RPAREN)
+					// Next token: allow any binary op, redirection, or another ')'
+	if (!is_op_or_redir(tok_array[index + 1].type) && tok_array[index + 1].type != TOKEN_RPAREN)
 		return (1);
 	return (0);
-
 }
 
 // Check for (a)(b), (((a) && b errors.
@@ -101,7 +107,7 @@ int wrapped_in_paren(t_token *tok_array, int size)
 
 	i = -1;
 	depth = 0;
-	if (size < 2 || tok_array[0].type != TOKEN_LPAREN || tok_array[size - 1].type != TOKEN_RPAREN) 
+	if (size < 2 || tok_array[0].type != TOKEN_LPAREN || tok_array[size - 1].type != TOKEN_RPAREN)
 		return (0);
 	// What happens if size == 2 and it's just () ?
 	if (size == 2)
@@ -117,7 +123,6 @@ int wrapped_in_paren(t_token *tok_array, int size)
 	}
 	return (depth == 1); // Depth should be at 1 since we stopped before the last one.
 }
-
 
 // Return the number of cmd and args in tok_array
 int get_cmd_argc(t_token *tok_array, int size)
@@ -136,10 +141,8 @@ int get_cmd_argc(t_token *tok_array, int size)
 	return (cmd_argc);
 }
 
-
-
 // take token type and return node type.
-t_node_type	map_token_to_node(t_token_type t)
+t_node_type map_token_to_node(t_token_type t)
 {
 	if (t == TOKEN_PIPE)
 		return (NODE_PIPE);
@@ -152,13 +155,14 @@ t_node_type	map_token_to_node(t_token_type t)
 
 // Create new node to the list, malloc and memset it, add its type.
 // If first, initialize the list.
-t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type)
+t_redir *add_redirection(t_main_data *data, t_node *node, t_token_type type)
 {
 	t_redir *redirection;
 	t_redir *last;
 
 	redirection = my_malloc(&data->malloc_tree, sizeof(t_redir));
 	redirection->type = type;
+	redirection->fd = -1;
 	if (!node->redirection)
 		node->redirection = redirection;
 	else
