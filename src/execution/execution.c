@@ -6,7 +6,7 @@
 // The recursion breakpoint is reached when a NODE_COMMAND is reached.
 int traverse_tree(t_node *node ,t_main_data *data)
 {
-	// Maybe add the check for subshell here.
+	// Create a subshell here.
 	if (node->type == NODE_COMMAND)
 		return (exec_cmd(node, data));
 	else if (node->type == NODE_PIPE)

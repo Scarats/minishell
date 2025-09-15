@@ -1,4 +1,4 @@
-# Guideline
+# minishell
 
 ## Testing
 
@@ -28,8 +28,9 @@ Functions should return integers, 1 for error and 0 for success.
 They should receive pointers.
 It's not mandatory, just simplify everything imo.
 
-# TODO
+# ToDo
 
+- [ ] Create subshell.
 - [ ] Add the function swap_list(from, to) to optimize memory usage at parsing.
 - [ ] Execution.
 - [ ] Error handling system.

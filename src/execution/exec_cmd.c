@@ -73,12 +73,12 @@ int set_io_fds(t_node *node, t_main_data *data)
 	if (!data)
 		data = NULL;
 
-	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+	if (node->input_fd != -1)
 	{
 		dup2(node->input_fd, STDIN_FILENO);
 		close(node->input_fd);
 	}
-	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+	if (node->output_fd != -1)
 	{
 		dup2(node->output_fd, STDOUT_FILENO);
 		close(node->output_fd);
