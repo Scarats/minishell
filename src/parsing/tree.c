@@ -40,7 +40,7 @@ t_node *create_node(t_main_data *data, t_token *tok_array, t_node_type type, int
 
 	node = my_malloc(&data->malloc_tree, sizeof(t_node));
 	node->type = type;
-	node->subshell = false;
+	node->create_subshell = false;
 	node->pipefd[0] = -1;
 	node->pipefd[1] = -1;
 	node->left_pid = -1;
@@ -89,7 +89,7 @@ int find_operator(t_token *tok_array, int size)
 // create a node from it.
 // Call itself from the first token of the left part, and call itself from the first token of the right part.
 // Continue until no operator is found.
-t_node *build_tree(t_main_data *data, t_token *tok_array, int size)
+t_node *build_tree(t_main_data *data, t_token *tok_array, int size, int depth)
 {
 	int i;
 	// char **cmd;
@@ -101,20 +101,27 @@ t_node *build_tree(t_main_data *data, t_token *tok_array, int size)
 	if (size <= 0 || !tok_array || check_paren_error(tok_array, size)) // (a)(b), (((((a) && b are errors
 		return (NULL); // Error.
 	else if (wrapped_in_paren(tok_array, size))
-		return (build_tree(data, tok_array + 1, size - 2));
+	{
+		node = build_tree(data, tok_array + 1, size - 2, depth + 1);
+		node->create_subshell = true;
+		node->in_subshell = depth + 1;
+		return (node);
+	}
 	i = find_operator(tok_array, size);
 	if (i < 0)
 	{
 		// end of recursion. add the full command to the node not only one token.
 		// each token->word to command.
 		node = create_node(data, tok_array, map_token_to_node(tok_array[0].type), size); // Could pass node command directly.
+		node->in_subshell = depth;
 		return (node);
 	}
 	else
 	{
 		node = create_node(data, NULL, map_token_to_node(tok_array[i].type), 0);
-		node->left = build_tree(data, tok_array, i);
-		node->right = build_tree(data, tok_array + i + 1, size - (i + 1));
+		node->in_subshell = depth;
+		node->left = build_tree(data, tok_array, i, depth);
+		node->right = build_tree(data, tok_array + i + 1, size - (i + 1), depth);
 		return (node);
 	}
 }

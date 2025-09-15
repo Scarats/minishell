@@ -30,11 +30,11 @@ It's not mandatory, just simplify everything imo.
 
 # ToDo
 
-- [ ] Create subshell.
+- [ ] See exit_status / code.
 - [ ] Add the function swap_list(from, to) to optimize memory usage at parsing.
 - [ ] Execution.
 - [ ] Error handling system.
 - [ ] Heredoc.
 - [ ] Signals.
 - [ ] Readline & continuous input system (it's currently a AI generated one for testing)
-- [ ] See for subshell creation.
+- [x] Create subshell.
