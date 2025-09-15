@@ -34,5 +34,6 @@ It's not mandatory, just simplify everything imo.
 - [ ] Execution.
 - [ ] Error handling system.
 - [ ] Heredoc.
+- [ ] Signals.
 - [ ] Readline & continuous input system (it's currently a AI generated one for testing)
 - [ ] See for subshell creation.

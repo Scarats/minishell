@@ -23,10 +23,10 @@ int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int siz
 			if (i + 1 >= size || tok_array[i + 1].type != TOKEN_FILE)
 				return (1);
 			curr_redir = add_redirection(data, node, tok_array[i++].type);
-			curr_redir->filename = my_strdup(data->malloc_tree, tok_array[i].word);
+			curr_redir->filename = my_strdup(&data->malloc_tree, tok_array[i].word);
 		}
 		else if ((tok_array[i].type == TOKEN_CMD || tok_array[i].type == TOKEN_ARGUMENT) && j < cmd_argc)
-			node->cmd_argv[j++] = my_strdup(data->malloc_tree, tok_array[i].word);
+			node->cmd_argv[j++] = my_strdup(&data->malloc_tree, tok_array[i].word);
 	}
 	if (node->cmd_argv)
 		node->cmd_argv[j] = NULL;
