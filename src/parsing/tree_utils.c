@@ -1,6 +1,34 @@
 #include "../minishell.h"
 
-static int	is_op_or_redir(t_token_type t)
+int is_built_in(char *cmd)
+{
+	int i;
+	int size;
+    const char *builtins[] = {
+        "echo",
+        "cd",
+        "pwd",
+        "export",
+        "unset",
+        "env",
+        "exit",
+        NULL
+    };
+
+	i = 0;
+	size = ft_strlen(cmd);
+	if (size < 1)
+		return (0);
+	while(builtins[i])
+	{
+		if (size == ft_strlen(builtins[i]) && ft_strncmp(builtins[i], cmd, (size_t)size) == 0)
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+int	is_op_or_redir(t_token_type t)
 {
     return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR
         || t == TOKEN_REDIRECT_IN || t == TOKEN_REDIRECT_OUT

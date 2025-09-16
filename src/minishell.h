@@ -72,6 +72,7 @@ typedef struct s_redir
 typedef struct s_node
 {
 	t_node_type type;
+	bool built_in;
 	bool create_subshell; // Trigger a subshell creation.
 	int in_subshell; // increase each time we create a subshell, it's the depth of subshells.
 
