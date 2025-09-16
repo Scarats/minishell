@@ -172,7 +172,7 @@ int exec_cmd(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
 int or_or(t_node *node, t_main_data *data);
 int pipes(t_node *node, t_main_data *data);
-int cmd_cd(void);
+int cmd_cd(t_node *node);
 int exec_builtins(t_node *node, t_main_data *data);
 int is_builtin(char *cmd);
 

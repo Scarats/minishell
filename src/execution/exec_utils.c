@@ -1,5 +1,6 @@
 #include "../minishell.h"
 
+// Execute built-in functions.
 int exec_builtins(t_node *node, t_main_data *data)
 {
 	int error;
@@ -11,9 +12,11 @@ int exec_builtins(t_node *node, t_main_data *data)
 	lenght = ft_strlen(node->cmd_argv[0]);
 
 	error = 0;
-	if (ft_strncmp(node->cmd_argv[0], "cd", lenght))
+	if (!ft_strncmp(node->cmd_argv[0], "cd", lenght))
 	{
-		error = cmd_cd();
+		error = cmd_cd(node);
 	}
+	else
+		printf(RED"error: built-in not found.\n"RESET);
 	return (error);
 }

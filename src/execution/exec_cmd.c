@@ -113,6 +113,8 @@ int exec_cmd(t_node *node, t_main_data *data)
     int status;
     int error;
 
+	if (!data->in_child && !node->in_subshell && node->builtin)
+		child_exec(data, node);
     // If you have parent-only builtins, handle and return here:
     // if (!data->in_child && is_parent_builtin(node)) return run_builtin_in_parent(node, data);
 
