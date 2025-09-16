@@ -37,6 +37,13 @@ It's not mandatory, just simplify everything imo.
 
 **Thomas**
 - [ ] Builtins.
+	- [ ] pwd
+	- [ ] echo
+	- [ ] export
+	- [ ] unset
+	- [ ] env
+	- [ ] exit
+	- [x] cd
 - [ ] See exit_status / code.
 - [ ] Signals.
 - [ ] Execution.
