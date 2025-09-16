@@ -89,7 +89,7 @@ int set_io_fds(t_node *node, t_main_data *data)
 }
 
 // Call step by step each function for clean execution.
-int child_exec(t_main_data *data, t_node *node)
+int exec_handler(t_main_data *data, t_node *node)
 {
 	int error;
 
@@ -114,7 +114,7 @@ int exec_cmd(t_node *node, t_main_data *data)
     int error;
 
 	if (node->builtin)
-		return (child_exec(data, node));
+		return (exec_handler(data, node));
     // If you have parent-only builtins, handle and return here:
     // if (!data->in_child && is_parent_builtin(node)) return run_builtin_in_parent(node, data);
 
@@ -124,7 +124,7 @@ int exec_cmd(t_node *node, t_main_data *data)
 
     if (pid == 0)
     {
-        error = child_exec(data, node); // sets pipe defaults, applies redirs, then execve
+        error = exec_handler(data, node); // sets pipe defaults, applies redirs, then execve
         exit(error);
     }
 
