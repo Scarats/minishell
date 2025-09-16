@@ -31,7 +31,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int siz
 	if (node->cmd_argv)
 		node->cmd_argv[j] = NULL;
 	if (is_builtin(node->cmd_argv[0]))
-		node->built_in = true;
+		node->builtin = true;
 	return (0);
 }
 

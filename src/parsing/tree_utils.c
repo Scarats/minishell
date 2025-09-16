@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-int is_built_in(char *cmd)
+int is_builtin(char *cmd)
 {
 	int i;
 	int size;

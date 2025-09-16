@@ -113,6 +113,7 @@ int exec_cmd(t_node *node, t_main_data *data)
     int status;
     int error;
 
+	if (node->builtin)
     // If you have parent-only builtins, handle and return here:
     // if (!data->in_child && is_parent_builtin(node)) return run_builtin_in_parent(node, data);
 
