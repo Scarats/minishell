@@ -12,6 +12,7 @@ int is_builtin(char *cmd)
         "unset",
         "env",
         "exit",
+		"matrix",
         NULL
     };
 

@@ -49,6 +49,9 @@ It's not mandatory, just simplify everything imo.
 # ToDo
 
 **Thomas**
+Matrix:
+
+- [ ] take 2 arguments to set the width and the height.
 
 - [ ] Builtins.
   - [ ] echo

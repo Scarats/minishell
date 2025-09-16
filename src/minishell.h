@@ -18,7 +18,7 @@
 # define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
 # define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
 # define RESET "\x1B[0m"
-
+# define MATRIX 50
 typedef enum e_char_type
 {
 	CHAR_SPACE,
@@ -178,5 +178,6 @@ int is_builtin(char *cmd);
 int cd(t_node *node);
 int pwd(void);
 int echo(char **argv);
+int matrix(char *arg);
 
 #endif
