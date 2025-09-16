@@ -31,7 +31,11 @@ int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int siz
 	if (node->cmd_argv)
 		node->cmd_argv[j] = NULL;
 	if (is_builtin(node->cmd_argv[0]))
+	{
+		printf(GREEN"%s\n"RESET, node->cmd_argv[0]);
 		node->builtin = true;
+		printf(RED"SET TO BUILDIN\n"RESET);
+	}
 	return (0);
 }
 
@@ -43,6 +47,7 @@ t_node *create_node(t_main_data *data, t_token *tok_array, t_node_type type, int
 	node = my_malloc(&data->malloc_tree, sizeof(t_node));
 	node->type = type;
 	node->create_subshell = false;
+	node->builtin = false;
 	node->pipefd[0] = -1;
 	node->pipefd[1] = -1;
 	node->left_pid = -1;

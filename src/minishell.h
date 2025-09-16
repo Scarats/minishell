@@ -10,11 +10,13 @@
 #include <unistd.h>
 #include <string.h>
 
-// typedef enum e_quote_state {
-//     QUOTE_NONE,
-//     QUOTE_SINGLE,
-//     QUOTE_DOUBLE
-// } t_quote_state;
+# define RED "\x1B[91m"    // Lighter red
+# define ORANGE "\x1B[33m" // Orange/yellow
+# define GREEN "\x1B[32m"  // Green
+# define BLUE "\x1B[94m"   // Light blue
+# define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
+# define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
+# define RESET "\x1B[0m"
 
 typedef enum e_char_type
 {
@@ -170,5 +172,8 @@ int exec_cmd(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
 int or_or(t_node *node, t_main_data *data);
 int pipes(t_node *node, t_main_data *data);
+int cmd_cd(void);
+int exec_builtins(t_node *node, t_main_data *data);
+int is_builtin(char *cmd);
 
 #endif

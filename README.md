@@ -22,6 +22,11 @@ test 3:
 echo "Hello mgl" | cat > output
 ```
 
+test 4:
+```
+(((echo start && (printf "inside\n" > tmp1.txt && cat tmp1.txt)) | tr a-z A-Z) || ((grep root /etc/passwd || echo no_root) && (echo fallback > tmp2.txt))) && ((cat tmp1.txt tmp2.txt | wc -l > lines.txt) || echo count_failed)
+```
+
 ## Return values
 
 Functions should return integers, 1 for error and 0 for success.
@@ -30,11 +35,15 @@ It's not mandatory, just simplify everything imo.
 
 # ToDo
 
+**Thomas**
+- [ ] Builtins.
 - [ ] See exit_status / code.
-- [ ] Add the function swap_list(from, to) to optimize memory usage at parsing.
-- [ ] Execution.
-- [ ] Error handling system.
-- [ ] Heredoc.
 - [ ] Signals.
-- [ ] Readline & continuous input system (it's currently a AI generated one for testing)
+- [ ] Execution.
+- [ ] Handle PATH (not the current hardcoded version).
+- [ ] Error handling system.
 - [x] Create subshell.
+
+**Albert**
+- [ ] Heredoc.
+- [ ] Readline & continuous input system (it's currently a AI generated one for testing)

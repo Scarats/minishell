@@ -63,8 +63,10 @@ int execution(t_node *node, t_main_data *data)
 {
 	if (!data)
 		data = NULL;
-
-	execve(node->path, node->cmd_argv, NULL);
+	if (node->builtin)
+		return (exec_builtins(node, data));
+	else
+		execve(node->path, node->cmd_argv, NULL);
 	return (1);
 }
 
@@ -92,16 +94,14 @@ int child_exec(t_main_data *data, t_node *node)
 	int error;
 
 	error = 0;
-	error = get_bin_path(node, data);
+	if (!node->builtin)
+		error = get_bin_path(node, data);
 	if (error == 0)
 		error = set_io_fds(node, data);
 	if (error == 0)
 		error = redirections(node, data);
 	if (error == 0)
-	{
-		execution(node, data);
-		error = 1; // Should not arrive here.
-	}
+		error = execution(node, data);
 	return (error);
 }
 
@@ -113,7 +113,6 @@ int exec_cmd(t_node *node, t_main_data *data)
     int status;
     int error;
 
-	if (node->builtin)
     // If you have parent-only builtins, handle and return here:
     // if (!data->in_child && is_parent_builtin(node)) return run_builtin_in_parent(node, data);
 
