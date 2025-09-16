@@ -3,62 +3,65 @@
 // Read 
 int gen_random(int size)
 {
-	int fd;
-	int seed;
-	char *addr;
+    int fd;
+    int seed;
+    char *addr;
 
-	addr = NULL;
-	seed = 0;
-	fd = open("/dev/urandom", O_RDONLY);
-	if (fd == -1)
-		fd = open("/dev/random", O_RDONLY);
-	if (fd == -1)
-	{
-		addr = malloc(1);	
-		seed = ft_atoi((char *)&addr);
-		free(addr);
-	}
-	else
-	{
-		read(fd, &seed, sizeof(seed));
-		close(fd);
-	}
-	return((seed % size + 1) - size);
+	if (size == 0)
+		size = MATRIX;
+    addr = NULL;
+    seed = 0;
+    fd = open("/dev/urandom", O_RDONLY);
+    if (fd == -1)
+        fd = open("/dev/random", O_RDONLY);
+    if (fd == -1)
+    {
+        addr = malloc(1);	
+        seed = (int)(uintptr_t)addr;
+        free(addr);
+    }
+    else
+    {
+        read(fd, &seed, sizeof(seed));
+        close(fd);
+    }
+    return((seed % size + 1) - size);
 }
 
-void gen_matrix(int *array, int size)
+void gen_matrix(int *array, int width, int height)
 {
 	int i;
 	int prev;
 	int range;
 
 	i = 1;
-	array[0] = gen_random(size);	
+	array[0] = gen_random(width);	
 	prev = array[0];
-	while (i < 30)
+	while (i < width)
 	{
-		if ((size - prev) <= 0)
-			range = prev - size;
+		if ((height - prev) <= 0)
+			range = prev - height;
 		else
-			range = size - prev;
+			range = height - prev;
 		array[i] = gen_random(range);
 		prev = array[i];
 		i++;
 	}
 }
 
-void fill_buff(int *array, char *buff, int size)
+void fill_buff(int *array, char *buff, int width, int height)
 {
     int i;
     int r;
     int ch;
     const int printable_count = 126 - 33 + 1;
 
-    for (i = 0; i < MATRIX; ++i)
+	i = 0;
+    while(i < width)
     {
         if (array[i] > 0)
         {
-            r = gen_random(size);
+            r = gen_random(height);
             if (r < 0)
                 r = -r;
             if (r == 0)
@@ -68,43 +71,58 @@ void fill_buff(int *array, char *buff, int size)
         }
         else
             buff[i] = ' ';
-        if (array[i] >= size)
-            array[i] = -size;
+        if (array[i] >= height)
+            array[i] = -height;
         else
             array[i] += 1;
+		i++;
     }
-    buff[MATRIX] = '\0';
+    buff[width] = '\0';
 }
 
-void print_matrix(int *array, char *buff, int size)
+void print_matrix(int *array, char *buff, int width, int height)
 {
 	while (1)
 	{
-		fill_buff(array, buff, size);
+		fill_buff(array, buff, width, height);
 		printf(GREEN"%s\n"RESET, buff);
+		usleep(10000);
 	}
-
 }
 
-// Kill it with signal
-int matrix(char *arg)
+// Usage:
+// matrix width height
+int matrix(char **argv)
 {
-    int size;
-    int array[MATRIX];     // array of ints, not pointers
-    char buff[MATRIX + 1];     // buffer with room for null terminator
-	char *addr;
+    int width;
+	int height;
+    int *array;
+    char *buff;
 
-	addr = NULL;
-	printf(RED"HOOOLLLLA\n"RESET);
-	if (arg)
-		size = ft_atoi(arg);
-	else
-	{
-		addr = malloc(1);
-		size = ft_atoi((char *)&addr);
-		free(addr);
-	}
-	gen_matrix(array, size);
-	print_matrix(array, buff, size);
-	return (0);
+    buff = NULL;
+    if (argv[1])
+        width = ft_atoi(argv[1]);
+    else
+    {
+        buff = malloc(1);
+        width = (int)(uintptr_t)buff;
+		width /= 2;
+        free(buff);
+    }
+    if (width == 0)
+        width = MATRIX;
+    /* allocate enough bytes for 'width' ints */
+    array = malloc(width * sizeof(*array));
+    buff = malloc(width + 1);
+    
+    if (argv[2])
+        height = atoi(argv[2]);
+    else
+        height = MATRIX;
+    gen_matrix(array, width, height);
+    print_matrix(array, buff, width, height);
+	
+	free(array);
+	free(buff);
+    return (0);
 }

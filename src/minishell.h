@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <dirent.h>
+#include <stdint.h>
 
 # define RED "\x1B[91m"    // Lighter red
 # define ORANGE "\x1B[33m" // Orange/yellow
@@ -178,6 +179,6 @@ int is_builtin(char *cmd);
 int cd(t_node *node);
 int pwd(void);
 int echo(char **argv);
-int matrix(char *arg);
+int matrix(char **arg);
 
 #endif
