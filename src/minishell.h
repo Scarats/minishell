@@ -19,7 +19,7 @@
 # define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
 # define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
 # define RESET "\x1B[0m"
-# define MATRIX 50
+# define MATRIX 100
 typedef enum e_char_type
 {
 	CHAR_SPACE,

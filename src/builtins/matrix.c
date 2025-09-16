@@ -86,7 +86,7 @@ void print_matrix(int *array, char *buff, int width, int height)
 	{
 		fill_buff(array, buff, width, height);
 		printf(GREEN"%s\n"RESET, buff);
-		usleep(10000);
+		usleep(20000);
 	}
 }
 
@@ -106,12 +106,12 @@ int matrix(char **argv)
     {
         buff = malloc(1);
         width = (int)(uintptr_t)buff;
-		width /= 2;
+		width %= MATRIX;
         free(buff);
     }
     if (width == 0)
         width = MATRIX;
-    /* allocate enough bytes for 'width' ints */
+
     array = malloc(width * sizeof(*array));
     buff = malloc(width + 1);
     
@@ -119,6 +119,8 @@ int matrix(char **argv)
         height = atoi(argv[2]);
     else
         height = MATRIX;
+	if (height == 0)
+		height = MATRIX;
     gen_matrix(array, width, height);
     print_matrix(array, buff, width, height);
 	
