@@ -1,6 +1,6 @@
 #include "../minishell.h"
  
-int cmd_cd(t_node *node)
+int cd(t_node *node)
 {
 	int error;
 

@@ -5,7 +5,6 @@ int exec_builtins(t_node *node, t_main_data *data)
 {
 	int error;
 	int lenght;
-	DIR *dir;
 
 	if (!data)
 		data = NULL;
@@ -14,13 +13,11 @@ int exec_builtins(t_node *node, t_main_data *data)
 
 	error = 0;
 	if (!ft_strncmp(node->cmd_argv[0], "cd", lenght))
-		error = cmd_cd(node);
+		error = cd(node);
 	else if (!ft_strncmp(node->cmd_argv[0], "pwd", lenght))
-	{
-		dir = opendir("..");
-		error = cmd_pwd(dir);
-		closedir(dir);
-	}
+		error = pwd();
+	else if (!ft_strncmp(node->cmd_argv[0], "echo", lenght))
+		error = echo(node->cmd_argv);
 	else
 		printf(RED"error: built-in not found.\n"RESET);
 	return (error);

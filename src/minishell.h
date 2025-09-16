@@ -175,7 +175,8 @@ int or_or(t_node *node, t_main_data *data);
 int pipes(t_node *node, t_main_data *data);
 int exec_builtins(t_node *node, t_main_data *data);
 int is_builtin(char *cmd);
-int cmd_cd(t_node *node);
-int cmd_pwd(DIR *dir);
+int cd(t_node *node);
+int pwd(void);
+int echo(char **argv);
 
 #endif

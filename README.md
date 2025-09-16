@@ -5,29 +5,37 @@
 You can test the minishell with this inputs:
 
 test 1:
+
 ```
 touch file1 && touch file2
 ```
+
 test 2:
+
 ```
 rm file3 || rm file1
 ```
+
 or do this as test 2:
+
 ```
 rm file3 || (rm file1 && rm file2)
 ```
 
 test 3:
+
 ```
 echo "Hello mgl" | cat > output
 ```
 
 test 4:
+
 ```
 (((echo start && (printf "inside\n" > tmp1.txt && cat tmp1.txt)) | tr a-z A-Z) || ((grep root /etc/passwd || echo no_root) && (echo fallback > tmp2.txt))) && ((cat tmp1.txt tmp2.txt | wc -l > lines.txt) || echo count_failed)
 ```
 
 to test cd:
+
 ```
 ls && (cd src && ls)
 ```
@@ -41,14 +49,16 @@ It's not mandatory, just simplify everything imo.
 # ToDo
 
 **Thomas**
+
 - [ ] Builtins.
-	- [ ] pwd
-	- [ ] echo
-	- [ ] export
-	- [ ] unset
-	- [ ] env
-	- [ ] exit
-	- [x] cd
+  - [ ] echo
+  - [ ] export
+  - [ ] unset
+  - [ ] env
+  - [ ] exit
+  - [x] pwd
+  - [x] cd
+- [ ] Check access permissions for builtins.
 - [ ] See exit_status / code.
 - [ ] Signals.
 - [ ] Execution.
@@ -57,5 +67,6 @@ It's not mandatory, just simplify everything imo.
 - [x] Create subshell.
 
 **Albert**
+
 - [ ] Heredoc.
 - [ ] Readline & continuous input system (it's currently a AI generated one for testing)
