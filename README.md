@@ -27,6 +27,11 @@ test 4:
 (((echo start && (printf "inside\n" > tmp1.txt && cat tmp1.txt)) | tr a-z A-Z) || ((grep root /etc/passwd || echo no_root) && (echo fallback > tmp2.txt))) && ((cat tmp1.txt tmp2.txt | wc -l > lines.txt) || echo count_failed)
 ```
 
+to test cd:
+```
+ls && (cd src && ls)
+```
+
 ## Return values
 
 Functions should return integers, 1 for error and 0 for success.
