@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <stdint.h>
 #include <limits.h>
+#include <signal.h>
 
 # define RED "\x1B[91m"    // Lighter red
 # define ORANGE "\x1B[33m" // Orange/yellow
@@ -21,6 +22,8 @@
 # define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
 # define RESET "\x1B[0m"
 # define MATRIX 100
+
+extern volatile sig_atomic_t stop_flag;   // declaration
 typedef enum e_char_type
 {
 	CHAR_SPACE,

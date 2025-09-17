@@ -1,6 +1,8 @@
 #include "minishell.h"
 #include <errno.h>
 
+volatile sig_atomic_t stop_flag = 0;
+
 int init(t_main_data *data)
 {
     data->tok = malloc(sizeof(t_tokenizer));
@@ -198,15 +200,27 @@ static void reset_tokenizer_for_line(t_tokenizer *tok, char *line)
     tok->token_list_size = 0;
 }
 
+void handler(int sig)
+{
+	(void)sig;
+    stop_flag = 1;
+}
+
 int main(void)
 {
+    struct sigaction sa;
     t_main_data data;
     t_token *current;
     int token_count;
     char *line = NULL;
     size_t cap = 0;
     ssize_t nread;
+    
+    sa.sa_handler = handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
 
+    sigaction(SIGINT, &sa, NULL);
     if (init(&data) != 0)
     {
         fprintf(stderr, "init failed\n");
@@ -244,6 +258,7 @@ int main(void)
             my_free(&data.malloc_tok);
             my_free(&data.malloc_tree);
             data.node = NULL;
+            stop_flag = 0; // reset stop_flag after cleaning
             continue;
         }
 
@@ -275,6 +290,7 @@ int main(void)
         my_free(&data.malloc_tok);
         my_free(&data.malloc_tree);
         data.node = NULL;
+        stop_flag = 0; // reset stop_flag after cleaning
     }
 
     // Free global resources

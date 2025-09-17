@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-// Read 
+// Read from random, else generate an int from a memory address.
 int gen_random(int size)
 {
     int fd;
@@ -28,6 +28,7 @@ int gen_random(int size)
     return((seed % size + 1) - size);
 }
 
+// Apply random numbers within height and -height to an array of int.
 void gen_matrix(int *array, int width, int height)
 {
 	int i;
@@ -49,6 +50,7 @@ void gen_matrix(int *array, int width, int height)
 	}
 }
 
+// Add random char if array[i] is positive, else add space.
 void fill_buff(int *array, char *buff, int width, int height)
 {
     int i;
@@ -85,7 +87,7 @@ void print_matrix(int *array, char *buff, int width, int height)
 	int i;
 
 	i = 0;
-	while (1)
+	while (!stop_flag)
 	{
 		fill_buff(array, buff, width, height);
 		printf(GREEN"%s\n"RESET, buff);
