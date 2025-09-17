@@ -11,6 +11,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <stdint.h>
+#include <limits.h>
 
 # define RED "\x1B[91m"    // Lighter red
 # define ORANGE "\x1B[33m" // Orange/yellow

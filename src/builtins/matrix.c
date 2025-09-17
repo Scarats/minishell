@@ -82,11 +82,21 @@ void fill_buff(int *array, char *buff, int width, int height)
 
 void print_matrix(int *array, char *buff, int width, int height)
 {
+	int i;
+
+	i = 0;
 	while (1)
 	{
 		fill_buff(array, buff, width, height);
 		printf(GREEN"%s\n"RESET, buff);
-		usleep(20000);
+		if (i == 1000)
+		{
+			gen_matrix(array, width, height);
+			i = 0;
+		}
+		else
+			usleep(20000);
+		i++;
 	}
 }
 
