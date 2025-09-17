@@ -7,8 +7,8 @@ int gen_random(int size)
     int seed;
     char *addr;
 
-	if (size == 0)
-		size = MATRIX;
+    if (size == 0)
+        size = MATRIX;
     addr = NULL;
     seed = 0;
     fd = open("/dev/urandom", O_RDONLY);
@@ -16,7 +16,7 @@ int gen_random(int size)
         fd = open("/dev/random", O_RDONLY);
     if (fd == -1)
     {
-        addr = malloc(1);	
+        addr = malloc(1);
         seed = (int)(uintptr_t)addr;
         free(addr);
     }
@@ -25,29 +25,29 @@ int gen_random(int size)
         read(fd, &seed, sizeof(seed));
         close(fd);
     }
-    return((seed % size + 1) - size);
+    return ((seed % size + 1) - size);
 }
 
 // Apply random numbers within height and -height to an array of int.
 void gen_matrix(int *array, int width, int height)
 {
-	int i;
-	int prev;
-	int range;
+    int i;
+    int prev;
+    int range;
 
-	i = 1;
-	array[0] = gen_random(width);	
-	prev = array[0];
-	while (i < width)
-	{
-		if ((height - prev) <= 0)
-			range = prev - height;
-		else
-			range = height - prev;
-		array[i] = gen_random(range);
-		prev = array[i];
-		i++;
-	}
+    i = 1;
+    array[0] = gen_random(width);
+    prev = array[0];
+    while (i < width)
+    {
+        if ((height - prev) <= 0)
+            range = prev - height;
+        else
+            range = height - prev;
+        array[i] = gen_random(range);
+        prev = array[i];
+        i++;
+    }
 }
 
 // Add random char if array[i] is positive, else add space.
@@ -58,8 +58,8 @@ void fill_buff(int *array, char *buff, int width, int height)
     int ch;
     const int printable_count = 126 - 33 + 1;
 
-	i = 0;
-    while(i < width)
+    i = 0;
+    while (i < width)
     {
         if (array[i] > 0)
         {
@@ -77,29 +77,29 @@ void fill_buff(int *array, char *buff, int width, int height)
             array[i] = -height;
         else
             array[i] += 1;
-		i++;
+        i++;
     }
     buff[width] = '\0';
 }
 
 void print_matrix(int *array, char *buff, int width, int height)
 {
-	int i;
+    int i;
 
-	i = 0;
-	while (!stop_flag)
-	{
-		fill_buff(array, buff, width, height);
-		printf(GREEN"%s\n"RESET, buff);
-		if (i == 1000)
-		{
-			gen_matrix(array, width, height);
-			i = 0;
-		}
-		else
-			usleep(20000);
-		i++;
-	}
+    i = 0;
+    while (!stop_flag)
+    {
+        fill_buff(array, buff, width, height);
+        printf(GREEN "%s\n" RESET, buff);
+        if (i == 1000)
+        {
+            gen_matrix(array, width, height);
+            i = 0;
+        }
+        else
+            usleep(20000);
+        i++;
+    }
 }
 
 // Usage:
@@ -107,7 +107,7 @@ void print_matrix(int *array, char *buff, int width, int height)
 int matrix(char **argv)
 {
     int width;
-	int height;
+    int height;
     int *array;
     char *buff;
 
@@ -118,7 +118,7 @@ int matrix(char **argv)
     {
         buff = malloc(1);
         width = (int)(uintptr_t)buff;
-		width %= MATRIX;
+        width %= MATRIX;
         free(buff);
     }
     if (width == 0)
@@ -126,17 +126,17 @@ int matrix(char **argv)
 
     array = malloc(width * sizeof(*array));
     buff = malloc(width + 1);
-    
+
     if (argv[2])
         height = atoi(argv[2]);
     else
         height = MATRIX;
-	if (height == 0)
-		height = MATRIX;
+    if (height == 0)
+        height = MATRIX;
     gen_matrix(array, width, height);
     print_matrix(array, buff, width, height);
-	
-	free(array);
-	free(buff);
+
+    free(array);
+    free(buff);
     return (0);
 }
