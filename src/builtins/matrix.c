@@ -136,6 +136,8 @@ int matrix(char **argv)
     gen_matrix(array, width, height);
     print_matrix(array, buff, width, height);
 
+	printf(GREEN"\n\nWake Up, Neo...\n\n"RESET);
+
     free(array);
     free(buff);
     return (0);
