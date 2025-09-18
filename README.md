@@ -51,18 +51,15 @@ It's not mandatory, just simplify everything imo.
 **Thomas**
 Matrix:
 
-- [ ] Matrix need to catch signals to stop.
-- [ ] take 2 arguments to set the width and the height.
-
 - [ ] Builtins.
-  - [ ] echo
   - [ ] export
   - [ ] unset
   - [ ] env
   - [ ] exit
+  - [x] echo
   - [x] pwd
   - [x] cd
-- [ ] Check access permissions for builtins.
+  	- [ ] Check access permissions for builtins.
 - [ ] See exit_status / code.
 - [ ] Signals.
 - [ ] Execution.

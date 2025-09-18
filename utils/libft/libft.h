@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/15 10:33:03 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/18 15:40:15 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,5 +176,7 @@ int					check_access(char *path, int r, int w, int x);
 char				*find_bin(char *bin);
 // Add full array to the garbadge collector.
 void				my_array_addtolist(t_list **list, void **data);
+// Chose the output fd.
+int					fdprintf(int fd, const char *str, ...);
 
 #endif
