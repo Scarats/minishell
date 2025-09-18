@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 14:54:38 by tcardair          #+#    #+#             */
-/*   Updated: 2025/02/18 14:23:28 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/18 15:47:49 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,6 @@ int					type_p(void *p);
 unsigned long long	to_hexa(unsigned long long addr);
 int					type_xx(unsigned int nb, char c);
 int					type_u(unsigned int u);
+int					loop(char *str, va_list list);
 
 #endif
