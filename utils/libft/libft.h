@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/18 15:48:24 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/19 19:06:06 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,5 +178,6 @@ char				*find_bin(char *bin);
 void				my_array_addtolist(t_list **list, void **data);
 // Chose the output fd.
 int					fdprintf(int fd, const char *str, ...);
+void				free_2d_array(void **arr);
 
 #endif

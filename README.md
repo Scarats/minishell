@@ -61,6 +61,7 @@ Matrix:
   - [x] cd
   	- [ ] Check access permissions for builtins.
 - [ ] See exit_status / code.
+- [ ] Shells variables, 1 list, bool exported, non exported var are erased at the end of the process. Exported are kept.
 - [ ] Signals.
 - [ ] Execution.
 - [ ] Handle PATH (not the current hardcoded version).
