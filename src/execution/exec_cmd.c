@@ -6,6 +6,17 @@ int get_bin_path(t_node *node, t_main_data *data)
 	if (!data)
 		data = NULL;
 
+	if (!node->cmd_argv || !node->cmd_argv[0])
+		return (1);
+	if (ft_strchr(node->cmd_argv[0], '/'))
+	{
+		if (access(node->cmd_argv[0], X_OK) == 0)
+		{
+			node->path = node->cmd_argv[0];
+			return (0);
+		}
+		return (1);
+	}
 	node->path = find_bin(node->cmd_argv[0]);
 	if (node->path)
 		return (0);

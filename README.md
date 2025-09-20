@@ -59,12 +59,13 @@ Matrix:
   - [x] echo
   - [x] pwd
   - [x] cd
-  	- [ ] Check access permissions for builtins.
+    - [ ] Check access permissions for builtins.
 - [ ] See exit_status / code.
 - [ ] Shells variables, 1 list, bool exported, non exported var are erased at the end of the process. Exported are kept.
 - [ ] Signals.
 - [ ] Execution.
 - [ ] Handle PATH (not the current hardcoded version).
+- [ ] Make find bin look at the current dir as well.
 - [ ] Error handling system.
 - [x] Create subshell.
 
