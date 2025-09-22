@@ -3,12 +3,17 @@
 
 volatile sig_atomic_t stop_flag = 0;
 
-int init(t_main_data *data)
+int init(t_root *root)
 {
+	t_main_data *data;
+
+	data = root->data;
     data->tok = malloc(sizeof(t_tokenizer));
     if (!data->tok)
         return (1);
     ft_memset(data->tok, 0, sizeof(t_tokenizer));
+	data->root = root;
+	data->curr_env = copy_env(data->malloc_tree, root->env);
     data->tok->prev_char_type = CHAR_SPACE;
     data->tok->curr_char_type = CHAR_NULL;
     data->tok->double_quote = false;
@@ -206,27 +211,28 @@ void handler(int sig)
     stop_flag = 1;
 }
 
-int main(void)
+int main(int ac, char **av, char **envp)
 {
     struct sigaction sa;
-    t_main_data data;
     t_token *current;
     int token_count;
     char *line = NULL;
     size_t cap = 0;
     ssize_t nread;
+	t_root root;
     
     sa.sa_handler = handler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
 
     sigaction(SIGINT, &sa, NULL);
-    if (init(&data) != 0)
+
+	root.env = get_env_var(root.malloc_root, envp);
+    if (init(&root) != 0)
     {
         fprintf(stderr, "init failed\n");
         return 1;
     }
-
     while (1)
     {
         printf("minishell> ");
@@ -249,22 +255,22 @@ int main(void)
         if (!ft_strncmp(line, "exit", 5))
             break;
 
-        reset_tokenizer_for_line(data.tok, line);
+        reset_tokenizer_for_line(root.data->tok, line);
 
-        if (parser(&data) != 0)
+        if (parser(&root.data) != 0)
         {
             fprintf(stderr, "parse error\n");
             // Free anything allocated for this line (tokens/tree) before continuing
-            my_free(&data.malloc_tok);
-            my_free(&data.malloc_tree);
-            data.node = NULL;
+            my_free(&root.data->malloc_tok);
+            my_free(&root.data->malloc_tree);
+            root.data->node = NULL;
             stop_flag = 0; // reset stop_flag after cleaning
             continue;
         }
 
         printf("\nNo.  | %-12s | Value\n", "Type");
         printf("----------------------------------\n");
-        current = data.tok->token_list;
+        current = root.data->tok->token_list;
         token_count = 0;
         while (current)
         {
@@ -277,26 +283,26 @@ int main(void)
 
         // Print AST
         printf("AST:\n");
-        print_ast(data.node);
+        print_ast(root.data->node);
         printf("\n");
 
         // Call traverse_tree to test execution/traversal
         {
-            int exec_ret = traverse_tree(data.node, &data);
+            int exec_ret = traverse_tree(root.data->node, &root.data);
             printf("traverse_tree returned: %d\n\n", exec_ret);
         }
 
         // Free allocations for this iteration (tokens + AST) tracked by my_malloc
-        my_free(&data.malloc_tok);
-        my_free(&data.malloc_tree);
-        data.node = NULL;
+        my_free(&root.data->malloc_tok);
+        my_free(&root.data->malloc_tree);
+        root.data->node = NULL;
         stop_flag = 0; // reset stop_flag after cleaning
     }
 
     // Free global resources
-    my_free(&data.malloc_tok);
-    my_free(&data.malloc_tree);
+    my_free(&root.data->malloc_tok);
+    my_free(&root.data->malloc_tree);
     free(line);
-    free(data.tok);
+    free(root.data->tok);
     return 0;
 }

@@ -166,7 +166,9 @@ typedef struct s_main_data
 
 	bool in_child;
 
-	// t_env *curr_env;
+	t_root *root;
+	// Copy of the root env, to be passed to execve, it contains the local var of this command.
+	t_env *curr_env;
 
 	t_tokenizer *tok;
 } t_main_data;
@@ -178,6 +180,8 @@ typedef struct s_root
 	int last_exit_status;
 
 	t_env *env;
+
+	t_list *malloc_root;
 }	t_root;
 
 t_token_type get_tok_type(char c, char next);
@@ -206,5 +210,7 @@ int cd(t_node *node);
 int pwd(void);
 int echo(char **argv);
 int matrix(char **arg);
+t_env *copy_env(t_list *malloc_list, t_env *env);
+t_env *get_env_var(t_list *malloc_list, char **env);
 
 #endif
