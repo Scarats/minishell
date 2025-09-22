@@ -23,17 +23,28 @@ t_token_type get_word_type(t_main_data *data)
 // Create token, add them to the list and add type.
 int create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-	t_token *lst;
+	t_token *tok;
+	bool text;
 
+	text = false;
 	if (type == TOKEN_SPACE)
 		return (0);
-	lst = add_to_list(data, data->tok->last_token, start, end);
-	if (!lst)
+	tok = add_to_list(data, data->tok->last_token, start, end);
+	if (!tok)
 		return (1);
 	if (type == TOKEN_TEXT)
+	{
 		type = get_word_type(data);
-	lst->type = type;
-	lst->word = clean_string(lst->word);
+		text = true;
+	}
+	tok->type = type;
+	if (tok->type == TOKEN_ENV_VAR)
+		tok->word = get_env_var();
+	else if (text)
+		tok->word = ft_substr(data->tok->input, start, end - start);
+	if (text)
+		my_addtolist(&data->malloc_tok, tok->word);
+	tok->word = clean_string(tok->word);
 	return (0);
 }
 

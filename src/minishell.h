@@ -69,8 +69,17 @@ typedef enum e_node_type
 	NODE_PIPE,	  // |
 	NODE_AND,	  // &&
 	NODE_OR,	  // ||
-	// NODE_SUBSHELL // ()
 } t_node_type;
+
+typedef struct s_env
+{
+	char *name;
+	char *value;
+
+	bool exported;
+
+	struct s_env *next;
+}	t_env;
 
 typedef struct s_redir
 {
@@ -94,6 +103,7 @@ typedef struct s_node
 	pid_t left_pid;
 	pid_t right_pid;
 
+	t_env *curr_env;
 	char **cmd_argv;
 	t_redir *redirection;
 	char *path;
@@ -156,10 +166,19 @@ typedef struct s_main_data
 
 	bool in_child;
 
-	int last_exit_status;
+	// t_env *curr_env;
 
 	t_tokenizer *tok;
 } t_main_data;
+
+typedef struct s_root
+{
+	t_main_data *data;
+
+	int last_exit_status;
+
+	t_env *env;
+}	t_root;
 
 t_token_type get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
