@@ -17,6 +17,8 @@ char	*my_strdup(t_list **malloc_list, char *src)
 {
 	char	*dup;
 
+	if (!src || !malloc_list)
+		return (NULL);
 	dup = ft_strdup(src);
 	if (!dup)
 		return (NULL);
