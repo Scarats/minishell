@@ -56,7 +56,8 @@ Matrix:
   - [ ] unset
   - [ ] env
   - [ ] exit
-  - [x] echo
+  - [ ] echo
+	- [ ] must handle multiple inputs.
   - [x] pwd
   - [x] cd
     - [ ] Check access permissions for builtins.
@@ -67,7 +68,8 @@ Matrix:
 - [ ] Handle PATH (not the current hardcoded version).
 - [ ] Make find bin look at the current dir as well.
 - [ ] Error handling system.
-- [x] Create subshell.
+- [ ] Check output when command doesn't exist. (just input `lol` or `$donotexist`).
+- [x] Create subshell. 
 
 **Albert**
 

@@ -1,15 +1,28 @@
 #include "../minishell.h"
 
+// remove_token: unlink a token from a doubly-linked list
+void remove_token(t_token **head, t_token *t)
+{
+    if (!t)
+		return;
+    if (t->prev_token)
+		t->prev_token->next_token= t->next_token;
+    else
+		*head = t->next_token;
+    if (t->next_token)
+		t->next_token->prev_token = t->prev_token;
+}
+
 // Determine if the word is a command, argument, filename etc...
 // It will be done according to the previous tokens created.
-t_token_type get_word_type(t_main_data *data)
+t_token_type get_word_type(t_token *tok)
 {
 	t_token_type prev_type;
 
 	// It's the first node, then COMMAND
-	if (data->tok->last_token->prev_token == NULL)
+	if (tok->prev_token == NULL)
 		return (TOKEN_CMD);
-	prev_type = data->tok->last_token->prev_token->type;
+	prev_type = tok->prev_token->type;
 	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN || prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
 		return (TOKEN_FILE);
 	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR || prev_type == TOKEN_LPAREN || prev_type == TOKEN_RPAREN)
@@ -36,14 +49,19 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 		return (1);
 	if (type == TOKEN_TEXT)
 	{
-		type = get_word_type(data);
+		type = get_word_type(tok);
 		text = true;
 	}
 	tok->type = type;
 	if (text || tok->type == TOKEN_ENV_VAR)
 		word = ft_substr(data->tok->input, start, end - start);
 	if (tok->type == TOKEN_ENV_VAR)
+	{
 		tok->word = get_env_var(((t_root *)data->root)->env, word);
+		if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
+			remove_token(&data->tok->token_list, tok->prev_token);
+		tok->type = get_word_type(tok);
+	}
 	else if (text)
 		tok->word = word;
 	if (text)
@@ -182,3 +200,5 @@ int parser(t_main_data *data)
 	// my_free(&data->malloc_tok); // Token memory can be freed.
 	return (0);
 }
+
+

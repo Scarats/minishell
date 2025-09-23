@@ -7,7 +7,7 @@ char *get_env_var(t_env *env, char *target)
         return (NULL);
     while (env)
     {
-        if (ft_strncmp(env->name, target, ft_strlen(env->name)) == 0)
+        if (env->name && ft_strncmp(env->name, target, ft_strlen(env->name) + 1) == 0)
             return (env->value);
         env = env->next;
     }
@@ -35,8 +35,9 @@ t_env *set_env_var_list(t_list **malloc_list, char **env)
         if (!tmp || tmp[0] == NULL || tmp[1] == NULL)
 			return (NULL);
         node = my_malloc(malloc_list, sizeof(t_env));
-        node->name = tmp[0];
-        node->value = tmp[1];
+        node->name = my_strdup(malloc_list, tmp[0]);
+        node->value = my_strdup(malloc_list, tmp[1]);
+		node->next = NULL;
 		free_2d_array((void **)tmp);
         if (!head)
             head = node;
