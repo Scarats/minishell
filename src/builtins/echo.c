@@ -1,5 +1,14 @@
 #include "../minishell.h"
 
+void print_array(char **argv)
+{
+	int i;
+
+	i = 0;
+	while (argv[i])
+		printf("%s", argv[i++]);
+}
+
 int echo(char **argv)
 {
 	bool n;
@@ -12,11 +21,10 @@ int echo(char **argv)
 	if (n && !argv[2])
 		return (printf("\n"));
 	if (n)
-		printf("%s", argv[2]);
+		print_array(&argv[2]);
 	else
 	{
-		if (argv[1])
-			printf("%s", argv[1]);
+		print_array(&argv[1]);
 		printf("\n");
 	}
 	return (0);
