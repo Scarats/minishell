@@ -206,6 +206,24 @@ void handler(int sig)
     stop_flag = 1;
 }
 
+static void ft_display_prompt(void)
+{
+    char hostname[1024];
+    char username[1024];
+    
+    hostname[0] = '\0';
+    username[0] = '\0';
+    
+    gethostname(hostname, sizeof(hostname));
+    getlogin_r(username, sizeof(username));
+
+    printf(GREEN"Welcome to " RED "tcardair " GREEN "& " PURPLE "aadeikal's " GREEN "minishell\n");
+    
+    printf(BLUE "%s" RESET "@" GREEN "%s" RESET ":" PURPLE "minishell" RESET "> ", 
+           username, hostname);
+    fflush(stdout);
+}
+
 int main(void)
 {
     struct sigaction sa;
@@ -229,7 +247,7 @@ int main(void)
 
     while (1)
     {
-        printf("minishell> ");
+        ft_display_prompt();
         fflush(stdout);
         // init(&data);  // REMOVE: this re-mallocs data->tok and leaks the previous one
 
