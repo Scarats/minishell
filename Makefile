@@ -5,7 +5,7 @@ SRCS = src/minishell.c \
 	   src/execution/execution.c src/execution/or_or.c \
 	   src/execution/pipes.c src/execution/exec_utils.c \
 	   src/builtins/cd.c src/builtins/pwd.c src/builtins/echo.c \
-	   src/builtins/matrix.c
+	   src/builtins/matrix.c src/env_var/get_env_var.c
 
 FLAGS = -Wall -Wextra -Werror 
 CC    = cc

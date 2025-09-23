@@ -116,6 +116,36 @@ int exec_handler(t_main_data *data, t_node *node)
 	return (error);
 }
 
+// Run builtin in parent: save fds, apply redirs, run, then restore.
+int exec_builtin_in_parent(t_node *node, t_main_data *data)
+{
+    int saved_in;
+    int saved_out;
+    int error;
+
+    saved_in = dup(STDIN_FILENO);
+    saved_out = dup(STDOUT_FILENO);
+    if (saved_in == -1 || saved_out == -1)
+    {
+        if (saved_in != -1)
+			close(saved_in);
+        if (saved_out != -1)
+			close(saved_out);
+        return (1);
+    }
+
+    error = exec_handler(data, node);
+
+    // Restore stdio no matter what
+    if (dup2(saved_in, STDIN_FILENO) == -1)
+		error = 1;
+    if (dup2(saved_out, STDOUT_FILENO) == -1)
+		error = 1;
+    close(saved_in);
+    close(saved_out);
+    return (error);
+}
+
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
 int exec_cmd(t_node *node, t_main_data *data)
@@ -124,8 +154,14 @@ int exec_cmd(t_node *node, t_main_data *data)
     int status;
     int error;
 
-	if (node->builtin)
-		return (exec_handler(data, node));
+    if (node->builtin)
+    {
+        // If already in a child (e.g., inside a pipe/subshell), just run it here.
+        if (data->in_child)
+            return (exec_handler(data, node));
+        // Otherwise run in parent but restore stdio after redirections.
+        return (exec_builtin_in_parent(node, data));
+    }
     // If you have parent-only builtins, handle and return here:
     // if (!data->in_child && is_parent_builtin(node)) return run_builtin_in_parent(node, data);
 

@@ -25,11 +25,13 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 {
 	t_token *tok;
 	bool text;
+	char *word;
 
 	text = false;
+	word = NULL;
 	if (type == TOKEN_SPACE)
 		return (0);
-	tok = add_to_list(data, data->tok->last_token, start, end);
+	tok = add_to_list(data, data->tok->last_token);
 	if (!tok)
 		return (1);
 	if (type == TOKEN_TEXT)
@@ -38,12 +40,14 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 		text = true;
 	}
 	tok->type = type;
+	if (text || tok->type == TOKEN_ENV_VAR)
+		word = ft_substr(data->tok->input, start, end - start);
 	if (tok->type == TOKEN_ENV_VAR)
-		tok->word = get_env_var();
+		tok->word = get_env_var(((t_root *)data->root)->env, word);
 	else if (text)
-		tok->word = ft_substr(data->tok->input, start, end - start);
+		tok->word = word;
 	if (text)
-		my_addtolist(&data->malloc_tok, tok->word);
+		my_addtolist(&data->malloc_tok, word);
 	tok->word = clean_string(tok->word);
 	return (0);
 }

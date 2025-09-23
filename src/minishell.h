@@ -166,7 +166,7 @@ typedef struct s_main_data
 
 	bool in_child;
 
-	t_root *root;
+	void *root; // Pointer to root, has to be casted at the beginning.
 	// Copy of the root env, to be passed to execve, it contains the local var of this command.
 	t_env *curr_env;
 
@@ -186,7 +186,7 @@ typedef struct s_root
 
 t_token_type get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
-t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end);
+t_token *add_to_list(t_main_data *data, t_token *prev);
 int parser(t_main_data *data);
 int traverse_tree(t_node *node, t_main_data *data);
 int handle_quotes(t_main_data *data);
@@ -210,7 +210,8 @@ int cd(t_node *node);
 int pwd(void);
 int echo(char **argv);
 int matrix(char **arg);
-t_env *copy_env(t_list *malloc_list, t_env *env);
-t_env *get_env_var(t_list *malloc_list, char **env);
+t_env *copy_env(t_list **malloc_list, t_env *env);
+t_env *set_env_var_list(t_list **malloc_list, char **env);
+char *get_env_var(t_env *env, char *target);
 
 #endif

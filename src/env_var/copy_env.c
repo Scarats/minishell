@@ -1,6 +1,8 @@
 #include "../minishell.h"
 
-t_env *copy_env(t_list *malloc_list, t_env *env)
+// Duplicate a t_env linked list.
+// New memory is allocated and added to the malloc_list,
+t_env *copy_env(t_list **malloc_list, t_env *env)
 {
     t_env *new_head;
     t_env *new_tail;

@@ -32,7 +32,7 @@ char check_next_char(char *str, int pos)
 
 // Create token, add to the list, malloc.
 // if first node, set prev to NULL
-t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end)
+t_token *add_to_list(t_main_data *data, t_token *prev)
 {
 	t_token *new;
 

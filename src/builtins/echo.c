@@ -5,6 +5,8 @@ int echo(char **argv)
 	bool n;
 
 	n = false;
+	// if (argv[1] == NULL)
+		// return ((void)printf("\n"), 0);
 	if (!ft_strncmp(argv[1], "-n", sizeof(argv[1])))
 		n = true;
 	if (n)
