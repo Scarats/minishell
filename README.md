@@ -52,12 +52,11 @@ It's not mandatory, just simplify everything imo.
 Matrix:
 
 - [ ] Builtins.
-  - [ ] export
   - [ ] unset
-  - [ ] env
   - [ ] exit
-  - [ ] echo
-	- [ ] must handle multiple inputs.
+  - [x] env
+  - [x] echo
+  - [x] export
   - [x] pwd
   - [x] cd
     - [ ] Check access permissions for builtins.

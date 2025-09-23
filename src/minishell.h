@@ -214,5 +214,6 @@ t_env *copy_env(t_list **malloc_list, t_env *env);
 t_env *set_env_var_list(t_list **malloc_list, char **env);
 char *get_env_var(t_env *env, char *target);
 int export(t_root *root, char *var);
+int env(t_env *root_env);
 
 #endif
