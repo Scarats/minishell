@@ -1,5 +1,7 @@
 #include "../minishell.h"
 
+// Add var to env.
+// If no var, print all var of the env using env command.
 int export(t_root *root, char *var)
 {
 	t_env *new_var;
@@ -8,6 +10,8 @@ int export(t_root *root, char *var)
 
 	if (!root)
 		return (1);
+	if (!var)
+		return (env(root->env));
 	args = NULL;
 	new_var = my_malloc(&root->malloc_root, sizeof(t_env));
 	ptr = root->env;
