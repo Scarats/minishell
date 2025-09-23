@@ -17,16 +17,16 @@
 #include <sys/stat.h>
 #include <errno.h>
 
-# define RED "\x1B[91m"    // Lighter red
-# define ORANGE "\x1B[33m" // Orange/yellow
-# define GREEN "\x1B[32m"  // Green
-# define BLUE "\x1B[94m"   // Light blue
-# define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
-# define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
-# define RESET "\x1B[0m"
-# define MATRIX 100
+#define RED "\x1B[91m"	  // Lighter red
+#define ORANGE "\x1B[33m" // Orange/yellow
+#define GREEN "\x1B[32m"  // Green
+#define BLUE "\x1B[94m"	  // Light blue
+#define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
+#define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
+#define RESET "\x1B[0m"
+#define MATRIX 100
 
-extern volatile sig_atomic_t stop_flag;   // declaration
+extern volatile sig_atomic_t stop_flag; // declaration
 typedef enum e_char_type
 {
 	CHAR_SPACE,
@@ -66,9 +66,9 @@ typedef enum e_token_type
 typedef enum e_node_type
 {
 	NODE_COMMAND,
-	NODE_PIPE,	  // |
-	NODE_AND,	  // &&
-	NODE_OR,	  // ||
+	NODE_PIPE, // |
+	NODE_AND,  // &&
+	NODE_OR,   // ||
 } t_node_type;
 
 typedef struct s_env
@@ -79,7 +79,7 @@ typedef struct s_env
 	bool exported;
 
 	struct s_env *next;
-}	t_env;
+} t_env;
 
 typedef struct s_redir
 {
@@ -94,7 +94,7 @@ typedef struct s_node
 	t_node_type type;
 	bool builtin;
 	bool create_subshell; // Trigger a subshell creation.
-	int in_subshell; // increase each time we create a subshell, it's the depth of subshells.
+	int in_subshell;	  // increase each time we create a subshell, it's the depth of subshells.
 
 	struct s_node *left;
 	struct s_node *right;
@@ -182,7 +182,7 @@ typedef struct s_root
 	t_env *env;
 
 	t_list *malloc_root;
-}	t_root;
+} t_root;
 
 t_token_type get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
@@ -192,14 +192,14 @@ int traverse_tree(t_node *node, t_main_data *data);
 int handle_quotes(t_main_data *data);
 char *clean_string(char *input);
 t_node_type map_token_to_node(t_token_type t);
-int	is_redir(t_token_type type);
-t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type);
-int	is_and_or(t_token_type t);
+int is_redir(t_token_type type);
+t_redir *add_redirection(t_main_data *data, t_node *node, t_token_type type);
+int is_and_or(t_token_type t);
 t_node *build_tree(t_main_data *data, t_token *tok_list, int size, int depth);
 int get_cmd_argc(t_token *tok_list, int size);
 int check_paren_error(t_token *tok_list, int size);
 int wrapped_in_paren(t_token *tok_list, int size);
-int traverse_tree(t_node *node ,t_main_data *data);
+int traverse_tree(t_node *node, t_main_data *data);
 int exec_cmd(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
 int or_or(t_node *node, t_main_data *data);
@@ -213,5 +213,6 @@ int matrix(char **arg);
 t_env *copy_env(t_list **malloc_list, t_env *env);
 t_env *set_env_var_list(t_list **malloc_list, char **env);
 char *get_env_var(t_env *env, char *target);
+int export(t_root *root, char *var);
 
 #endif

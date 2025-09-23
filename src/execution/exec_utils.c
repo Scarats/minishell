@@ -20,7 +20,9 @@ int exec_builtins(t_node *node, t_main_data *data)
 		error = echo(node->cmd_argv);
 	else if (!ft_strncmp(node->cmd_argv[0], "matrix", lenght))
 		error = matrix(node->cmd_argv);
+	else if (!ft_strncmp(node->cmd_argv[0], "export", lenght))
+		error = export(data->root, node->cmd_argv[0]);
 	else
-		printf(RED"error: built-in not found.\n"RESET);
+		printf(RED "error: built-in not found.\n" RESET);
 	return (error);
 }
