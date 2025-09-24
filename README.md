@@ -66,8 +66,8 @@ Matrix:
 - [ ] Execution.
 - [ ] Handle PATH (not the current hardcoded version).
 - [ ] Make find bin look at the current dir as well.
-- [ ] Error handling system.
 - [ ] Check output when command doesn't exist. (just input `lol` or `$donotexist`).
+- [x] Error handling system.
 - [x] Create subshell. 
 
 **Albert**

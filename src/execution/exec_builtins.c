@@ -19,13 +19,15 @@ int exec_builtins(t_node *node, t_main_data *data)
 	else if (!ft_strncmp(node->cmd_argv[0], "pwd", lenght))
 		error = pwd();
 	else if (!ft_strncmp(node->cmd_argv[0], "echo", lenght))
-		error = echo(node->cmd_argv);
+		error = echo(&node->cmd_argv[1]);
 	else if (!ft_strncmp(node->cmd_argv[0], "matrix", lenght))
 		error = matrix(node->cmd_argv);
 	else if (!ft_strncmp(node->cmd_argv[0], "export", lenght))
 		error = export(root, node->cmd_argv[1]);
 	else if (!ft_strncmp(node->cmd_argv[0], "env", lenght))
 		error = env(root->env);
+	else if (!ft_strncmp(node->cmd_argv[0], "unset", lenght))
+		error = unset(&root->env, &node->cmd_argv[1]);
 	else
 		printf(RED "error: built-in not found.\n" RESET);
 	return (error);
