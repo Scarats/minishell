@@ -52,8 +52,8 @@ It's not mandatory, just simplify everything imo.
 Matrix:
 
 - [ ] Builtins.
-  - [ ] unset
   - [ ] exit
+  - [x] unset
   - [x] env
   - [x] echo
   - [x] export
