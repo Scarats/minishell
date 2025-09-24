@@ -4,7 +4,7 @@ int del_one(t_env **head, const char *name)
 {
     t_env   *prev;
     t_env   *curr;
-    int  length;
+    int     length;
 
     if (!head || !*head || !name)
         return (1);
@@ -13,13 +13,14 @@ int del_one(t_env **head, const char *name)
     length = ft_strlen(name);
     while (curr)
     {
-        if (ft_strlen(curr->name) == length && ft_strncmp(curr->name, name, length) == 0)
+        if (curr->name
+            && (int)ft_strlen(curr->name) == length
+            && ft_strncmp(curr->name, name, length) == 0)
         {
             if (prev)
                 prev->next = curr->next;
             else
                 *head = curr->next;
-            free(curr);
             return (0);
         }
         prev = curr;
