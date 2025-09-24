@@ -174,8 +174,7 @@ int exec_cmd(t_node *node, t_main_data *data)
 
         // Unified child cleanup: free the child's copies before exiting to avoid
         // "still reachable" reports in the child when execve didn't replace the process.
-        my_free(&data->malloc_tree);
-        my_free(&((t_root *)data->root)->malloc_root);
+        my_multi_free(&((t_root *)data->root)->list_of_list);
 		exit(error);
     }
 

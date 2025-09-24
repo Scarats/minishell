@@ -170,13 +170,15 @@ int tokenizer(t_main_data *data)
 int list_to_array(t_main_data *data, t_token *token_list, int size)
 {
 	t_token *curr_tok;
+	t_root *root;
 	int i;
 
 	i = 0;
 	if (size <= 0)
 		return (1);
+	root = data->root;
 	curr_tok = token_list;
-	data->tok->token_array = my_malloc(&data->malloc_tok, sizeof(t_token) * size); // Just t_token not a ptr
+	data->tok->token_array = my_malloc(&root->list_of_list, &data->malloc_tok, sizeof(t_token) * size); // Just t_token not a ptr
 	while (curr_tok && i < size)
 	{
 		data->tok->token_array[i] = *curr_tok;

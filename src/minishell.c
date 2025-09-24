@@ -1,6 +1,8 @@
 #include "minishell.h"
 #include <errno.h>
 
+static void noop_free(void *p) { (void)p; }
+
 volatile sig_atomic_t stop_flag = 0;
 
 int init(t_root *root)
@@ -11,8 +13,12 @@ int init(t_root *root)
     data->malloc_tok = NULL;
     data->malloc_tree = NULL;
 
+    // DO NOT reset the persistent pools here; they were set in main
+    // root->list_of_list = NULL;
+    // root->malloc_root = NULL;
+
     // Allocate tokenizer in the persistent pool (root), not per-line
-    data->tok = my_malloc(&root->malloc_root, sizeof(t_tokenizer));
+    data->tok = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(t_tokenizer));
     if (!data->tok)
         return (1);
     ft_memset(data->tok, 0, sizeof(t_tokenizer));
@@ -225,8 +231,11 @@ int main(int ac, char **av, char **envp)
     ssize_t nread;
     t_root root;
     t_main_data data;
-    
-	(void)ac;   
+
+    ft_memset(&root, 0, sizeof(root));
+    ft_memset(&data, 0, sizeof(data));
+
+    (void)ac;   
 	(void)av;   
 
     sa.sa_handler = handler;
@@ -238,11 +247,12 @@ int main(int ac, char **av, char **envp)
     // Initialize allocation root and env before using my_malloc/my_free
     root.malloc_root = NULL;
     root.env = NULL;
+    root.list_of_list = NULL;  // <-- add this
 
     root.data = &data;
     root.data->root = &root;
     // set_env_var_list now takes t_list **; pass the address so it can update the head
-    root.env = set_env_var_list(&root.malloc_root, envp);
+    root.env = set_env_var_list(&root, envp);
 	
     if (init(&root) != 0)
     {
@@ -308,6 +318,7 @@ int main(int ac, char **av, char **envp)
         stop_flag = 0; // reset stop_flag after cleaning
     }
 
+	my_multi_free(&root.list_of_list);
     // Free global resources
     my_free(&root.malloc_root);
     if (data.malloc_tok)
@@ -315,8 +326,8 @@ int main(int ac, char **av, char **envp)
     my_free(&data.malloc_tree);
     free(line);    // safe: NULL if already freed via my_free
 
-    // data->tok was allocated in root.malloc_root; do not free it separately
-    // free(data.tok);  // remove
+    // Also free the tracking list nodes themselves (optional, silences "still reachable")
+    ft_lstclear(&root.list_of_list, noop_free);
 
     return 0;
 }

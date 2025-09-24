@@ -13,7 +13,7 @@ int export(t_root *root, char *var)
 	if (!var)
 		return (env(root->env));
 	args = NULL;
-	new_var = my_malloc(&root->malloc_root, sizeof(t_env));
+	new_var = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(t_env));
 	ptr = root->env;
 	while (ptr->next != NULL)
 		ptr = ptr->next;

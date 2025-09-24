@@ -188,8 +188,10 @@ t_redir *add_redirection(t_main_data *data, t_node *node, t_token_type type)
 {
 	t_redir *redirection;
 	t_redir *last;
+	t_root *root;
 
-	redirection = my_malloc(&data->malloc_tree, sizeof(t_redir));
+	root = data->root;
+	redirection = my_malloc(&root->list_of_list, &data->malloc_tree, sizeof(t_redir));
 	redirection->type = type;
 	redirection->fd = -1;
 	if (!node->redirection)

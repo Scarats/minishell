@@ -16,7 +16,7 @@ char *get_env_var(t_env *env, char *target)
 
 
 // Create a t_env struct from a char **, spliting NAME=value.
-t_env *set_env_var_list(t_list **malloc_list, char **env)
+t_env *set_env_var_list(t_root *root, char **env)
 {
     t_env	*head;
     t_env	*tail;
@@ -34,9 +34,9 @@ t_env *set_env_var_list(t_list **malloc_list, char **env)
         tmp = ft_split(env[i], '=');
         if (!tmp || tmp[0] == NULL || tmp[1] == NULL)
 			return (NULL);
-        node = my_malloc(malloc_list, sizeof(t_env));
-        node->name = my_strdup(malloc_list, tmp[0]);
-        node->value = my_strdup(malloc_list, tmp[1]);
+        node = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(t_env));
+        node->name = my_strdup(&root->malloc_root, tmp[0]);
+        node->value = my_strdup(&root->malloc_root, tmp[1]);
 		node->next = NULL;
 		free_2d_array((void **)tmp);
         if (!head)

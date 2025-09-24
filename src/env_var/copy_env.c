@@ -14,11 +14,11 @@ t_env *copy_env(t_list **malloc_list, t_env *env)
     new_tail = NULL;
     while (env != NULL)
     {
-        node = my_malloc(&malloc_list, sizeof(t_env));
+        node = my_malloc(NULL, &malloc_list, sizeof(t_env));
         if (!node)
             return (NULL);
-        node->name = my_strdup(malloc_list, env->name);
-        node->value = my_strdup(malloc_list, env->value);
+        node->name = my_strdup(&malloc_list, env->name);
+        node->value = my_strdup(&malloc_list, env->value);
         if (!node->name || !node->value)
             return (NULL);
         if (!new_head)
