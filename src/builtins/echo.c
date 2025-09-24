@@ -6,7 +6,11 @@ void print_array(char **argv)
 
 	i = 0;
 	while (argv[i])
+	{
+		if (i > 0)
+			printf(" ");
 		printf("%s", argv[i++]);
+	}
 }
 
 int echo(char **argv)
