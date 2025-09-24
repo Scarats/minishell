@@ -72,13 +72,13 @@ int redirections(t_node *node, t_main_data *data)
 // Should not return since the program will be replaced by execve.
 int execution(t_node *node, t_main_data *data)
 {
-	if (!data)
-		data = NULL;
-	if (node->builtin)
-		return (exec_builtins(node, data));
-	else
-		execve(node->path, node->cmd_argv, NULL);
-	return (1);
+    if (!data)
+        data = NULL;
+    if (node->builtin)
+        return (exec_builtins(node, data));
+    else
+        execve(node->path, node->cmd_argv, NULL);
+    return (1);
 }
 
 int set_io_fds(t_node *node, t_main_data *data)
@@ -162,8 +162,6 @@ int exec_cmd(t_node *node, t_main_data *data)
         // Otherwise run in parent but restore stdio after redirections.
         return (exec_builtin_in_parent(node, data));
     }
-    // If you have parent-only builtins, handle and return here:
-    // if (!data->in_child && is_parent_builtin(node)) return run_builtin_in_parent(node, data);
 
     pid = fork();
     if (pid == -1)
@@ -171,8 +169,14 @@ int exec_cmd(t_node *node, t_main_data *data)
 
     if (pid == 0)
     {
-        error = exec_handler(data, node); // sets pipe defaults, applies redirs, then execve
-        exit(error);
+        // Child: run the command pipeline (bin path, fds, redirs, execve/builtin)
+        error = exec_handler(data, node);
+
+        // Unified child cleanup: free the child's copies before exiting to avoid
+        // "still reachable" reports in the child when execve didn't replace the process.
+        my_free(&data->malloc_tree);
+        my_free(&((t_root *)data->root)->malloc_root);
+		exit(error);
     }
 
     if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)

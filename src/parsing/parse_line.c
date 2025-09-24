@@ -197,7 +197,6 @@ int parser(t_main_data *data)
 	data->node = build_tree(data, data->tok->token_array, data->tok->token_list_size, 0);
 	if (!data->node)
 		return (1);
-	// my_free(&data->malloc_tok); // Token memory can be freed.
 	return (0);
 }
 
