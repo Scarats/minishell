@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:08:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/24 16:48:03 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/24 18:30:15 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,6 @@ int	check_list(t_list **list, void *data)
 	return (0);
 }
 
-// Add ptr to the list or initialiaze the new list.
-void	add_or_create_list(t_list **list, void *ptr)
-{
-	if (!*list)
-		*list = ft_lstnew(ptr);
-	else
-		ft_lstadd_back(list, ft_lstnew(ptr));
-}
-
 // Same usage as malloc, but keep track of allocated memory in list.
 // Memset memory.
 // list_of_list keep track of all the malloc_list of the program.
@@ -51,7 +42,7 @@ void	*my_malloc(t_list **list_of_list, t_list **malloc_list, size_t size)
 	if (size < 1)
 		return (NULL);
 	if (list_of_list && malloc_list && !check_list(list_of_list, malloc_list))
-		add_or_create_list(list_of_list, malloc_list);
+		my_addtolist(list_of_list, malloc_list);
 	ptr = ft_calloc(1, size);
 	if (!ptr)
 	{
@@ -62,7 +53,7 @@ void	*my_malloc(t_list **list_of_list, t_list **malloc_list, size_t size)
 		exit(1);
 	}
 	if (malloc_list)
-		add_or_create_list(malloc_list, ptr);
+		my_addtolist(malloc_list, ptr);
 	return (ptr);
 }
 
