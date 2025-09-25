@@ -217,6 +217,6 @@ char *get_env_var(t_env *env, char *target);
 int export(t_root *root, char *var);
 int env(t_env *root_env);
 int unset(t_env **env, char **argv);
-
+int	set_last_exit_status_var(t_root *root);
 
 #endif

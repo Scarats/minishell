@@ -307,11 +307,8 @@ int main(int ac, char **av, char **envp)
         cap = 0;
 
         // Execute without debug prints
-        {
-            int exec_ret = traverse_tree(data.node, &data);
-            (void)exec_ret;
-        }
-
+        root.last_exit_status = traverse_tree(data.node, &data);
+		set_last_exit_status_var(&root);
         // Free allocations for this iteration (AST) tracked by my_malloc
         my_free(&data.malloc_tree);
         data.node = NULL;

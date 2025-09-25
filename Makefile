@@ -6,7 +6,8 @@ SRCS = src/minishell.c \
 	   src/execution/pipes.c src/execution/exec_builtins.c \
 	   src/builtins/cd.c src/builtins/pwd.c src/builtins/echo.c \
 	   src/builtins/matrix.c src/env_var/get_env_var.c \
-	   src/builtins/export.c src/builtins/env.c src/builtins/unset.c
+	   src/builtins/export.c src/builtins/env.c src/builtins/unset.c \
+	   src/handlers/set_last_exit_status.c
 
 FLAGS = -Wall -Wextra -Werror 
 CC    = cc

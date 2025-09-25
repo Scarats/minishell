@@ -62,6 +62,7 @@ Matrix:
     - [ ] Check access permissions for builtins.
 - [ ] See exit_status / code.
 - [ ] Signals.
+- [ ] $? exit status.
 - [x] Handle PATH (not the current hardcoded version).
 - [x] Make find bin look at the current dir as well.
 - [x] Check output when command doesn't exist. (just input `lol` or `$donotexist`).
