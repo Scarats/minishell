@@ -8,8 +8,8 @@ void print_array(char **argv)
 	while (argv[i])
 	{
 		if (i > 0)
-			printf(" ");
-		printf("%s", argv[i++]);
+			ft_printf(" ");
+		ft_printf("%s", argv[i++]);
 	}
 }
 
@@ -43,13 +43,12 @@ int echo(char **argv)
 	if (is_n(argv[0]))
 		n = true;
 	if (n && !argv[1])
-		return (printf("\n"));
+		return (ft_printf("\n"));
 	if (n)
 		print_array(&argv[1]);
 	else
 	{
 		print_array(&argv[0]);
-		printf("\n");
 	}
 	return (0);
 }

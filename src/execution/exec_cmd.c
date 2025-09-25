@@ -163,6 +163,7 @@ int exec_cmd(t_node *node, t_main_data *data)
         return (exec_builtin_in_parent(node, data));
     }
 
+	printf(RED"EXEC_CMD\n"RESET);
     pid = fork();
     if (pid == -1)
         return 1;

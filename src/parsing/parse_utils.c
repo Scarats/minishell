@@ -61,42 +61,47 @@ t_token *add_to_list(t_main_data *data, t_token *prev)
 // Set quote flags.
 int handle_quotes(t_main_data *data)
 {
-    /* If we see a quote, toggle its state.
-       Always treat quote characters and their contents as TEXT (transparent).
-       If the quote opens and it does not follow TEXT, start the token at the first
-       character inside the quote (pos + 1). */
+    char c = data->tok->input[data->tok->pos];
+
     if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE)
     {
-        /* Toggle double-quote state */
+        // Toggle double-quote state
         data->tok->double_quote = !data->tok->double_quote;
 
         if (data->tok->double_quote)
         {
-            /* Opening double-quote: if previous char wasn't text, start token inside quote */
+            // Opening: start the token right after the quote if we were not in TEXT
             if (data->tok->prev_char_type != CHAR_TEXT)
                 data->tok->prev_pos = data->tok->pos + 1;
         }
-        /* Treat quote itself as text (no token boundary) */
-        data->tok->curr_char_type = CHAR_TEXT;
+        // Make the quote character itself behave like a separator (no token emitted)
+        data->tok->curr_char_type = CHAR_SPACE;
     }
     else if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE)
     {
-        /* Toggle single-quote state */
+        // Toggle single-quote state
         data->tok->single_quote = !data->tok->single_quote;
 
         if (data->tok->single_quote)
         {
-            /* Opening single-quote: if previous char wasn't text, start token inside quote */
             if (data->tok->prev_char_type != CHAR_TEXT)
                 data->tok->prev_pos = data->tok->pos + 1;
         }
-        /* Treat quote itself as text (no token boundary) */
+        // Make the quote character itself behave like a separator (no token emitted)
+        data->tok->curr_char_type = CHAR_SPACE;
+    }
+    else if (data->tok->single_quote)
+    {
+        // Inside single quotes: everything is literal
         data->tok->curr_char_type = CHAR_TEXT;
     }
-    else if (data->tok->double_quote || data->tok->single_quote)
+    else if (data->tok->double_quote)
     {
-        /* Inside quotes, treat everything as text */
-        data->tok->curr_char_type = CHAR_TEXT;
+        // Inside double quotes: keep $ as operator to allow $VAR expansion,
+        // treat everything else (including spaces) as text
+        if (c != '$')
+            data->tok->curr_char_type = CHAR_TEXT;
+        // else: keep whatever get_char_type set (CHAR_OPERATOR for '$')
     }
     return (0);
 }

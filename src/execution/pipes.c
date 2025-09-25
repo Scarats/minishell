@@ -3,79 +3,92 @@
 // Will call the left node.
 int left(t_node *node, t_main_data *data)
 {
-    int error;
+	int error;
+	t_root *root;
 
-    error = 0;
-    close(node->pipefd[0]);
+	root = data->root;
 
-    // Make pipe the default stdout in this child first
-    if (dup2(node->pipefd[1], STDOUT_FILENO) == -1)
-        exit(1);
-    close(node->pipefd[1]);
+	error = 0;
+	close(node->pipefd[0]);
 
-    // Pass parent's input fd into the left subtree so set_io_fds can use it
-    if (node->input_fd != -1)
-        node->left->input_fd = node->input_fd;
-    // ensure not to pre-set left->output_fd here; pipe is already set via dup2
+	// Make pipe the default stdout in this child first
+	if (dup2(node->pipefd[1], STDOUT_FILENO) == -1)
+		exit(1);
+	close(node->pipefd[1]);
 
-    data->in_child = true;
-    error = traverse_tree(node->left, data);
-    exit(error);
+	// Pass parent's input fd into the left subtree so set_io_fds can use it
+	if (node->input_fd != -1)
+		node->left->input_fd = node->input_fd;
+	// ensure not to pre-set left->output_fd here; pipe is already set via dup2
+
+	data->in_child = true;
+	error = traverse_tree(node->left, data);
+	if (error)
+		my_multi_free(&root->list_of_list);
+	exit(error);
 }
 
 // Will call the right node.
 int right(t_node *node, t_main_data *data)
 {
-    int error;
+	int error;
+	t_root *root;
 
-    error = 0;
-    close(node->pipefd[1]);
+	root = data->root;
+	error = 0;
+	close(node->pipefd[1]);
 
-    // Make pipe the default stdin in this child first
-    if (dup2(node->pipefd[0], STDIN_FILENO) == -1)
-        exit(1);
-    close(node->pipefd[0]);
+	// Make pipe the default stdin in this child first
+	if (dup2(node->pipefd[0], STDIN_FILENO) == -1)
+		exit(1);
+	close(node->pipefd[0]);
 
-    // Pass parent's output fd into the right subtree so set_io_fds can use it
-    if (node->output_fd != -1)
-        node->right->output_fd = node->output_fd;
-    // ensure not to pre-set right->input_fd here; pipe is already set via dup2
+	// Pass parent's output fd into the right subtree so set_io_fds can use it
+	if (node->output_fd != -1)
+		node->right->output_fd = node->output_fd;
+	// ensure not to pre-set right->input_fd here; pipe is already set via dup2
 
-    data->in_child = true;
-    error = traverse_tree(node->right, data);
-    exit(error);
+	data->in_child = true;
+	error = traverse_tree(node->right, data);
+	if (error)
+		my_multi_free(&root->list_of_list);
+	exit(error);
 }
 
 // Will create two childs, left and right, for each end of the pipe.
 int pipes(t_node *node, t_main_data *data)
 {
-    int status_left;
-    int status_right;
+	int status_left;
+	int status_right;
 
-    if (pipe(node->pipefd) == -1)
-        return (perror("pipe"), 1);
+	if (!node || !data)
+		return (1);
 
-    node->left_pid = fork();
-    if (node->left_pid == -1)
-        return (perror("fork"), 1);
-    else if (node->left_pid == 0)
-        left(node, data);
+	if (pipe(node->pipefd) == -1)
+		return (perror("pipe"), 1);
 
-    node->right_pid = fork();
-    if (node->right_pid == -1)
-        return (perror("fork"), 1);
-    else if (node->right_pid == 0)
-        right(node, data);
+	printf(RED"PIPE\n"RESET);
+	node->left_pid = fork();
+	if (node->left_pid == -1)
+		return (perror("fork"), 1);
+	else if (node->left_pid == 0)
+		left(node, data);
 
-    close(node->pipefd[0]);
-    close(node->pipefd[1]);
+	node->right_pid = fork();
+	if (node->right_pid == -1)
+		return (perror("fork"), 1);
+	else if (node->right_pid == 0)
+		right(node, data);
 
-    if (waitpid(node->left_pid, &status_left, 0) == -1 || waitpid(node->right_pid, &status_right, 0) == -1)
-        return (1);
+	close(node->pipefd[0]);
+	close(node->pipefd[1]);
 
-    if (WIFEXITED(status_right))
-        return (WEXITSTATUS(status_right));
-    if (WIFSIGNALED(status_right))
-        return (128 + WTERMSIG(status_right));
-    return (0);
+	if (waitpid(node->left_pid, &status_left, 0) == -1 || waitpid(node->right_pid, &status_right, 0) == -1)
+		return (1);
+
+	if (WIFEXITED(status_right))
+		return (WEXITSTATUS(status_right));
+	if (WIFSIGNALED(status_right))
+		return (128 + WTERMSIG(status_right));
+	return (0);
 }

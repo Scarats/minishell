@@ -1,8 +1,6 @@
 #include "minishell.h"
 #include <errno.h>
 
-static void noop_free(void *p) { (void)p; }
-
 volatile sig_atomic_t stop_flag = 0;
 
 int init(t_root *root)
@@ -289,42 +287,54 @@ int main(int ac, char **av, char **envp)
         if (parser(&data) != 0)
         {
             fprintf(stderr, "parse error\n");
-            // Free anything allocated for this line (tokens/tree/line) before continuing
             if (data.malloc_tok)
                 my_free(&data.malloc_tok);
-            line = NULL;   // prevent reuse by getline and double-free
+            data.tok->token_array = NULL;
+            data.tok->token_list = NULL;
+            data.tok->last_token = NULL;
+            data.tok->token_list_size = 0;
+            line = NULL;
             cap = 0;
-            my_free(&data.malloc_tree);
+            if (data.malloc_tree)
+                my_free(&data.malloc_tree);
             data.node = NULL;
-            stop_flag = 0; // reset stop_flag after cleaning
+            stop_flag = 0;
             continue;
         }
+		set_last_exit_status_var(&root);
 
-        // Tokens and getline buffer are not needed anymore; free them now
+        /* Tokens and getline buffer are not needed anymore; free them now */
         if (data.malloc_tok)
             my_free(&data.malloc_tok);
-        line = NULL;   // getline will allocate a fresh buffer next time
+        data.tok->token_array = NULL;
+        data.tok->token_list = NULL;
+        data.tok->last_token = NULL;
+        data.tok->token_list_size = 0;
+        line = NULL;
         cap = 0;
 
-        // Execute without debug prints
+        /* Execute without debug prints */
         root.last_exit_status = traverse_tree(data.node, &data);
-		set_last_exit_status_var(&root);
-        // Free allocations for this iteration (AST) tracked by my_malloc
-        my_free(&data.malloc_tree);
+        
+        /* Free allocations for this iteration (AST) tracked by my_malloc */
+        if (data.malloc_tree)
+            my_free(&data.malloc_tree);
         data.node = NULL;
-        stop_flag = 0; // reset stop_flag after cleaning
+        stop_flag = 0; /* reset stop_flag after cleaning */
     }
 
-	my_multi_free(&root.list_of_list);
-    // Free global resources
-    my_free(&root.malloc_root);
-    if (data.malloc_tok)
-        my_free(&data.malloc_tok);
-    my_free(&data.malloc_tree);
-    free(line);    // safe: NULL if already freed via my_free
+    // Per-project: free the env list structure (keys/values/nodes)
+    // Free env list tracked by my_malloc/my_addtolist
 
-    // Also free the tracking list nodes themselves (optional, silences "still reachable")
-    ft_lstclear(&root.list_of_list, noop_free);
+    my_free(&data.malloc_tok);
+    my_free(&data.malloc_tree);
+
+    my_multi_free(&root.list_of_list); // frees per-pool lists (if registered)
+    // Also free the list-of-lists nodes themselves
+    ft_lstclear(&root.list_of_list, NULL);
+
+    my_free(&root.malloc_root);        // frees persistent pool (env/tok/etc.)
+    free(line);
 
     return 0;
 }
