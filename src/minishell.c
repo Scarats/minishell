@@ -217,7 +217,7 @@ static void ft_display_prompt(void)
     gethostname(hostname, sizeof(hostname));
     getlogin_r(username, sizeof(username));
 
-    printf(GREEN"Welcome to " RED "tcardair " GREEN "& " PURPLE "aadeikal's " GREEN "minishell\n");
+    printf(GREEN "Welcome to " RED "tcardair " GREEN "& " PURPLE "aadeikal's " GREEN "minishell\n");
     
     printf(BLUE "%s" RESET "@" GREEN "%s" RESET ":" PURPLE "minishell" RESET "> ", 
            username, hostname);

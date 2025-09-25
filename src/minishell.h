@@ -17,6 +17,9 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#include <readline/readline.h>
+#include <readline/history.h>
+
 # define RED "\x1B[91m"    // Lighter red
 # define ORANGE "\x1B[33m" // Orange/yellow
 # define GREEN "\x1B[32m"  // Green
