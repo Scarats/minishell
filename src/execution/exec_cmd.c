@@ -171,7 +171,7 @@ int exec_cmd(t_node *node, t_main_data *data)
     {
         // Child: run the command pipeline (bin path, fds, redirs, execve/builtin)
         error = exec_handler(data, node);
-
+		fdprintf(2, "minishell: command not found: %s\n", node->cmd_argv[0]);
         // Unified child cleanup: free the child's copies before exiting to avoid
         // "still reachable" reports in the child when execve didn't replace the process.
         my_multi_free(&((t_root *)data->root)->list_of_list);
