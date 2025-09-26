@@ -57,7 +57,7 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
         word = ft_substr(data->tok->input, start, end - start);
     if (tok->type == TOKEN_ENV_VAR)
     {
-        tok->word = get_env_var(((t_root *)data->root)->env, word);
+        tok->word = get_env_var(data->root->env, word);
         if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
             remove_token(&data->tok->token_list, tok->prev_token);
         tok->type = get_word_type(tok);

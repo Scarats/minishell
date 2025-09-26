@@ -151,6 +151,7 @@ typedef struct s_tokenizer
 	int token_list_size; // Keep track of the number of tokens
 } t_tokenizer;
 
+typedef struct s_root t_root;
 typedef struct s_main_data
 {
 	t_node *node;
@@ -166,7 +167,7 @@ typedef struct s_main_data
 
 	bool in_child;
 
-	void *root; // Pointer to root, has to be casted at the beginning.
+	t_root *root; // Pointer to root, has to be casted at the beginning.
 	// Copy of the root env, to be passed to execve, it contains the local var of this command.
 	t_env *curr_env;
 

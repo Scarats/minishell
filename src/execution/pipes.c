@@ -4,9 +4,6 @@
 int left(t_node *node, t_main_data *data)
 {
 	int error;
-	t_root *root;
-
-	root = data->root;
 
 	error = 0;
 	close(node->pipefd[0]);
@@ -24,7 +21,7 @@ int left(t_node *node, t_main_data *data)
 	data->in_child = true;
 	error = traverse_tree(node->left, data);
 	if (error)
-		my_multi_free(&root->list_of_list);
+		my_multi_free(&data->root->list_of_list);
 	exit(error);
 }
 
@@ -32,9 +29,7 @@ int left(t_node *node, t_main_data *data)
 int right(t_node *node, t_main_data *data)
 {
 	int error;
-	t_root *root;
 
-	root = data->root;
 	error = 0;
 	close(node->pipefd[1]);
 
@@ -51,7 +46,7 @@ int right(t_node *node, t_main_data *data)
 	data->in_child = true;
 	error = traverse_tree(node->right, data);
 	if (error)
-		my_multi_free(&root->list_of_list);
+		my_multi_free(&data->root->list_of_list);
 	exit(error);
 }
 

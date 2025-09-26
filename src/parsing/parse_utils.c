@@ -35,10 +35,8 @@ char check_next_char(char *str, int pos)
 t_token *add_to_list(t_main_data *data, t_token *prev)
 {
 	t_token *new;
-	t_root *root;
 
-	root = data->root;
-	new = my_malloc(&root->list_of_list, &data->malloc_tok, sizeof(t_token));
+	new = my_malloc(&data->root->list_of_list, &data->malloc_tok, sizeof(t_token));
 	if (!new)
 		return (NULL);
 	if (prev == NULL)
