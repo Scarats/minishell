@@ -165,7 +165,6 @@ int tokenizer(t_main_data *data)
 int list_to_array(t_main_data *data, t_token *token_list, int size)
 {
     t_token *curr_tok;
-    t_root *root;
     int i;
     int real_size;
 
@@ -181,8 +180,7 @@ int list_to_array(t_main_data *data, t_token *token_list, int size)
     data->tok->token_list_size = real_size;
 
     i = 0;
-    root = data->root;
-    data->tok->token_array = my_malloc(&root->list_of_list, &data->malloc_tok,
+    data->tok->token_array = my_malloc(&data->root->list_of_list, &data->malloc_tok,
                                        sizeof(t_token) * (size > 0 ? size : 1));
     if (!data->tok->token_array && size > 0)
         return (1);

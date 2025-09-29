@@ -8,6 +8,8 @@ int exec_builtins(t_node *node, t_main_data *data)
 
 	if (!data)
 		data = NULL;
+	if (!node)
+		return (1);
 
 	lenght = ft_strlen(node->cmd_argv[0]);
 
