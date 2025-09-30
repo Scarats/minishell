@@ -20,7 +20,7 @@ $(OBJ_DIR)/%.o: %.c
 
 $(NAME): $(OBJS)
 	@make -C ./utils/libft
-	$(CC) $(OBJS) -Lutils/libft -lft -o $(NAME)
+	$(CC) $(OBJS) -Lutils/libft -lft -lreadline -lhistory -o $(NAME)
 
 all: $(NAME)
 

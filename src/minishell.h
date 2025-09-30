@@ -164,6 +164,14 @@ typedef struct s_main_data
 	t_tokenizer *tok;
 } t_main_data;
 
+typedef struct s_history
+{
+	char **commands;
+	int capacity;
+	int count;
+	int current_pos;
+} t_history;
+
 t_token_type get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
 t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end);

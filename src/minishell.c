@@ -103,7 +103,7 @@ static void print_ast_pretty_rec(t_node *node, const char *prefix, int is_last)
     const char *pad    = is_last ? "    " : "│   ";
 
     // Current line
-    printf("%s%s", prefix, branch);
+    printf("%s%s", prefix, branch); 
     if (node->type == NODE_COMMAND)
     {
         printf("CMD: ");
@@ -206,7 +206,7 @@ void handler(int sig)
     stop_flag = 1;
 }
 
-static void ft_display_prompt(void)
+/* static void ft_display_prompt(void)
 {
     char hostname[1024];
     char username[1024];
@@ -217,12 +217,12 @@ static void ft_display_prompt(void)
     gethostname(hostname, sizeof(hostname));
     getlogin_r(username, sizeof(username));
 
-    printf(GREEN "Welcome to " RED "tcardair " GREEN "& " PURPLE "aadeikal's " GREEN "minishell\n");
+    printf(GREEN "Welcome to " RED "tcardair " GREEN "& " PURPLE "aadeikal's " GREEN "minishell\n" RESET);
     
     printf(BLUE "%s" RESET "@" GREEN "%s" RESET ":" PURPLE "minishell" RESET "> ", 
            username, hostname);
     fflush(stdout);
-}
+} */
 
 int main(void)
 {
@@ -231,8 +231,19 @@ int main(void)
     t_token *current;
     int token_count;
     char *line = NULL;
-    size_t cap = 0;
-    ssize_t nread;
+    //size_t cap = 0;
+    //ssize_t nread;
+
+    char hostname[64] = {0};
+    char username[64] = {0};
+    gethostname(hostname, sizeof(hostname));
+    getlogin_r(username, sizeof(username));
+
+    hostname[sizeof(hostname) - 1] = '\0';
+    username[sizeof(username) - 1] = '\0';
+
+    char prompt[256];
+    snprintf(prompt, sizeof(prompt), BLUE "%.32s" RESET "@" GREEN "%.32s" RESET ":" PURPLE "minishell" RESET "> ", username, hostname);
     
     sa.sa_handler = handler;
     sigemptyset(&sa.sa_mask);
@@ -245,14 +256,22 @@ int main(void)
         return 1;
     }
 
+    // Read history file on startup
+    read_history(".minishell_history");
+
     while (1)
     {
-        ft_display_prompt();
+        //ft_display_prompt();
         fflush(stdout);
         // init(&data);  // REMOVE: this re-mallocs data->tok and leaks the previous one
 
-        nread = getline(&line, &cap, stdin);
-        if (nread == -1)
+        line = readline(prompt);
+
+        // Add line to history if not empty
+        if (line && *line)
+            add_history(line);
+
+        if (!line)
         {
             if (feof(stdin))
                 printf("exit\n");
@@ -260,8 +279,6 @@ int main(void)
                 perror("getline");
             break;
         }
-        if (nread > 0 && line[nread - 1] == '\n')
-            line[nread - 1] = '\0';
         if (line[0] == '\0')
             continue;
         if (!ft_strncmp(line, "exit", 5))
@@ -298,7 +315,7 @@ int main(void)
         print_ast(data.node);
         printf("\n");
 
-        // Call traverse_tree to test execution/traversal
+        // Call traverse_tree to test execution/trTraversing
         {
             int exec_ret = traverse_tree(data.node, &data);
             printf("traverse_tree returned: %d\n\n", exec_ret);
@@ -310,6 +327,9 @@ int main(void)
         data.node = NULL;
         stop_flag = 0; // reset stop_flag after cleaning
     }
+
+    // Write history to file before exiting
+    write_history(".minishell_history");
 
     // Free global resources
     my_free(&data.malloc_tok);
