@@ -29,6 +29,11 @@ int is_builtin(char *cmd)
 	return (0);
 }
 
+int	is_operator(t_token_type t)
+{
+    return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR);
+}
+
 int	is_op_or_redir(t_token_type t)
 {
     return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR

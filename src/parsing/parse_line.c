@@ -238,46 +238,62 @@ int	check_op_syntax(t_token *tok)
 	return (0);
 }
 
+// A command can start with a word-like token or a left parenthesis
+int	is_command_start(t_token_type t)
+{
+    return (is_word_token(t) || t == TOKEN_LPAREN);
+}
 
-// Check conditions.
-// Add the parenthesis ones.
+// A command can end with a word-like token or a right parenthesis
+int	is_command_end(t_token_type t)
+{
+    return (is_word_token(t) || t == TOKEN_RPAREN);
+}
+
 int	syntax_check(t_token *token_array, int size)
 {
     int	i;
+	t_token_type t;
+
 
     printf(RED "SYNTAX_CHECK\n" RESET);
     if (!token_array || size <= 0)
         return (1);
-    /* If there's a single token, it must be a redirection or a word type. */
-    if (size == 1 && !(is_redir(token_array[0].type)
-            || is_word_token(token_array[0].type)))
+    if (size == 1 && !(is_redir(token_array[0].type) || is_word_token(token_array[0].type)))
         return (fdprintf(2,
-                "minishell: syntax error near unexpected token `%s'\n",
-                token_array[0].word), 1);
-    /* Walk from right to left */
+            "minishell: syntax error near unexpected token `%s'\n", token_array[0].word), 1);
     i = 0;
     while (i < size)
     {
-        if (is_op_or_redir(token_array[i].type))
+        t = token_array[i].type;
+
+        /* Logical / pipe operators */
+        if (is_operator(t))
         {
-            ft_printf("token %s\n", token_array[i].word);
-            if (is_and_or(token_array[i].type)
-                && check_op_syntax(&token_array[i]))
+            /* Left side must exist and be a command end (word or ')') */
+            if (i == 0 || !is_command_end(token_array[i - 1].type))
                 return (fdprintf(2,
-                        "minishell: syntax error near unexpected token `%s'\n",
-                        token_array[i].word), 1);
-            /* left operand must exist and be a word token */
-            if (i - 1 < 0 || !is_word_token(token_array[i - 1].type))
+                    "minishell: syntax error near unexpected token `%s'\n", token_array[i].word), 1);
+            /* Right side must exist */
+            if (i + 1 >= size)
                 return (fdprintf(2,
-                        "minishell: syntax error near unexpected token `%s'\n",
-                        token_array[i - 1].word), 1);
-            /* right operand must exist and be a word token */
-            if (i + 1 >= size || !is_word_token(token_array[i + 1].type))
+                    "minishell: syntax error near unexpected token `newline'\n"), 1);
+            /* And be a command start (word or '(') */
+            if (!is_command_start(token_array[i + 1].type))
                 return (fdprintf(2,
-                        "minishell: syntax error near unexpected token `%s'\n",
-                        token_array[i + 1].word), 1);
+                    "minishell: syntax error near unexpected token `%s'\n", token_array[i + 1].word), 1);
         }
-		printf(PURPLE"\ntok %i = %s\n", i, token_array[i].word);
+        /* Redirections */
+        else if (is_redir(t))
+        {
+            if (i + 1 >= size)
+                return (fdprintf(2,
+                    "minishell: syntax error near unexpected token `newline'\n"), 1);
+            if (!is_word_token(token_array[i + 1].type))
+                return (fdprintf(2,
+                    "minishell: syntax error near unexpected token `%s'\n", token_array[i + 1].word), 1);
+            i++; /* skip filename */
+        }
         i++;
     }
     printf(GREEN "SYNTAX_END\n" RESET);

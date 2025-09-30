@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 16:47:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/24 16:26:24 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/30 17:22:20 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ char	*loop_find_bin(char **path, char *slash_bin)
 	size_t	i;
 
 	i = 0;
+	if (!path || !*path || !slash_bin)
+		return (NULL);
 	while (path[i])
 	{
 		if (path[i][0] == '\0')
@@ -43,7 +45,7 @@ char	*find_bin(char *bin)
 	char	*slash_bin;
 	char	**path;
 
-	if (!bin)
+	if (!bin || !*bin)
 		return (NULL);
 	env = getenv("PATH");
 	if (!env)
