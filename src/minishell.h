@@ -197,6 +197,8 @@ t_node_type map_token_to_node(t_token_type t);
 int is_redir(t_token_type type);
 t_redir *add_redirection(t_main_data *data, t_node *node, t_token_type type);
 int is_and_or(t_token_type t);
+int is_word_token(t_token_type t);
+int	is_op_or_redir(t_token_type t);
 t_node *build_tree(t_main_data *data, t_token *tok_list, int size, int depth);
 int get_cmd_argc(t_token *tok_list, int size);
 int check_paren_error(t_token *tok_list, int size);
