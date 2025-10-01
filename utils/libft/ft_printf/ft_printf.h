@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_printf.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 14:54:38 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/18 15:47:49 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/01 15:25:29 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,5 +29,14 @@ unsigned long long	to_hexa(unsigned long long addr);
 int					type_xx(unsigned int nb, char c);
 int					type_u(unsigned int u);
 int					loop(char *str, va_list list);
+
+int					ft_snprintf(char *buffer, size_t max_size,
+						const char *format, ...);
+int					buffer_type_c(char c, char *buffer, size_t *pos,
+						size_t max_size);
+int					buffer_type_s(char *str, char *buffer, size_t *pos,
+						size_t max_size);
+int					buffer_type_i(int nb, char *buffer, size_t *pos,
+						size_t max_size);
 
 #endif
