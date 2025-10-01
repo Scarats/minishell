@@ -178,7 +178,7 @@ int exec_cmd(t_node *node, t_main_data *data)
     {
         error = exec_handler(data, node);
         if (error == 127 && node->cmd_argv && node->cmd_argv[0])
-            fdprintf(2, "minishell: command not found: %s\n", node->cmd_argv[0]);
+            fdprintf(2, "minishell: %s: command not found\n", node->cmd_argv[0]);
         /* No message for pure redirection (error == 0) */
         my_multi_free(&data->root->list_of_list);
         exit(error);

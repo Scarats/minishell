@@ -44,7 +44,7 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
 	char	*expanded;
 
 	if (type == TOKEN_SPACE)
-		return (0);
+		type = TOKEN_TEXT;
 	tok = add_to_list(data, data->tok->last_token);
 	if (!tok)
 		return (1);

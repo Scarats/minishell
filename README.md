@@ -51,6 +51,7 @@ It's not mandatory, just simplify everything imo.
 **Thomas**
 Matrix:
 
+- [ ] env_var should only contain chars.
 - [ ] exit codes.
 - [ ] pass env to execve.
 - [ ] use execve for builtins.
