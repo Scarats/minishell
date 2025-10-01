@@ -59,7 +59,6 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
     // Handle environment variable expansion (but NOT inside single quotes)
     if (tok->type == TOKEN_ENV_VAR)
     {
-		printf(RED"$ FOUND\n"RESET);
         expanded = get_env_var(data->root->env, slice);
         if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
             remove_token(&data->tok->token_list, tok->prev_token);
@@ -133,23 +132,21 @@ int	handle_operator(t_main_data *data, t_token_type *tok_type)
     create_token(data, data->tok->prev_pos, data->tok->prev_pos + len,
         *tok_type);
     data->tok->prev_pos += len;
-    /* Adjust position so the main loop's pos++ lands exactly at prev_pos */
-    data->tok->pos = data->tok->prev_pos - 1;
     return (0);
 }
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
-	if (!data || !tok_type)
-		return (1);
-	if (data->tok->prev_char_type != CHAR_SPACE)
-	{
-		*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-				check_next_char(data->tok->input, data->tok->prev_pos));
-		create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
-	}
-	data->tok->prev_pos = data->tok->pos;
-	return (0);
+    if (!data || !tok_type)
+        return (1);
+    if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+    {
+        *tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+                check_next_char(data->tok->input, data->tok->prev_pos));
+        create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+    }
+    data->tok->prev_pos = data->tok->pos;
+    return (0);
 }
 
 int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
@@ -160,8 +157,6 @@ int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
             check_next_char(data->tok->input, data->tok->prev_pos));
     create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
     data->tok->prev_pos = data->tok->pos;
-    /* Same adjustment to avoid creating a trailing empty token */
-    data->tok->pos = data->tok->prev_pos - 1;
     return (0);
 }
 
