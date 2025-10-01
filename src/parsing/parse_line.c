@@ -171,52 +171,33 @@ int	tokenizer(t_main_data *data)
     tok_type = TOKEN_NULL;
     while (data->tok->pos < data->tok->length)
     {
-        char c = data->tok->input[data->tok->pos];
-
-        /* 1. Classify raw character */
-        data->tok->curr_char_type = get_char_type(c);
-
-        /* 2. Update quote state AFTER seeing the raw type */
+        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
         handle_quotes(data);
-
-        /* 3. Inside single quotes: everything except the closing quote is plain text */
-        if (data->tok->single_quote && c != '\'')
+        if (data->tok->single_quote
+            && data->tok->curr_char_type != CHAR_SINGLE_QUOTE)
             data->tok->curr_char_type = CHAR_TEXT;
-
-        /* 4. Normal splitting only when not inside single quotes */
-        if (!data->tok->single_quote)
-        {
-			if ()
-            if (data->tok->curr_char_type == CHAR_PARENTHESIS
-                && data->tok->prev_char_type == CHAR_PARENTHESIS
-                && data->tok->pos > data->tok->prev_pos)
-                handle_parenthesis(data, &tok_type);
-            else if (data->tok->curr_char_type == CHAR_OPERATOR
-                && data->tok->prev_char_type == CHAR_OPERATOR
-                && data->tok->pos > data->tok->prev_pos)
-                handle_operator(data, &tok_type);
-            else if (data->tok->curr_char_type != data->tok->prev_char_type)
-                handle_normal_token(data, &tok_type);
-        }
+        if (data->tok->curr_char_type == CHAR_PARENTHESIS
+            && data->tok->prev_char_type == CHAR_PARENTHESIS
+            && data->tok->pos > data->tok->prev_pos)
+            handle_parenthesis(data, &tok_type);
+        else if (data->tok->curr_char_type == CHAR_OPERATOR
+            && data->tok->prev_char_type == CHAR_OPERATOR
+            && data->tok->pos > data->tok->prev_pos)
+            handle_operator(data, &tok_type);
+        else if (data->tok->curr_char_type != data->tok->prev_char_type)
+            handle_normal_token(data, &tok_type);
         data->tok->prev_char_type = data->tok->curr_char_type;
         data->tok->pos++;
     }
-
-    /* Final token (avoid emitting a lone quote) */
     if (data->tok->prev_char_type != CHAR_SPACE
         && data->tok->prev_pos < data->tok->pos
-        && data->tok->prev_pos < data->tok->length)
+        && data->tok->prev_pos < data->tok->length) /* prevent empty trailing token */
     {
-        tok_type = get_tok_type(
-            data->tok->input[data->tok->prev_pos],
-            check_next_char(data->tok->input, data->tok->prev_pos));
-        /* Skip isolated single/double quote leftovers */
-        if (!(tok_type == TOKEN_TEXT && (data->tok->pos - data->tok->prev_pos) == 1
-              && (data->tok->input[data->tok->prev_pos] == '\''
-                  || data->tok->input[data->tok->prev_pos] == '"')))
-            create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+                check_next_char(data->tok->input, data->tok->prev_pos));
+        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
     }
-
+    /* New: detect unclosed quotes */
     if (data->tok->double_quote || data->tok->single_quote)
         return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
     return (0);
