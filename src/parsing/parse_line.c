@@ -194,6 +194,9 @@ int	tokenizer(t_main_data *data)
                 check_next_char(data->tok->input, data->tok->prev_pos));
         create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
     }
+    /* New: detect unclosed quotes */
+    if (data->tok->double_quote || data->tok->single_quote)
+        return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
     return (0);
 }
 
@@ -258,7 +261,6 @@ int	syntax_check(t_token *token_array, int size)
 {
     int	i;
 	t_token_type t;
-
 
     printf(RED "SYNTAX_CHECK\n" RESET);
     if (!token_array || size <= 0)
