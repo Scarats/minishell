@@ -166,35 +166,57 @@ int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 
 int	tokenizer(t_main_data *data)
 {
-	t_token_type	tok_type;
+    t_token_type	tok_type;
 
     tok_type = TOKEN_NULL;
     while (data->tok->pos < data->tok->length)
     {
-        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+        char c = data->tok->input[data->tok->pos];
+
+        /* 1. Classify raw character */
+        data->tok->curr_char_type = get_char_type(c);
+
+        /* 2. Update quote state AFTER seeing the raw type */
         handle_quotes(data);
-        if (data->tok->curr_char_type == CHAR_PARENTHESIS
-            && data->tok->prev_char_type == CHAR_PARENTHESIS
-            && data->tok->pos > data->tok->prev_pos)
-            handle_parenthesis(data, &tok_type);
-        else if (data->tok->curr_char_type == CHAR_OPERATOR
-            && data->tok->prev_char_type == CHAR_OPERATOR
-            && data->tok->pos > data->tok->prev_pos)
-            handle_operator(data, &tok_type);
-        else if (data->tok->curr_char_type != data->tok->prev_char_type)
-            handle_normal_token(data, &tok_type);
+
+        /* 3. Inside single quotes: everything except the closing quote is plain text */
+        if (data->tok->single_quote && c != '\'')
+            data->tok->curr_char_type = CHAR_TEXT;
+
+        /* 4. Normal splitting only when not inside single quotes */
+        if (!data->tok->single_quote)
+        {
+			if ()
+            if (data->tok->curr_char_type == CHAR_PARENTHESIS
+                && data->tok->prev_char_type == CHAR_PARENTHESIS
+                && data->tok->pos > data->tok->prev_pos)
+                handle_parenthesis(data, &tok_type);
+            else if (data->tok->curr_char_type == CHAR_OPERATOR
+                && data->tok->prev_char_type == CHAR_OPERATOR
+                && data->tok->pos > data->tok->prev_pos)
+                handle_operator(data, &tok_type);
+            else if (data->tok->curr_char_type != data->tok->prev_char_type)
+                handle_normal_token(data, &tok_type);
+        }
         data->tok->prev_char_type = data->tok->curr_char_type;
         data->tok->pos++;
     }
+
+    /* Final token (avoid emitting a lone quote) */
     if (data->tok->prev_char_type != CHAR_SPACE
         && data->tok->prev_pos < data->tok->pos
-        && data->tok->prev_pos < data->tok->length) /* prevent empty trailing token */
+        && data->tok->prev_pos < data->tok->length)
     {
-        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-                check_next_char(data->tok->input, data->tok->prev_pos));
-        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+        tok_type = get_tok_type(
+            data->tok->input[data->tok->prev_pos],
+            check_next_char(data->tok->input, data->tok->prev_pos));
+        /* Skip isolated single/double quote leftovers */
+        if (!(tok_type == TOKEN_TEXT && (data->tok->pos - data->tok->prev_pos) == 1
+              && (data->tok->input[data->tok->prev_pos] == '\''
+                  || data->tok->input[data->tok->prev_pos] == '"')))
+            create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
     }
-    /* New: detect unclosed quotes */
+
     if (data->tok->double_quote || data->tok->single_quote)
         return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
     return (0);
@@ -265,39 +287,27 @@ int	syntax_check(t_token *token_array, int size)
     if (!token_array || size <= 0)
         return (1);
     if (size == 1 && !(is_redir(token_array[0].type) || is_word_token(token_array[0].type)))
-        return (fdprintf(2,
-            "minishell: syntax error near unexpected token `%s'\n", token_array[0].word), 1);
+        return (syntax_error(token_array[0].word), 1);
     i = 0;
     while (i < size)
     {
         t = token_array[i].type;
-
-        /* Logical / pipe operators */
         if (is_operator(t))
         {
-            /* Left side must exist and be a command end (word or ')') */
             if (i == 0 || !is_command_end(token_array[i - 1].type))
-                return (fdprintf(2,
-                    "minishell: syntax error near unexpected token `%s'\n", token_array[i].word), 1);
-            /* Right side must exist */
+        		return (syntax_error(token_array[i].word), 1);
             if (i + 1 >= size)
-                return (fdprintf(2,
-                    "minishell: syntax error near unexpected token `newline'\n"), 1);
-            /* And be a command start (word or '(') */
+        		return (syntax_error("newline"), 1);
             if (!is_command_start(token_array[i + 1].type))
-                return (fdprintf(2,
-                    "minishell: syntax error near unexpected token `%s'\n", token_array[i + 1].word), 1);
+        		return (syntax_error(token_array[i + 1].word), 1);
         }
-        /* Redirections */
         else if (is_redir(t))
         {
             if (i + 1 >= size)
-                return (fdprintf(2,
-                    "minishell: syntax error near unexpected token `newline'\n"), 1);
+        		return (syntax_error("newline"), 1);
             if (!is_word_token(token_array[i + 1].type))
-                return (fdprintf(2,
-                    "minishell: syntax error near unexpected token `%s'\n", token_array[i + 1].word), 1);
-            i++; /* skip filename */
+        		return (syntax_error(token_array[i + 1].word), 1);
+            i++;
         }
         i++;
     }

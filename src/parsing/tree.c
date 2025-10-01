@@ -36,11 +36,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int siz
 
     /* Guard: only test builtin if a command exists */
     if (node->cmd_argv[0] && is_builtin(node->cmd_argv[0]))
-    {
-        printf(GREEN"%s\n"RESET, node->cmd_argv[0]);
         node->builtin = true;
-        printf(RED"SET TO BUILDIN\n"RESET);
-    }
     return (0);
 }
 

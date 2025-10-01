@@ -51,6 +51,12 @@ It's not mandatory, just simplify everything imo.
 **Thomas**
 Matrix:
 
+- [ ] handle enclosed quotes : echo "'lol'".
+- [ ] if / in command, return bash: `/src`: No such file or directory instead of `command not found`.
+- [ ] `$?`
+	- [ ] should not be in the env.
+	- [ ] should be set to 0 at the beginning.
+	- [ ] should not be modifiable.
 - [ ] env_var should only contain chars.
 - [ ] exit codes.
 - [ ] pass env to execve.
