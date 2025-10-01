@@ -286,7 +286,6 @@ int main(int ac, char **av, char **envp)
 
         if (parser(&data) != 0)
         {
-            fprintf(stderr, "parse error\n");
             if (data.malloc_tok)
                 my_free(&data.malloc_tok);
             data.tok->token_array = NULL;

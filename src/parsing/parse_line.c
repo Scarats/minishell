@@ -262,7 +262,6 @@ int	syntax_check(t_token *token_array, int size)
     int	i;
 	t_token_type t;
 
-    printf(RED "SYNTAX_CHECK\n" RESET);
     if (!token_array || size <= 0)
         return (1);
     if (size == 1 && !(is_redir(token_array[0].type) || is_word_token(token_array[0].type)))
@@ -302,7 +301,6 @@ int	syntax_check(t_token *token_array, int size)
         }
         i++;
     }
-    printf(GREEN "SYNTAX_END\n" RESET);
     return (0);
 }
 
