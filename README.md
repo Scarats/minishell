@@ -51,6 +51,9 @@ It's not mandatory, just simplify everything imo.
 **Thomas**
 Matrix:
 
+- [ ] exit codes.
+- [ ] pass env to execve.
+- [ ] use execve for builtins.
 - [ ] Builtins.
   - [ ] exit
   - [x] unset

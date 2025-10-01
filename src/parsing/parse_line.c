@@ -117,23 +117,24 @@ t_token_type	get_tok_type(char c, char next)
 
 int	handle_operator(t_main_data *data, t_token_type *tok_type)
 {
-	int	len;
+    int	len;
 
-	len = 0;
-	if (!data || !tok_type)
-		return (1);
-	*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-			check_next_char(data->tok->input, data->tok->prev_pos));
-	if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR
-		|| *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
-		len = 2;
-	else
-		len = 1;
-	create_token(data, data->tok->prev_pos, data->tok->prev_pos + len,
-		*tok_type);
-	data->tok->prev_pos += len;
-	data->tok->pos = data->tok->prev_pos;
-	return (0);
+    len = 0;
+    if (!data || !tok_type)
+        return (1);
+    *tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+            check_next_char(data->tok->input, data->tok->prev_pos));
+    if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR
+        || *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
+        len = 2;
+    else
+        len = 1;
+    create_token(data, data->tok->prev_pos, data->tok->prev_pos + len,
+        *tok_type);
+    data->tok->prev_pos += len;
+    /* Adjust position so the main loop's pos++ lands exactly at prev_pos */
+    data->tok->pos = data->tok->prev_pos - 1;
+    return (0);
 }
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
@@ -152,45 +153,48 @@ int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 
 int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 {
-	if (!data || !tok_type)
-		return (1);
-	*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-			check_next_char(data->tok->input, data->tok->prev_pos));
-	create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
-	data->tok->prev_pos = data->tok->pos;
-	return (0);
+    if (!data || !tok_type)
+        return (1);
+    *tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+            check_next_char(data->tok->input, data->tok->prev_pos));
+    create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+    data->tok->prev_pos = data->tok->pos;
+    /* Same adjustment to avoid creating a trailing empty token */
+    data->tok->pos = data->tok->prev_pos - 1;
+    return (0);
 }
 
 int	tokenizer(t_main_data *data)
 {
 	t_token_type	tok_type;
 
-	tok_type = TOKEN_NULL;
-	while (data->tok->pos < data->tok->length)
-	{
-		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
-		handle_quotes(data);
-		if (data->tok->curr_char_type == CHAR_PARENTHESIS
-			&& data->tok->prev_char_type == CHAR_PARENTHESIS
-			&& data->tok->pos > data->tok->prev_pos)
-			handle_parenthesis(data, &tok_type);
-		else if (data->tok->curr_char_type == CHAR_OPERATOR
-			&& data->tok->prev_char_type == CHAR_OPERATOR
-			&& data->tok->pos > data->tok->prev_pos)
-			handle_operator(data, &tok_type);
-		else if (data->tok->curr_char_type != data->tok->prev_char_type)
-			handle_normal_token(data, &tok_type);
-		data->tok->prev_char_type = data->tok->curr_char_type;
-		data->tok->pos++;
-	}
-	if (data->tok->prev_char_type != CHAR_SPACE
-		&& data->tok->prev_pos < data->tok->pos)
-	{
-		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-				check_next_char(data->tok->input, data->tok->prev_pos));
-		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-	}
-	return (0);
+    tok_type = TOKEN_NULL;
+    while (data->tok->pos < data->tok->length)
+    {
+        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+        handle_quotes(data);
+        if (data->tok->curr_char_type == CHAR_PARENTHESIS
+            && data->tok->prev_char_type == CHAR_PARENTHESIS
+            && data->tok->pos > data->tok->prev_pos)
+            handle_parenthesis(data, &tok_type);
+        else if (data->tok->curr_char_type == CHAR_OPERATOR
+            && data->tok->prev_char_type == CHAR_OPERATOR
+            && data->tok->pos > data->tok->prev_pos)
+            handle_operator(data, &tok_type);
+        else if (data->tok->curr_char_type != data->tok->prev_char_type)
+            handle_normal_token(data, &tok_type);
+        data->tok->prev_char_type = data->tok->curr_char_type;
+        data->tok->pos++;
+    }
+    if (data->tok->prev_char_type != CHAR_SPACE
+        && data->tok->prev_pos < data->tok->pos
+        && data->tok->prev_pos < data->tok->length) /* prevent empty trailing token */
+    {
+        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+                check_next_char(data->tok->input, data->tok->prev_pos));
+        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+    }
+    return (0);
 }
 
 // Turn the token linked list in an array, easier for AST.
