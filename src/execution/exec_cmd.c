@@ -102,18 +102,26 @@ int set_io_fds(t_node *node, t_main_data *data)
 // Call step by step each function for clean execution.
 int exec_handler(t_main_data *data, t_node *node)
 {
-	int error;
+    int error = 0;
 
-	error = 0;
-	if (!node->builtin)
-		error = get_bin_path(node, data);
-	if (error == 0)
-		error = set_io_fds(node, data);
-	if (error == 0)
-		error = redirections(node, data);
-	if (error == 0)
-		error = execution(node, data);
-	return (error);
+    /* Apply pipes / inherited fds and explicit redirections first */
+    if ((error = set_io_fds(node, data)) != 0)
+        return (error);
+    if ((error = redirections(node, data)) != 0)
+        return (error);
+
+    /* Pure redirection: nothing to execute */
+    if (!node->cmd_argv || !node->cmd_argv[0])
+        return (0);
+
+    /* Builtin: execution() handles it, but we can short‑circuit */
+    if (node->builtin)
+        return (execution(node, data));
+
+    /* External command: resolve path; on failure return 127 */
+    if (get_bin_path(node, data) != 0 || !node->path)
+        return (127);
+    return (execution(node, data));
 }
 
 // Run builtin in parent: save fds, apply redirs, run, then restore.
@@ -156,27 +164,24 @@ int exec_cmd(t_node *node, t_main_data *data)
 
     if (node->builtin)
     {
-        // If already in a child (e.g., inside a pipe/subshell), just run it here.
         if (data->in_child)
-            return (exec_handler(data, node));
-        // Otherwise run in parent but restore stdio after redirections.
-        return (exec_builtin_in_parent(node, data));
+            return exec_handler(data, node);
+        return exec_builtin_in_parent(node, data);
     }
 
-	printf(RED"EXEC_CMD\n"RESET);
+    printf(RED"EXEC_CMD\n"RESET);
     pid = fork();
     if (pid == -1)
         return 1;
 
     if (pid == 0)
     {
-        // Child: run the command pipeline (bin path, fds, redirs, execve/builtin)
         error = exec_handler(data, node);
-		fdprintf(2, "minishell: command not found: %s\n", node->cmd_argv[0]);
-        // Unified child cleanup: free the child's copies before exiting to avoid
-        // "still reachable" reports in the child when execve didn't replace the process.
+        if (error == 127 && node->cmd_argv && node->cmd_argv[0])
+            fdprintf(2, "minishell: command not found: %s\n", node->cmd_argv[0]);
+        /* No message for pure redirection (error == 0) */
         my_multi_free(&data->root->list_of_list);
-		exit(error);
+        exit(error);
     }
 
     if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
@@ -185,11 +190,11 @@ int exec_cmd(t_node *node, t_main_data *data)
         close(node->output_fd);
 
     if (waitpid(pid, &status, 0) == -1)
-        return (1);
+        return 1;
 
     if (WIFEXITED(status))
         return WEXITSTATUS(status);
     else if (WIFSIGNALED(status))
         return (128 + WTERMSIG(status));
-    return (1);
+    return 1;
 }

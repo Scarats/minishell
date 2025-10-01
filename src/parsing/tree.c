@@ -3,40 +3,45 @@
 // Create the excve argv, add cmd and args to it, set redirections.
 int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int size)
 {
-	int i;
-	int j;
-	int cmd_argc;
-	t_redir *curr_redir;
+    int i;
+    int j;
+    int cmd_argc;
+    t_redir *curr_redir;
 
-	curr_redir = NULL;
-	cmd_argc = get_cmd_argc(tok_array, size);
+    curr_redir = NULL;
+    cmd_argc = get_cmd_argc(tok_array, size);
 
-	if (cmd_argc > 0)
-		node->cmd_argv = my_malloc(&data->root->list_of_list, &data->malloc_tree, sizeof(char *) * (cmd_argc + 1));
+    /* Always allocate at least one slot (NULL terminator),
+       even if there are zero command/argument tokens (pure redirection). */
+    node->cmd_argv = my_malloc(&data->root->list_of_list,
+            &data->malloc_tree, sizeof(char *) * (cmd_argc + 1));
+    if (!node->cmd_argv)
+        return (1);
+    i = -1;
+    j = 0;
+    while (++i < size)
+    {
+        if (is_redir(tok_array[i].type))
+        {
+            if (i + 1 >= size || tok_array[i + 1].type != TOKEN_FILE)
+                return (1);
+            curr_redir = add_redirection(data, node, tok_array[i++].type);
+            curr_redir->filename = my_strdup(&data->malloc_tree, tok_array[i].word);
+        }
+        else if ((tok_array[i].type == TOKEN_CMD
+                || tok_array[i].type == TOKEN_ARGUMENT) && j < cmd_argc)
+            node->cmd_argv[j++] = my_strdup(&data->malloc_tree, tok_array[i].word);
+    }
+    node->cmd_argv[j] = NULL;
 
-	i = -1;
-	j = 0;
-	while (++i < size)
-	{
-		if (is_redir(tok_array[i].type))
-		{
-			if (i + 1 >= size || tok_array[i + 1].type != TOKEN_FILE)
-				return (1);
-			curr_redir = add_redirection(data, node, tok_array[i++].type);
-			curr_redir->filename = my_strdup(&data->malloc_tree, tok_array[i].word);
-		}
-		else if ((tok_array[i].type == TOKEN_CMD || tok_array[i].type == TOKEN_ARGUMENT) && j < cmd_argc)
-			node->cmd_argv[j++] = my_strdup(&data->malloc_tree, tok_array[i].word);
-	}
-	if (node->cmd_argv)
-		node->cmd_argv[j] = NULL;
-	if (is_builtin(node->cmd_argv[0]))
-	{
-		printf(GREEN"%s\n"RESET, node->cmd_argv[0]);
-		node->builtin = true;
-		printf(RED"SET TO BUILDIN\n"RESET);
-	}
-	return (0);
+    /* Guard: only test builtin if a command exists */
+    if (node->cmd_argv[0] && is_builtin(node->cmd_argv[0]))
+    {
+        printf(GREEN"%s\n"RESET, node->cmd_argv[0]);
+        node->builtin = true;
+        printf(RED"SET TO BUILDIN\n"RESET);
+    }
+    return (0);
 }
 
 // While size, add token, check its type and add it to the node.
