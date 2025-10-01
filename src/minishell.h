@@ -223,5 +223,6 @@ int env(t_env *root_env);
 int unset(t_env **env, char **argv);
 int	set_last_exit_status_var(t_root *root);
 void syntax_error(char *message);
+int	create_token(t_main_data *data, int start, int end, t_token_type type);
 
 #endif

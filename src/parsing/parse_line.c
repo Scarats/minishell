@@ -39,36 +39,37 @@ t_token_type	get_word_type(t_token *tok)
 // Create token, add them to the list and add type.
 int	create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-	t_token	*tok;
-	char	*slice;
-	char	*expanded;
+    t_token	*tok;
+    char	*slice;
+    char	*expanded;
 
-	if (type == TOKEN_SPACE)
-		type = TOKEN_TEXT;
-	tok = add_to_list(data, data->tok->last_token);
-	if (!tok)
-		return (1);
-	if (type == TOKEN_TEXT)
-		type = get_word_type(tok);
-	tok->type = type;
-	// Always grab the raw lexeme (operators, parens, words, etc.)
-	slice = ft_substr(data->tok->input, start, end - start);
-	if (slice)
-		my_addtolist(&data->malloc_tok, slice);
-	tok->word = slice;
-	// Handle environment variable expansion
-	if (tok->type == TOKEN_ENV_VAR)
-	{
-		expanded = get_env_var(data->root->env, slice);
-		if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
-			remove_token(&data->tok->token_list, tok->prev_token);
-		tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
-		if (expanded)
-			tok->word = expanded;
-		// Use expanded value (do not track if from env)
-	}
-	tok->word = clean_string(tok->word);
-	return (0);
+    if (type == TOKEN_SPACE)
+        type = TOKEN_TEXT;
+    tok = add_to_list(data, data->tok->last_token);
+    if (!tok)
+        return (1);
+    if (type == TOKEN_TEXT)
+        type = get_word_type(tok);
+    tok->type = type;
+    // Always grab the raw lexeme (operators, parens, words, etc.)
+    slice = ft_substr(data->tok->input, start, end - start);
+    if (slice)
+        my_addtolist(&data->malloc_tok, slice);
+    tok->word = slice;
+    // Handle environment variable expansion (but NOT inside single quotes)
+    if (tok->type == TOKEN_ENV_VAR)
+    {
+		printf(RED"$ FOUND\n"RESET);
+        expanded = get_env_var(data->root->env, slice);
+        if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
+            remove_token(&data->tok->token_list, tok->prev_token);
+        tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
+        if (expanded)
+            tok->word = expanded;
+        // Use expanded value (do not track if from env)
+    }
+    tok->word = clean_string(tok->word);
+    return (0);
 }
 
 t_char_type	get_char_type(char c)
@@ -173,9 +174,6 @@ int	tokenizer(t_main_data *data)
     {
         data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
         handle_quotes(data);
-        if (data->tok->single_quote
-            && data->tok->curr_char_type != CHAR_SINGLE_QUOTE)
-            data->tok->curr_char_type = CHAR_TEXT;
         if (data->tok->curr_char_type == CHAR_PARENTHESIS
             && data->tok->prev_char_type == CHAR_PARENTHESIS
             && data->tok->pos > data->tok->prev_pos)
@@ -191,7 +189,7 @@ int	tokenizer(t_main_data *data)
     }
     if (data->tok->prev_char_type != CHAR_SPACE
         && data->tok->prev_pos < data->tok->pos
-        && data->tok->prev_pos < data->tok->length) /* prevent empty trailing token */
+        && data->tok->prev_pos < data->tok->length && !data->tok->single_quote) /* prevent empty trailing token */
     {
         tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
                 check_next_char(data->tok->input, data->tok->prev_pos));

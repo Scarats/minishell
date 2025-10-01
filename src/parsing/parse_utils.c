@@ -61,36 +61,55 @@ int handle_quotes(t_main_data *data)
 {
     char c = data->tok->input[data->tok->pos];
 
-    if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE)
+    if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE && !data->tok->double_quote)
     {
-        // Toggle double-quote state
-        data->tok->double_quote = !data->tok->double_quote;
-
-        if (data->tok->double_quote)
-        {
-            // Opening: start the token right after the quote if we were not in TEXT
-            if (data->tok->prev_char_type != CHAR_TEXT)
-                data->tok->prev_pos = data->tok->pos + 1;
-        }
-        // Make the quote character itself behave like a separator (no token emitted)
-        data->tok->curr_char_type = CHAR_SPACE;
-    }
-    else if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE)
-    {
-        // Toggle single-quote state
+        // Toggle single-quote state only if not inside double quotes
         data->tok->single_quote = !data->tok->single_quote;
 
         if (data->tok->single_quote)
         {
+            // Opening single quote: start token after the quote
             if (data->tok->prev_char_type != CHAR_TEXT)
                 data->tok->prev_pos = data->tok->pos + 1;
         }
-        // Make the quote character itself behave like a separator (no token emitted)
+        else
+        {
+            // Closing single quote: create token with content before the quote
+            if (data->tok->pos > data->tok->prev_pos)
+            {
+                create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
+            }
+            data->tok->prev_pos = data->tok->pos + 1;
+        }
+        // Make the quote character itself behave like a separator
+        data->tok->curr_char_type = CHAR_SPACE;
+    }
+    else if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE && !data->tok->single_quote)
+    {
+        // Toggle double-quote state only if not inside single quotes
+        data->tok->double_quote = !data->tok->double_quote;
+
+        if (data->tok->double_quote)
+        {
+            // Opening: start the token right after the quote
+            if (data->tok->prev_char_type != CHAR_TEXT)
+                data->tok->prev_pos = data->tok->pos + 1;
+        }
+        else
+        {
+            // Closing double quote: create token with content before the quote
+            if (data->tok->pos > data->tok->prev_pos)
+            {
+                create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
+            }
+            data->tok->prev_pos = data->tok->pos + 1;
+        }
+        // Make the quote character itself behave like a separator
         data->tok->curr_char_type = CHAR_SPACE;
     }
     else if (data->tok->single_quote)
     {
-        // Inside single quotes: everything is literal
+        // Inside single quotes: everything is literal text
         data->tok->curr_char_type = CHAR_TEXT;
     }
     else if (data->tok->double_quote)
