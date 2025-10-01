@@ -245,7 +245,7 @@ int	check_op_syntax(t_token *tok)
 // A command can start with a word-like token or a left parenthesis
 int	is_command_start(t_token_type t)
 {
-    return (is_word_token(t) || t == TOKEN_LPAREN);
+    return (is_word_token(t) || t == TOKEN_LPAREN || t == TOKEN_REDIRECT_OUT);
 }
 
 // A command can end with a word-like token or a right parenthesis

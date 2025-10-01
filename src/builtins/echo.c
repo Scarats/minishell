@@ -37,6 +37,8 @@ int echo(char **argv)
 {
 	bool n;
 
+	if (!argv || !*argv)
+		return (ft_printf("\n"));
 	n = false;
 	if (argv[0] == NULL)
 		return ((void)printf("\n"), 0);
@@ -47,8 +49,8 @@ int echo(char **argv)
 	if (n)
 		print_array(&argv[1]);
 	else
-	{
 		print_array(&argv[0]);
-	}
+	if (!n)
+		ft_printf("\n");
 	return (0);
 }
