@@ -57,70 +57,25 @@ t_token *add_to_list(t_main_data *data, t_token *prev)
 }
 
 // Set quote flags.
-int handle_quotes(t_main_data *data)
+int handle_quotes(t_tokenizer *tok, t_main_data *data)
 {
     char c;
 	
-	c = data->tok->input[data->tok->pos];
-    if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE && !data->tok->double_quote)
-    {
-        // Toggle single-quote state only if not inside double quotes
-        data->tok->single_quote = !data->tok->single_quote;
-
-        if (data->tok->single_quote)
-        {
-            // Opening single quote: start token after the quote
-            if (data->tok->prev_char_type != CHAR_TEXT)
-                data->tok->prev_pos = data->tok->pos + 1;
-        }
-        else
-        {
-            // Closing single quote: create token with content before the quote
-            if (data->tok->pos > data->tok->prev_pos)
-            {
-                create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
-            }
-            data->tok->prev_pos = data->tok->pos + 1;
-        }
-        // Make the quote character itself behave like a separator
-        data->tok->curr_char_type = CHAR_SPACE;
-    }
-    else if (data->tok->curr_char_type == CHAR_DOUBLE_QUOTE && !data->tok->single_quote)
-    {
-        // Toggle double-quote state only if not inside single quotes
-        data->tok->double_quote = !data->tok->double_quote;
-
-        if (data->tok->double_quote)
-        {
-            // Opening: start the token right after the quote
-            if (data->tok->prev_char_type != CHAR_TEXT)
-                data->tok->prev_pos = data->tok->pos + 1;
-        }
-        else
-        {
-            // Closing double quote: create token with content before the quote
-            if (data->tok->pos > data->tok->prev_pos)
-            {
-                create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
-            }
-            data->tok->prev_pos = data->tok->pos + 1;
-        }
-        // Make the quote character itself behave like a separator
-        data->tok->curr_char_type = CHAR_SPACE;
-    }
-    else if (data->tok->single_quote)
-    {
-        // Inside single quotes: everything is literal text
-        data->tok->curr_char_type = CHAR_TEXT;
-    }
-    else if (data->tok->double_quote)
-    {
-        // Inside double quotes: keep $ as operator to allow $VAR expansion,
-        // treat everything else (including spaces) as text
-        if (c != '$')
-            data->tok->curr_char_type = CHAR_TEXT;
-        // else: keep whatever get_char_type set (CHAR_OPERATOR for '$')
-    }
+	c = data->tok->input[tok->pos];
+	if (c == '\'' && !tok->double_quote)
+	{
+		tok->single_quote = !tok->single_quote;
+		tok->curr_char_type = CHAR_SPACE;
+	}
+	else if (c == '"' && !tok->single_quote)
+	{
+		tok->double_quote = !tok->double_quote;
+		tok->curr_char_type = CHAR_SPACE;
+	}
+    else if (tok->double_quote && c != '$')
+        tok->curr_char_type = CHAR_TEXT;
+	else if (tok->single_quote)
+		tok->curr_char_type = CHAR_TEXT;
     return (0);
 }
 

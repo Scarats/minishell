@@ -7,7 +7,7 @@ void print_array(char **argv)
 	i = 0;
 	while (argv[i])
 	{
-		if (i > 0)
+		if (i > 0 && argv[i] != NULL)
 			ft_printf(" ");
 		ft_printf("%s", argv[i++]);
 	}

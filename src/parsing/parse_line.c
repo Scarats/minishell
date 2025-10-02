@@ -39,36 +39,40 @@ t_token_type	get_word_type(t_token *tok)
 // Create token, add them to the list and add type.
 int	create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-    t_token	*tok;
-    char	*slice;
-    char	*expanded;
+	t_token		*tok;
+	char		*slice;
+	char		*expanded;
+	static int	i;
 
-    if (type == TOKEN_SPACE)
-        type = TOKEN_TEXT;
-    tok = add_to_list(data, data->tok->last_token);
-    if (!tok)
-        return (1);
-    if (type == TOKEN_TEXT)
-        type = get_word_type(tok);
-    tok->type = type;
-    // Always grab the raw lexeme (operators, parens, words, etc.)
-    slice = ft_substr(data->tok->input, start, end - start);
-    if (slice)
-        my_addtolist(&data->malloc_tok, slice);
-    tok->word = slice;
-    // Handle environment variable expansion (but NOT inside single quotes)
-    if (tok->type == TOKEN_ENV_VAR)
-    {
-        expanded = get_env_var(data->root->env, slice);
-        if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
-            remove_token(&data->tok->token_list, tok->prev_token);
-        tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
-        if (expanded)
-            tok->word = expanded;
-        // Use expanded value (do not track if from env)
-    }
-    // tok->word = clean_string(tok->word);
-    return (0);
+	if (!i)
+		i = 1;
+	if (type == TOKEN_SPACE)
+		type = TOKEN_TEXT;
+	tok = add_to_list(data, data->tok->last_token);
+	if (!tok)
+		return (1);
+	if (type == TOKEN_TEXT)
+		type = get_word_type(tok);
+	tok->type = type;
+	// Always grab the raw lexeme (operators, parens, words, etc.)
+	slice = ft_substr(data->tok->input, start, end - start);
+	if (slice)
+		my_addtolist(&data->malloc_tok, slice);
+	tok->word = slice;
+	// Handle environment variable expansion (but NOT inside single quotes)
+	if (tok->type == TOKEN_ENV_VAR)
+	{
+		expanded = get_env_var(data->root->env, slice);
+		if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
+			remove_token(&data->tok->token_list, tok->prev_token);
+		tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
+		if (expanded)
+			tok->word = expanded;
+		// Use expanded value (do not track if from env)
+	}
+	printf(RED "tok %i = %s\n" RESET, i++, tok->word);
+	// tok->word = clean_string(tok->word);
+	return (0);
 }
 
 t_char_type	get_char_type(char c)
@@ -117,83 +121,85 @@ t_token_type	get_tok_type(char c, char next)
 
 int	handle_operator(t_main_data *data, t_token_type *tok_type)
 {
-    int	len;
+	int	len;
 
-    len = 0;
-    if (!data || !tok_type)
-        return (1);
-    *tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-            check_next_char(data->tok->input, data->tok->prev_pos));
-    if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR
-        || *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
-        len = 2;
-    else
-        len = 1;
-    create_token(data, data->tok->prev_pos, data->tok->prev_pos + len,
-        *tok_type);
-    data->tok->prev_pos += len;
-    return (0);
+	len = 0;
+	if (!data || !tok_type)
+		return (1);
+	*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+			check_next_char(data->tok->input, data->tok->prev_pos));
+	if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR
+		|| *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
+		len = 2;
+	else
+		len = 1;
+	create_token(data, data->tok->prev_pos, data->tok->prev_pos + len,
+		*tok_type);
+	data->tok->prev_pos += len;
+	return (0);
 }
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
-    if (!data || !tok_type)
-        return (1);
-    if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
-    {
-        *tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-                check_next_char(data->tok->input, data->tok->prev_pos));
-        create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
-    }
-    data->tok->prev_pos = data->tok->pos;
-    return (0);
+	if (!data || !tok_type)
+		return (1);
+	if (data->tok->prev_char_type != CHAR_SPACE
+		&& data->tok->prev_pos < data->tok->pos)
+	{
+		*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+				check_next_char(data->tok->input, data->tok->prev_pos));
+		create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+	}
+	data->tok->prev_pos = data->tok->pos;
+	return (0);
 }
 
 int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 {
-    if (!data || !tok_type)
-        return (1);
-    *tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-            check_next_char(data->tok->input, data->tok->prev_pos));
-    create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
-    data->tok->prev_pos = data->tok->pos;
-    return (0);
+	if (!data || !tok_type)
+		return (1);
+	*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+			check_next_char(data->tok->input, data->tok->prev_pos));
+	create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+	data->tok->prev_pos = data->tok->pos;
+	return (0);
 }
 
 int	tokenizer(t_main_data *data)
 {
-    t_token_type	tok_type;
+	t_token_type	tok_type;
 
-    tok_type = TOKEN_NULL;
-    while (data->tok->pos < data->tok->length)
-    {
-        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
-        handle_quotes(data);
-        if (data->tok->curr_char_type == CHAR_PARENTHESIS
-            && data->tok->prev_char_type == CHAR_PARENTHESIS
-            && data->tok->pos > data->tok->prev_pos)
-            handle_parenthesis(data, &tok_type);
-        else if (data->tok->curr_char_type == CHAR_OPERATOR
-            && data->tok->prev_char_type == CHAR_OPERATOR
-            && data->tok->pos > data->tok->prev_pos)
-            handle_operator(data, &tok_type);
-        else if (data->tok->curr_char_type != data->tok->prev_char_type)
-            handle_normal_token(data, &tok_type);
-        data->tok->prev_char_type = data->tok->curr_char_type;
-        data->tok->pos++;
-    }
-    if (data->tok->prev_char_type != CHAR_SPACE
-        && data->tok->prev_pos < data->tok->pos
-        && data->tok->prev_pos < data->tok->length && !data->tok->single_quote) /* prevent empty trailing token */
-    {
-        tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-                check_next_char(data->tok->input, data->tok->prev_pos));
-        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-    }
-    /* New: detect unclosed quotes */
-    if (data->tok->double_quote || data->tok->single_quote)
-        return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
-    return (0);
+	tok_type = TOKEN_NULL;
+	while (data->tok->pos < data->tok->length)
+	{
+		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+		handle_quotes(data->tok, data);
+		if (data->tok->curr_char_type == CHAR_PARENTHESIS
+			&& data->tok->prev_char_type == CHAR_PARENTHESIS
+			&& data->tok->pos > data->tok->prev_pos)
+			handle_parenthesis(data, &tok_type);
+		else if (data->tok->curr_char_type == CHAR_OPERATOR
+			&& data->tok->prev_char_type == CHAR_OPERATOR
+			&& data->tok->pos > data->tok->prev_pos)
+			handle_operator(data, &tok_type);
+		else if (data->tok->curr_char_type != data->tok->prev_char_type)
+			handle_normal_token(data, &tok_type);
+		data->tok->prev_char_type = data->tok->curr_char_type;
+		data->tok->pos++;
+	}
+	if (data->tok->prev_char_type != CHAR_SPACE
+		&& data->tok->prev_pos < data->tok->pos
+		&& data->tok->prev_pos < data->tok->length && !data->tok->single_quote)
+		/* prevent empty trailing token */
+	{
+		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+				check_next_char(data->tok->input, data->tok->prev_pos));
+		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+	}
+	/* New: detect unclosed quotes */
+	if (data->tok->double_quote || data->tok->single_quote)
+		return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
+	return (0);
 }
 
 // Turn the token linked list in an array, easier for AST.
@@ -232,60 +238,61 @@ int	check_op_syntax(t_token *tok)
 {
 	if (!tok)
 		return (1);
-	printf(PURPLE"\nWORD = %s\n", tok->word);
+	printf(PURPLE "\nWORD = %s\n", tok->word);
 	if (tok->type == TOKEN_AND_AND && ft_strncmp(tok->word, "&&", 2))
-		return (printf(GREEN"\nCASE &&\n"RESET), 1);
+		return (printf(GREEN "\nCASE &&\n" RESET), 1);
 	else if (tok->type == TOKEN_OR && ft_strncmp(tok->word, "||", 2))
-		return (printf(GREEN"\nCASE ||\n"RESET), 1);
-	printf(GREEN"\nELSE\n"RESET);
+		return (printf(GREEN "\nCASE ||\n" RESET), 1);
+	printf(GREEN "\nELSE\n" RESET);
 	return (0);
 }
 
 // A command can start with a word-like token or a left parenthesis
 int	is_command_start(t_token_type t)
 {
-    return (is_word_token(t) || t == TOKEN_LPAREN || t == TOKEN_REDIRECT_OUT);
+	return (is_word_token(t) || t == TOKEN_LPAREN || t == TOKEN_REDIRECT_OUT);
 }
 
 // A command can end with a word-like token or a right parenthesis
 int	is_command_end(t_token_type t)
 {
-    return (is_word_token(t) || t == TOKEN_RPAREN);
+	return (is_word_token(t) || t == TOKEN_RPAREN);
 }
 
 int	syntax_check(t_token *token_array, int size)
 {
-    int	i;
-	t_token_type t;
+	int				i;
+	t_token_type	t;
 
-    if (!token_array || size <= 0)
-        return (1);
-    if (size == 1 && !(is_redir(token_array[0].type) || is_word_token(token_array[0].type)))
-        return (syntax_error(token_array[0].word), 1);
-    i = 0;
-    while (i < size)
-    {
-        t = token_array[i].type;
-        if (is_operator(t))
-        {
-            if (i == 0 || !is_command_end(token_array[i - 1].type))
-        		return (syntax_error(token_array[i].word), 1);
-            if (i + 1 >= size)
-        		return (syntax_error("newline"), 1);
-            if (!is_command_start(token_array[i + 1].type))
-        		return (syntax_error(token_array[i + 1].word), 1);
-        }
-        else if (is_redir(t))
-        {
-            if (i + 1 >= size)
-        		return (syntax_error("newline"), 1);
-            if (!is_word_token(token_array[i + 1].type))
-        		return (syntax_error(token_array[i + 1].word), 1);
-            i++;
-        }
-        i++;
-    }
-    return (0);
+	if (!token_array || size <= 0)
+		return (1);
+	if (size == 1 && !(is_redir(token_array[0].type)
+			|| is_word_token(token_array[0].type)))
+		return (syntax_error(token_array[0].word), 1);
+	i = 0;
+	while (i < size)
+	{
+		t = token_array[i].type;
+		if (is_operator(t))
+		{
+			if (i == 0 || !is_command_end(token_array[i - 1].type))
+				return (syntax_error(token_array[i].word), 1);
+			if (i + 1 >= size)
+				return (syntax_error("newline"), 1);
+			if (!is_command_start(token_array[i + 1].type))
+				return (syntax_error(token_array[i + 1].word), 1);
+		}
+		else if (is_redir(t))
+		{
+			if (i + 1 >= size)
+				return (syntax_error("newline"), 1);
+			if (!is_word_token(token_array[i + 1].type))
+				return (syntax_error(token_array[i + 1].word), 1);
+			i++;
+		}
+		i++;
+	}
+	return (0);
 }
 
 // Parse the input.
