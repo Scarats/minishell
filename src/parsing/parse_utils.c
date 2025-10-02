@@ -1,26 +1,26 @@
 #include "../minishell.h"
 
-// Removes quotes.
-char *clean_string(char *input)
-{
-	char *output;
-	int i;
-	int y;
+// // Removes quotes.
+// char *clean_string(char *input)
+// {
+// 	char *output;
+// 	int i;
+// 	int y;
 
-	if (!input)
-		return (NULL);
-	output = input;
-	i = 0;
-	y = 0;
-	while (input[i])
-	{
-		if (input[i] != '"' && input[i] != '\'')
-			output[y++] = input[i];
-		i++;
-	}
-	output[y] = '\0';
-	return (output);
-}
+// 	if (!input)
+// 		return (NULL);
+// 	output = input;
+// 	i = 0;
+// 	y = 0;
+// 	while (input[i])
+// 	{
+// 		if (input[i] != '"' && input[i] != '\'')
+// 			output[y++] = input[i];
+// 		i++;
+// 	}
+// 	output[y] = '\0';
+// 	return (output);
+// }
 
 char check_next_char(char *str, int pos)
 {
@@ -59,8 +59,9 @@ t_token *add_to_list(t_main_data *data, t_token *prev)
 // Set quote flags.
 int handle_quotes(t_main_data *data)
 {
-    char c = data->tok->input[data->tok->pos];
-
+    char c;
+	
+	c = data->tok->input[data->tok->pos];
     if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE && !data->tok->double_quote)
     {
         // Toggle single-quote state only if not inside double quotes

@@ -67,7 +67,7 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
             tok->word = expanded;
         // Use expanded value (do not track if from env)
     }
-    tok->word = clean_string(tok->word);
+    // tok->word = clean_string(tok->word);
     return (0);
 }
 
