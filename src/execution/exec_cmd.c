@@ -162,6 +162,11 @@ int exec_cmd(t_node *node, t_main_data *data)
     int status;
     int error;
 
+	printf("\n");
+	printf(BROWN"IN EXEC\nlength: %i\ntoken_list_size: %i\n"RESET, data->tok->length, data->tok->token_list_size);
+	for (int i = 0; node->cmd_argv[i]; i++)
+		ft_printf(BLUE"EXEC_CMD node: %s\n"RESET, node->cmd_argv[i]);
+	printf("\n");
     if (node->builtin)
     {
         if (data->in_child)

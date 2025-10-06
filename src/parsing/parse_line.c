@@ -141,6 +141,9 @@ int	handle_operator(t_main_data *data, t_token_type *tok_type)
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
+	bool just_closed_quote;
+
+	just_closed_quote = false;
 	if (!data || !tok_type)
 		return (1);
 	if (data->tok->prev_char_type != CHAR_SPACE
@@ -148,7 +151,14 @@ int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 	{
 		*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
 				check_next_char(data->tok->input, data->tok->prev_pos));
-		create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+		if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE
+                && !data->tok->single_quote)
+			create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+		else
+			create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
+		printf("\n");
+		printf(RED"CREATE_TOK %s, type %i\nin single quote: %i\n"RESET, data->tok->last_token->word, *tok_type, data->tok->single_quote);
+		printf("\n");
 	}
 	data->tok->prev_pos = data->tok->pos;
 	return (0);
@@ -301,12 +311,16 @@ int	parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
+	// for (int i = 0; i < data->tok->token_list_size; i++)
+	// 	printf(RED"BEGPARSING node %i: %s = type %i\n"RESET, i, data->tok->token_list[i].word, data->tok->token_list[i].type);
 	if (list_to_array(data, data->tok->token_list, data->tok->token_list_size))
 		return (1);
 	if (syntax_check(data->tok->token_array, data->tok->token_list_size))
 		return (1);
 	data->node = build_tree(data, data->tok->token_array,
 			data->tok->token_list_size, 0);
+	for (int i = 0; i < data->tok->token_list_size; i++)
+		printf(RED"EOFP node %i: '%s' = type %i\n"RESET, i, data->tok->token_array[i].word, data->tok->token_array[i].type);
 	if (!data->node)
 		return (1);
 	return (0);

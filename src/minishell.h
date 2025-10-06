@@ -60,6 +60,8 @@ typedef enum e_token_type
 	TOKEN_DOLLAR,		// $
 	TOKEN_ENV_VAR,		//$variable
 	TOKEN_TEXT,
+	TOKEN_DOUBLE_QUOTE,
+	TOKEN_SINGLE_QUOTE,
 	TOKEN_EOF
 } t_token_type;
 

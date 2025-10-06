@@ -39,6 +39,8 @@ int echo(char **argv)
 
 	if (!argv || !*argv)
 		return (ft_printf("\n"));
+	for (int i = 0; argv[i]; i++)
+		ft_printf(RED"ECHO %i: %s\n"RESET, i, argv[i]);
 	n = false;
 	if (argv[0] == NULL)
 		return ((void)printf("\n"), 0);

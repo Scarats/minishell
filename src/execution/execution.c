@@ -35,6 +35,10 @@ int create_subshell(t_node *node, t_main_data *data)
 // The recursion breakpoint is reached when a NODE_COMMAND is reached.
 int traverse_tree(t_node *node, t_main_data *data)
 {
+	printf("\n");
+	for (int i = 0; node->cmd_argv[i]; i++)
+		ft_printf(GREEN"TRAVERSE_TREE: %s\n"RESET, node->cmd_argv[i]);
+	printf("\n");
 	if (!node || !data)
 		return (1);
 	// Create a subshell here.

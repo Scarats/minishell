@@ -12,7 +12,8 @@ int exec_builtins(t_node *node, t_main_data *data)
 		return (1);
 
 	lenght = ft_strlen(node->cmd_argv[0]);
-
+	for (int i = 0; node->cmd_argv[i]; i++)
+		ft_printf(GREEN"EXEC_BUILDINS %i: %s\n"RESET, i, node->cmd_argv[i]);
 	error = 0;
 	if (!ft_strncmp(node->cmd_argv[0], "cd", lenght))
 		error = cd(node);
