@@ -116,6 +116,10 @@ t_token_type	get_tok_type(char c, char next)
 		return (TOKEN_RPAREN);
 	else if (c == ' ')
 		return (TOKEN_SPACE);
+	else if (c == '\'')
+		return (TOKEN_SINGLE_QUOTE);
+	else if (c == '"')
+		return (TOKEN_DOUBLE_QUOTE);
 	return (TOKEN_TEXT);
 }
 
@@ -126,8 +130,6 @@ int	handle_operator(t_main_data *data, t_token_type *tok_type)
 	len = 0;
 	if (!data || !tok_type)
 		return (1);
-	*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-			check_next_char(data->tok->input, data->tok->prev_pos));
 	if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR
 		|| *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
 		len = 2;
@@ -141,35 +143,30 @@ int	handle_operator(t_main_data *data, t_token_type *tok_type)
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
-	bool just_closed_quote;
-
-	just_closed_quote = false;
-	if (!data || !tok_type)
-		return (1);
-	if (data->tok->prev_char_type != CHAR_SPACE
-		&& data->tok->prev_pos < data->tok->pos)
-	{
-		*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-				check_next_char(data->tok->input, data->tok->prev_pos));
-		if (data->tok->curr_char_type == CHAR_SINGLE_QUOTE
-                && !data->tok->single_quote)
-			create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+    if (!data || !tok_type)
+        return (1);
+    if (data->tok->prev_char_type != CHAR_SPACE
+        && data->tok->prev_pos < data->tok->pos)
+    {
+		if (data->tok->prev_pos > 0
+             && data->tok->input[data->tok->prev_pos - 1] == '\'')
+            create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
 		else
-			create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
-		printf("\n");
-		printf(RED"CREATE_TOK %s, type %i\nin single quote: %i\n"RESET, data->tok->last_token->word, *tok_type, data->tok->single_quote);
-		printf("\n");
-	}
-	data->tok->prev_pos = data->tok->pos;
-	return (0);
+            create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+        printf("\n");
+        printf(RED"CREATE_TOK %s, type %i\nin single quote: %i\n"RESET,
+            data->tok->last_token->word, *tok_type, data->tok->single_quote);
+        printf("\n");
+    }
+    data->tok->prev_pos = data->tok->pos;
+    return (0);
 }
 
 int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 {
 	if (!data || !tok_type)
 		return (1);
-	*tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-			check_next_char(data->tok->input, data->tok->prev_pos));
+
 	create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
 	data->tok->prev_pos = data->tok->pos;
 	return (0);
@@ -183,6 +180,8 @@ int	tokenizer(t_main_data *data)
 	while (data->tok->pos < data->tok->length)
 	{
 		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
+			check_next_char(data->tok->input, data->tok->prev_pos));
 		handle_quotes(data->tok, data);
 		if (data->tok->curr_char_type == CHAR_PARENTHESIS
 			&& data->tok->prev_char_type == CHAR_PARENTHESIS
