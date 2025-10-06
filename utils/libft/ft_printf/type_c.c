@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 11:20:04 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/01 15:35:02 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:28:35 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,8 @@ int	type_c(char c)
 	return (1);
 }
 
-int	buffer_type_c(char c, char *buffer, size_t pos, size_t max_size)
+int	buffer_type_c(char c, t_buffer *s_buffer)
 {
-	if (*pos < max_size - 1)
-		buffer[(*pos)++] = c;
-	else
-		(*pos)++;
+	write_char_to_buffer(c, s_buffer);
 	return (1);
 }

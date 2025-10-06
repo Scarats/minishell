@@ -1,90 +1,71 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_snprintf.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/06 13:49:27 by aadeikal          #+#    #+#             */
+/*   Updated: 2025/10/06 15:01:05 by aadeikal         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
 
-static void write_char_to_buffer(char c, char *buffer, size_t *pos, size_t max_size)
+void	write_char_to_buffer(char c, t_buffer *s_buffer)
 {
-    if (*pos < max_size - 1)
-        buffer[(*pos)++] = c;
-    else
-        (*pos)++;
+	if (s_buffer->buffer != NULL && *(s_buffer->pos) < s_buffer->max_size - 1)
+		s_buffer->buffer[(*(s_buffer->pos))] = c;
+	(*(s_buffer->pos))++;
 }
 
-static int handle_percent(char *str, size_t *i, va_list list, 
-                         char *buffer, size_t *pos, size_t max_size)
+int	handle_percent(char *str, size_t *i, va_list list, t_buffer *s_buffer)
 {
-    int chars_added = 0;
-    
-    if (str[*i + 1] == '%')
-    {
-        write_char_to_buffer('%', buffer, pos, max_size);
-        chars_added = 1;
-    }
-    else
-        chars_added = buffer_router(str[*i + 1], list, buffer, pos, max_size);
-    
-    (*i) += 2;
-    return chars_added;
+	int	chars_added;
+
+	chars_added = 0;
+	if (!str || !s_buffer)
+		return (-1);
+	if (str[*i + 1] == '\0')
+		return (-1);
+	if (str[*i + 1] == '%')
+	{
+		write_char_to_buffer('%', s_buffer);
+		chars_added = 1;
+	}
+	else
+	{
+		chars_added = buffer_router(str[*i + 1], list, s_buffer);
+		if (chars_added < 0)
+			return (-1);
+	}
+	(*i) += 2;
+	return (chars_added);
 }
 
-static void null_terminate_buffer(char *buffer, size_t pos, size_t max_size)
+void	null_terminate_buffer(t_buffer *s_buffer)
 {
-    if (max_size > 0)
-    {
-        if (pos < max_size - 1)
-            buffer[pos] = '\0';
-        else
-            buffer[max_size - 1] = '\0';
-    }
+	if (!s_buffer)
+		return ;
+	if (s_buffer->buffer == NULL || s_buffer->max_size == 0)
+		return ;
+	if (*(s_buffer->pos) < s_buffer->max_size - 1)
+		s_buffer->buffer[*(s_buffer->pos)] = '\0';
+	else
+		s_buffer->buffer[s_buffer->max_size - 1] = '\0';
 }
 
-int buffer_router(char c, va_list list, char *buffer, size_t *pos, size_t max_size)
+int	ft_snprintf(char *buffer, size_t max_size, const char *format, ...)
 {
-    int chars_would_write = 0;
-    
-    if (c == 'c')
-        chars_would_write = buffer_type_c((char)va_arg(list, int), buffer, pos, max_size);
-    else if (c == 's')
-        chars_would_write = buffer_type_s(va_arg(list, char *), buffer, pos, max_size);
-    else if (c == 'i' || c == 'd')
-        chars_would_write = buffer_type_i(va_arg(list, int), buffer, pos, max_size);
-    else if (c == 'p')
-		chars_would_write = buffer_type_p(va_arg(list, int), buffer, pos, max_size);
-	else if (c == 'x' || c == 'X')
-		chars_would_write = buffer_type_xx(va_arg(list, int), buffer, pos, max_size);
-	else if (c == 'u')
-		chars_would_write = buffer_type_u(va_arg(list, int), buffer, pos, max_size);    
-    return (chars_would_write);
-}
+	int		result;
+	va_list	list;
 
-int buffer_loop(char *str, va_list list, char *buffer, size_t max_size)
-{
-    size_t i = 0;
-    size_t pos = 0;
-    int total_chars = 0;
-
-    while (str[i] != '\0')
-    {
-        if (str[i] == '%')
-            total_chars += handle_percent(str, &i, list, buffer, &pos, max_size);
-        else
-        {
-            write_char_to_buffer(str[i], buffer, &pos, max_size);
-            total_chars++;
-            i++;
-        }
-    }
-    
-    null_terminate_buffer(buffer, pos, max_size);
-    return (total_chars);
-}
-
-int ft_snprintf(char *buffer, size_t max_size, const char *format, ...)
-{
-    int result;
-    va_list list;
-    
-    va_start(list, format);
-    result = buffer_loop((char *)format, list, buffer, max_size);
-    va_end(list);
-    
-    return result;
+	if (!format)
+		return (-1);
+	va_start(list, format);
+	result = buffer_loop((char *)format, list, buffer, max_size);
+	va_end(list);
+	if (result < 0)
+		return (-1);
+	return (result);
 }

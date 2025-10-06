@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   type_xx.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 14:56:29 by tcardair          #+#    #+#             */
-/*   Updated: 2024/11/11 16:12:38 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:30:57 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,26 +25,6 @@ void	swap(char *ptr, int i)
 		ptr[i - y - 1] = temp;
 		y++;
 	}
-}
-
-unsigned int	to_hexa_ptr(unsigned int nb, char *ptr)
-{
-	int		i;
-
-	i = 0;
-	if (nb == 0)
-		ptr[i++] = '0';
-	else
-	{
-		while (nb > 0)
-		{
-			ptr[i++] = HEXA_MAJ[nb % 16];
-			nb /= 16;
-		}
-	}
-	ptr[i] = '\0';
-	swap(ptr, i);
-	return (i);
 }
 
 int	type_xx(unsigned int nb, char c)
@@ -71,14 +51,38 @@ int	type_xx(unsigned int nb, char c)
 	free(ptr);
 	return (i);
 }
-/*
-#include <stdio.h>
 
-int	main(void)
+static char	get_hex_digit(unsigned int digit, char c)
 {
-	unsigned int i = 3000000000;
-	char c = 'x';
-	int y = type_xX(i, c);
-	printf("\n%d, %X", y, i);
-	return (0);
-}*/
+	if (digit < 10)
+		return (digit + '0');
+	if (c == 'x')
+		return (digit - 10 + 'a');
+	return (digit - 10 + 'A');
+}
+
+static int	buffer_write_hex(unsigned int nb, char c, t_buffer *s_buffer)
+{
+	int	count;
+
+	count = 0;
+	if (nb >= 16)
+	{
+		count = buffer_write_hex(nb / 16, c, s_buffer);
+		if (*(s_buffer->pos) < s_buffer->max_size - 1)
+			s_buffer->buffer[(*(s_buffer->pos))++] = get_hex_digit(nb % 16, c);
+		else
+			(*(s_buffer->pos))++;
+		return (count + 1);
+	}
+	if (*(s_buffer->pos) < s_buffer->max_size - 1)
+		s_buffer->buffer[(*(s_buffer->pos))++] = get_hex_digit(nb, c);
+	else
+		(*(s_buffer->pos))++;
+	return (1);
+}
+
+int	buffer_type_xx(unsigned int nb, char c, t_buffer *s_buffer)
+{
+	return (buffer_write_hex(nb, c, s_buffer));
+}
