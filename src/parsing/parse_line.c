@@ -38,6 +38,8 @@ t_token_type	get_word_type(t_token *tok)
 
 // Return 1 if there is NO space immediately before the token start,
 // allowing quote delimiters right before it (e.g., foo"bar").
+// Special-case: if the previous non-quote is '$', require that the char
+// before '$' is not a space (so "echo $VAR" does NOT merge, but "foo$VAR" does).
 static int	no_space_before_token_start(const char *s, int start)
 {
     int i;
@@ -45,11 +47,23 @@ static int	no_space_before_token_start(const char *s, int start)
     if (start <= 0)
         return (0);
     i = start - 1;
-    // Skip immediate quote delimiters
+
+    // Skip quote delimiters immediately before the token start
     while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
         i--;
     if (i < 0)
         return (0);
+
+    if (s[i] == '$')
+    {
+        int j = i - 1;
+        // Skip quotes before the '$' as well (handles foo"$VAR")
+        while (j >= 0 && (s[j] == '\'' || s[j] == '"'))
+            j--;
+        if (j < 0)
+            return (0);
+        return (s[j] != ' ');
+    }
     return (s[i] != ' ');
 }
 
