@@ -36,40 +36,46 @@ t_token_type	get_word_type(t_token *tok)
 		return (TOKEN_ARGUMENT);
 }
 
-// Return 1 if there is NO space immediately before the token start,
-// allowing quote delimiters right before it (e.g., foo"bar").
-// Special-case: if the previous non-quote is '$', require that the char
-// before '$' is not a space (so "echo $VAR" does NOT merge, but "foo$VAR" does).
-static int	no_space_before_token_start(const char *s, int start)
+// Return 1 if there is NO space immediately before the token start.
+// - Skip quote delimiters.
+// - If allow_skip_dollar=1 and the immediate previous char is '$', skip that '$' too.
+// - Otherwise, never merge across a '$'.
+static int	no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
 {
     int i;
 
     if (start <= 0)
         return (0);
+
     i = start - 1;
 
-    // Skip quote delimiters immediately before the token start
+    // Skip immediate quote delimiters
     while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
         i--;
+
     if (i < 0)
         return (0);
 
+    // Handle a preceding '$'
     if (s[i] == '$')
     {
-        int j = i - 1;
-        // Skip quotes before the '$' as well (handles foo"$VAR")
-        while (j >= 0 && (s[j] == '\'' || s[j] == '"'))
-            j--;
-        if (j < 0)
+        if (!allow_skip_dollar)
             return (0);
-        return (s[j] != ' ');
+        // Skip this '$' and any quote delimiters before it
+        i--;
+        while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+            i--;
+        if (i < 0)
+            return (0);
     }
+
+    // Merge only when there is no space separating
     return (s[i] != ' ');
 }
 
 // Merge current word-like token into the previous one if adjacent (no space).
-// Returns 1 if merged and current token was removed.
-static int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start)
+// just_removed_dollar indicates we removed a preceding '$' for this token.
+static int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start, int just_removed_dollar)
 {
     t_token	*prev;
     size_t	a;
@@ -80,7 +86,7 @@ static int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int star
         return (0);
     if (!is_word_token(prev->type) || !is_word_token(tok->type))
         return (0);
-    if (!no_space_before_token_start(data->tok->input, start))
+    if (!no_space_before_token_start(data->tok->input, start, just_removed_dollar))
         return (0);
 
     a = ft_strlen(prev->word);
@@ -92,6 +98,7 @@ static int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int star
     ft_memcpy(joined + a, tok->word, b);
     joined[a + b] = '\0';
     prev->word = joined;
+
     // If previous was a generic TEXT, promote it to its role.
     if (prev->type == TOKEN_TEXT)
         prev->type = get_word_type(prev);
@@ -108,12 +115,16 @@ static int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int star
 int	create_token(t_main_data *data, int start, int end, t_token_type type)
 {
     t_token		*tok;
+    t_token     *removed;
     char		*slice;
     char		*expanded;
+    int         removed_dollar; // NEW
     static int	i;
 
     if (!i)
         i = 1;
+    removed_dollar = 0;
+
     if (type == TOKEN_SPACE)
         type = TOKEN_TEXT;
     tok = add_to_list(data, data->tok->last_token);
@@ -122,31 +133,40 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
     if (type == TOKEN_TEXT)
         type = get_word_type(tok);
     tok->type = type;
-    // Always grab the raw lexeme (operators, parens, words, etc.)
+    removed = tok->prev_token;
+
     slice = ft_substr(data->tok->input, start, end - start);
     if (slice)
         my_addtolist(&data->malloc_tok, slice);
     tok->word = slice;
-    // Handle environment variable expansion (but NOT inside single quotes)
+
     if (tok->type == TOKEN_ENV_VAR)
     {
         expanded = get_env_var(data->root->env, slice);
+
+        // Remove the preceding '$' token if present
         if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
-            remove_token(&data->tok->token_list, tok->prev_token);
-        tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
+        {
+            remove_token(&data->tok->token_list, removed);
+            if (data->tok->last_token == removed)
+                data->tok->last_token = tok;
+            removed_dollar = 1; // NEW: remember we just removed '$'
+        }
+
+        tok->type = get_word_type(tok); // CMD/ARG/FILE based on new prev
         if (expanded)
             tok->word = expanded;
     }
 
     // Merge only when there is no space around quotes (adjacent pieces).
-    if (merge_with_prev_if_adjacent(data, tok, start))
+    // Allow skipping exactly one '$' if we just removed it for this token.
+    if (merge_with_prev_if_adjacent(data, tok, start, removed_dollar))
     {
         printf(RED "tok %i = (merged)\n" RESET, i++);
         return (0);
     }
 
     printf(RED "tok %i = %s\n" RESET, i++, tok->word);
-    // tok->word = clean_string(tok->word);
     return (0);
 }
 
@@ -220,19 +240,35 @@ int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
     if (!data || !tok_type)
         return (1);
+
+    // If the previous run is an OPERATOR starting with '$', emit only '$'
+    // so the following word can become TOKEN_ENV_VAR.
+    if (data->tok->prev_char_type == CHAR_OPERATOR
+        && data->tok->prev_pos < data->tok->pos
+        && data->tok->input[data->tok->prev_pos] == '$')
+    {
+        create_token(data, data->tok->prev_pos, data->tok->prev_pos + 1, TOKEN_DOLLAR);
+        data->tok->prev_pos = data->tok->prev_pos + 1;
+        return (0);
+    }
+
     if (data->tok->prev_char_type != CHAR_SPACE
         && data->tok->prev_pos < data->tok->pos)
     {
-		if (data->tok->prev_pos > 0
-             && data->tok->input[data->tok->prev_pos - 1] == '\'')
-            create_token(data, data->tok->prev_pos, data->tok->pos, TOKEN_TEXT);
-		else
-            create_token(data, data->tok->prev_pos, data->tok->pos, *tok_type);
+        // Force TEXT when the previous run was TEXT (e.g., inside single quotes),
+        // so '$' inside single quotes is not mis-typed as TOKEN_DOLLAR.
+        t_token_type effective = *tok_type;
+        if (data->tok->prev_char_type == CHAR_TEXT)
+            effective = TOKEN_TEXT;
+
+        create_token(data, data->tok->prev_pos, data->tok->pos, effective);
+
         printf("\n");
         printf(RED"CREATE_TOK %s, type %i\nin single quote: %i\n"RESET,
-            data->tok->last_token->word, *tok_type, data->tok->single_quote);
+            data->tok->last_token->word, effective, data->tok->single_quote);
         printf("\n");
     }
+
     data->tok->prev_pos = data->tok->pos;
     return (0);
 }
@@ -249,41 +285,50 @@ int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 
 int	tokenizer(t_main_data *data)
 {
-	t_token_type	tok_type;
+    t_token_type	tok_type;
 
-	tok_type = TOKEN_NULL;
-	while (data->tok->pos < data->tok->length)
-	{
-		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
-		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-			check_next_char(data->tok->input, data->tok->prev_pos));
-		handle_quotes(data->tok, data);
-		if (data->tok->curr_char_type == CHAR_PARENTHESIS
-			&& data->tok->prev_char_type == CHAR_PARENTHESIS
-			&& data->tok->pos > data->tok->prev_pos)
-			handle_parenthesis(data, &tok_type);
-		else if (data->tok->curr_char_type == CHAR_OPERATOR
-			&& data->tok->prev_char_type == CHAR_OPERATOR
-			&& data->tok->pos > data->tok->prev_pos)
-			handle_operator(data, &tok_type);
-		else if (data->tok->curr_char_type != data->tok->prev_char_type)
-			handle_normal_token(data, &tok_type);
-		data->tok->prev_char_type = data->tok->curr_char_type;
-		data->tok->pos++;
-	}
-	if (data->tok->prev_char_type != CHAR_SPACE
-		&& data->tok->prev_pos < data->tok->pos
-		&& data->tok->prev_pos < data->tok->length && !data->tok->single_quote)
-		/* prevent empty trailing token */
-	{
-		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-				check_next_char(data->tok->input, data->tok->prev_pos));
-		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
-	}
-	/* New: detect unclosed quotes */
-	if (data->tok->double_quote || data->tok->single_quote)
-		return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
-	return (0);
+    tok_type = TOKEN_NULL;
+    while (data->tok->pos < data->tok->length)
+    {
+        data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+
+        // First, update quote state and possibly override curr_char_type.
+        handle_quotes(data->tok, data);
+
+        // Now compute token type at the start of the current run,
+        // after quote handling decided how to treat characters.
+        tok_type = get_tok_type(
+            data->tok->input[data->tok->prev_pos],
+            check_next_char(data->tok->input, data->tok->prev_pos)
+        );
+
+        if (data->tok->curr_char_type == CHAR_PARENTHESIS
+            && data->tok->prev_char_type == CHAR_PARENTHESIS
+            && data->tok->pos > data->tok->prev_pos)
+            handle_parenthesis(data, &tok_type);
+        else if (data->tok->curr_char_type == CHAR_OPERATOR
+            && data->tok->prev_char_type == CHAR_OPERATOR
+            && data->tok->pos > data->tok->prev_pos)
+            handle_operator(data, &tok_type);
+        else if (data->tok->curr_char_type != data->tok->prev_char_type)
+            handle_normal_token(data, &tok_type);
+
+        data->tok->prev_char_type = data->tok->curr_char_type;
+        data->tok->pos++;
+    }
+    if (data->tok->prev_char_type != CHAR_SPACE
+        && data->tok->prev_pos < data->tok->pos
+        && data->tok->prev_pos < data->tok->length && !data->tok->single_quote)
+    {
+        tok_type = get_tok_type(
+            data->tok->input[data->tok->prev_pos],
+            check_next_char(data->tok->input, data->tok->prev_pos)
+        );
+        create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
+    }
+    if (data->tok->double_quote || data->tok->single_quote)
+        return (fdprintf(2, "minishell: syntax error: unclosed quote\n"), 1);
+    return (0);
 }
 
 // Turn the token linked list in an array, easier for AST.
