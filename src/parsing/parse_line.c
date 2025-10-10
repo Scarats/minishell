@@ -3,14 +3,14 @@
 // remove_token: unlink a token from a doubly-linked list
 void	remove_token(t_token **head, t_token *t)
 {
-	if (!t)
-		return ;
-	if (t->prev_token)
-		t->prev_token->next_token = t->next_token;
-	else
-		*head = t->next_token;
-	if (t->next_token)
-		t->next_token->prev_token = t->prev_token;
+    if (!t)
+        return ;
+    if (t->prev_token)
+        t->prev_token->next_token = t->next_token;
+    else
+        *head = t->next_token;
+    if (t->next_token)
+        t->next_token->prev_token = t->prev_token;
 }
 
 // Determine if the word is a command, argument, filename etc...
@@ -36,43 +36,104 @@ t_token_type	get_word_type(t_token *tok)
 		return (TOKEN_ARGUMENT);
 }
 
+// Return 1 if there is NO space immediately before the token start,
+// allowing quote delimiters right before it (e.g., foo"bar").
+static int	no_space_before_token_start(const char *s, int start)
+{
+    int i;
+
+    if (start <= 0)
+        return (0);
+    i = start - 1;
+    // Skip immediate quote delimiters
+    while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+        i--;
+    if (i < 0)
+        return (0);
+    return (s[i] != ' ');
+}
+
+// Merge current word-like token into the previous one if adjacent (no space).
+// Returns 1 if merged and current token was removed.
+static int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start)
+{
+    t_token	*prev;
+    size_t	a;
+    size_t	b;
+    char	*joined;
+
+    if (!tok || !(prev = tok->prev_token))
+        return (0);
+    if (!is_word_token(prev->type) || !is_word_token(tok->type))
+        return (0);
+    if (!no_space_before_token_start(data->tok->input, start))
+        return (0);
+
+    a = ft_strlen(prev->word);
+    b = ft_strlen(tok->word);
+    joined = my_malloc(&data->root->list_of_list, &data->malloc_tok, a + b + 1);
+    if (!joined)
+        return (0);
+    ft_memcpy(joined, prev->word, a);
+    ft_memcpy(joined + a, tok->word, b);
+    joined[a + b] = '\0';
+    prev->word = joined;
+    // If previous was a generic TEXT, promote it to its role.
+    if (prev->type == TOKEN_TEXT)
+        prev->type = get_word_type(prev);
+
+    // Unlink current token and ensure last_token points to the true tail.
+    remove_token(&data->tok->token_list, tok);
+    data->tok->last_token = prev;
+    while (data->tok->last_token && data->tok->last_token->next_token)
+        data->tok->last_token = data->tok->last_token->next_token;
+    return (1);
+}
+
 // Create token, add them to the list and add type.
 int	create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-	t_token		*tok;
-	char		*slice;
-	char		*expanded;
-	static int	i;
+    t_token		*tok;
+    char		*slice;
+    char		*expanded;
+    static int	i;
 
-	if (!i)
-		i = 1;
-	if (type == TOKEN_SPACE)
-		type = TOKEN_TEXT;
-	tok = add_to_list(data, data->tok->last_token);
-	if (!tok)
-		return (1);
-	if (type == TOKEN_TEXT)
-		type = get_word_type(tok);
-	tok->type = type;
-	// Always grab the raw lexeme (operators, parens, words, etc.)
-	slice = ft_substr(data->tok->input, start, end - start);
-	if (slice)
-		my_addtolist(&data->malloc_tok, slice);
-	tok->word = slice;
-	// Handle environment variable expansion (but NOT inside single quotes)
-	if (tok->type == TOKEN_ENV_VAR)
-	{
-		expanded = get_env_var(data->root->env, slice);
-		if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
-			remove_token(&data->tok->token_list, tok->prev_token);
-		tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
-		if (expanded)
-			tok->word = expanded;
-		// Use expanded value (do not track if from env)
-	}
-	printf(RED "tok %i = %s\n" RESET, i++, tok->word);
-	// tok->word = clean_string(tok->word);
-	return (0);
+    if (!i)
+        i = 1;
+    if (type == TOKEN_SPACE)
+        type = TOKEN_TEXT;
+    tok = add_to_list(data, data->tok->last_token);
+    if (!tok)
+        return (1);
+    if (type == TOKEN_TEXT)
+        type = get_word_type(tok);
+    tok->type = type;
+    // Always grab the raw lexeme (operators, parens, words, etc.)
+    slice = ft_substr(data->tok->input, start, end - start);
+    if (slice)
+        my_addtolist(&data->malloc_tok, slice);
+    tok->word = slice;
+    // Handle environment variable expansion (but NOT inside single quotes)
+    if (tok->type == TOKEN_ENV_VAR)
+    {
+        expanded = get_env_var(data->root->env, slice);
+        if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
+            remove_token(&data->tok->token_list, tok->prev_token);
+        tok->type = get_word_type(tok); // Recompute final role (CMD/ARG/FILE)
+        if (expanded)
+            tok->word = expanded;
+    }
+
+    // Merge only when there is no space around quotes (adjacent pieces).
+    if (merge_with_prev_if_adjacent(data, tok, start))
+    {
+        printf(RED "tok %i = (merged)\n" RESET, i++);
+        return (0);
+    }
+
+    printf(RED "tok %i = %s\n" RESET, i++, tok->word);
+    // tok->word = clean_string(tok->word);
+    return (0);
 }
 
 t_char_type	get_char_type(char c)
