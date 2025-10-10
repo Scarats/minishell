@@ -36,14 +36,17 @@ int open_file(char *filename, int action)
 	else if (action == 3)
 		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 
-	if (fd < 0)
-		return (1); // Error.
-	if (action == 1 && dup2(fd, STDIN_FILENO) == -1)
-		return (close(fd), 1); // Error.
-	else if (action > 1 && dup2(fd, STDOUT_FILENO) == -1)
-		return (close(fd), 1);
-	close(fd);
-	return (0);
+    if (fd < 0)
+    {
+        fdprintf(2, "minishell: %s: %s\n", filename, strerror(errno));
+        return (1); // Error.
+    }
+    if (action == 1 && dup2(fd, STDIN_FILENO) == -1)
+        return (close(fd), 1); // Error.
+    else if (action > 1 && dup2(fd, STDOUT_FILENO) == -1)
+        return (close(fd), 1);
+    close(fd);
+    return (0);
 }
 
 // Check the redirections, change accordingly the inpout and output fds
