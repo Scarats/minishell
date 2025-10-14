@@ -94,6 +94,19 @@ static void print_cmd_inline(const t_node *node)
     }
 }
 
+static void str_concat(char *dst, const char *src, size_t size)
+{
+    size_t dst_len = ft_strlen(dst);
+    size_t i = 0;
+    
+    while (src[i] && dst_len + i < size - 1)
+    {
+        dst[dst_len + i] = src[i];
+        i++;
+    }
+    dst[dst_len + i] = '\0';
+}
+
 static void print_ast_pretty_rec(t_node *node, const char *prefix, int is_last)
 {
     if (!node) return;
@@ -109,25 +122,6 @@ static void print_ast_pretty_rec(t_node *node, const char *prefix, int is_last)
         printf("CMD: ");
         print_cmd_inline(node);
         printf("\n");
-
-        // If you prefer redirs on their own lines (instead of inline),
-        // uncomment below and remove them from print_cmd_inline above.
-        /*
-        int count = 0;
-        for (t_redir *tmp = node->redirection; tmp; tmp = tmp->next) count++;
-        int idx = 0;
-        for (t_redir *r = node->redirection; r; r = r->next, idx++)
-        {
-            char next_prefix[1024];
-            ft_snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, pad);
-            int r_last = (idx == count - 1);
-            printf("%s%sredir %s %s\n",
-                   next_prefix,
-                   r_last ? "└── " : "├── ",
-                   redir_type_str(r->type),
-                   r->filename ? r->filename : "(null)");
-        }
-        */
         return; // command has no tree children
     }
     else
@@ -137,7 +131,9 @@ static void print_ast_pretty_rec(t_node *node, const char *prefix, int is_last)
 
     // Prepare child prefix
     char next_prefix[1024];
-    snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, pad);
+    ft_bzero(next_prefix, sizeof(next_prefix));
+    ft_strlcpy(next_prefix, prefix, sizeof(next_prefix));
+    str_concat(next_prefix, pad, sizeof(next_prefix));
 
     // Collect real children (left/right)
     t_node *children[2];
@@ -202,27 +198,9 @@ static void reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 
 void handler(int sig)
 {
-	(void)sig;
+    (void)sig;
     stop_flag = 1;
 }
-
-/* static void ft_display_prompt(void)
-{
-    char hostname[1024];
-    char username[1024];
-    
-    hostname[0] = '\0';
-    username[0] = '\0';
-    
-    gethostname(hostname, sizeof(hostname));
-    getlogin_r(username, sizeof(username));
-
-    printf(GREEN "Welcome to " RED "tcardair " GREEN "& " PURPLE "aadeikal's " GREEN "minishell\n" RESET);
-    
-    printf(BLUE "%s" RESET "@" GREEN "%s" RESET ":" PURPLE "minishell" RESET "> ", 
-           username, hostname);
-    fflush(stdout);
-} */
 
 int main(void)
 {
@@ -231,8 +209,6 @@ int main(void)
     t_token *current;
     int token_count;
     char *line = NULL;
-    //size_t cap = 0;
-    //ssize_t nread;
 
     char hostname[64] = {0};
     char username[64] = {0};
@@ -242,8 +218,16 @@ int main(void)
     hostname[sizeof(hostname) - 1] = '\0';
     username[sizeof(username) - 1] = '\0';
 
+    // Create prompt string without using snprintf
     char prompt[256];
-    snprintf(prompt, sizeof(prompt), BLUE "%.32s" RESET "@" GREEN "%.32s" RESET ":" PURPLE "minishell" RESET "> ", username, hostname);
+    ft_bzero(prompt, sizeof(prompt));
+    
+    // Build the prompt manually with strlcat
+    ft_strlcat(prompt, BLUE, sizeof(prompt));
+    ft_strlcat(prompt, username, sizeof(prompt));
+    ft_strlcat(prompt, RESET "@" GREEN, sizeof(prompt));
+    ft_strlcat(prompt, hostname, sizeof(prompt));
+    ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", sizeof(prompt));
     
     sa.sa_handler = handler;
     sigemptyset(&sa.sa_mask);
@@ -261,9 +245,7 @@ int main(void)
 
     while (1)
     {
-        //ft_display_prompt();
         fflush(stdout);
-        // init(&data);  // REMOVE: this re-mallocs data->tok and leaks the previous one
 
         line = readline(prompt);
 

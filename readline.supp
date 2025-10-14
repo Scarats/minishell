@@ -1,0 +1,39 @@
+{
+   Readline_Memory
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:readline
+}
+
+{
+   Add_History_Memory
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:add_history
+}
+
+{
+   Read_History_Memory
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   ...
+   fun:read_history
+}
+
+{
+   Generic_Readline_Memory
+   Memcheck:Leak
+   match-leak-kinds: all
+   ...
+   obj:*/libreadline.so*
+}
+
+{
+   Generic_History_Memory
+   Memcheck:Leak
+   match-leak-kinds: all
+   ...
+   obj:*/libhistory.so*
+}
