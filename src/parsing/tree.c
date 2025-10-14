@@ -14,7 +14,7 @@ int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int siz
     /* Always allocate at least one slot (NULL terminator),
        even if there are zero command/argument tokens (pure redirection). */
     node->cmd_argv = my_malloc(&data->root->list_of_list,
-            &data->malloc_tree, sizeof(char *) * (cmd_argc + 1));
+            &data->malloc_tree, sizeof(char *) * (cmd_argc + 2));
     if (!node->cmd_argv)
         return (1);
     i = -1;

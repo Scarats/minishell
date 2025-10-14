@@ -300,7 +300,7 @@ int main(int ac, char **av, char **envp)
             stop_flag = 0;
             continue;
         }
-		set_last_exit_status_var(&root);
+		// set_last_exit_status_var(&root);
 
         /* Tokens and getline buffer are not needed anymore; free them now */
         if (data.malloc_tok)

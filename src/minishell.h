@@ -220,10 +220,10 @@ int matrix(char **arg);
 t_env *copy_env(t_list **malloc_list, t_env *env);
 t_env *set_env_var_list(t_root *root, char **env);
 char *get_env_var(t_env *env, char *target);
-int export(t_root *root, char *var);
+int export(t_root *root, char **var);
 int env(t_env *root_env);
 int unset(t_env **env, char **argv);
-int	set_last_exit_status_var(t_root *root);
+int	set_last_exit_status_var(t_root *root, int status);
 void syntax_error(char *message);
 int	create_token(t_main_data *data, int start, int end, t_token_type type);
 
