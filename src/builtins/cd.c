@@ -14,6 +14,6 @@ int cd(t_node *node)
 		return (1);
 	error = chdir(node->cmd_argv[1]);
 	if (error)
-		return (fdprintf(2, "cd: %s: %s\n", strerror(errno), node->cmd_argv[1]), 1);
+		return (fdprintf(2, "minishell: cd: %s: %s\n", node->cmd_argv[1], strerror(errno)), 1);
 	return (error);
 }

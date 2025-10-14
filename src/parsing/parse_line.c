@@ -430,8 +430,6 @@ int	parser(t_main_data *data)
 {
 	if (tokenizer(data))
 		return (1);
-	// for (int i = 0; i < data->tok->token_list_size; i++)
-	// 	printf(RED"BEGPARSING node %i: %s = type %i\n"RESET, i, data->tok->token_list[i].word, data->tok->token_list[i].type);
 	if (list_to_array(data, data->tok->token_list, data->tok->token_list_size))
 		return (1);
 	if (syntax_check(data->tok->token_array, data->tok->token_list_size))
