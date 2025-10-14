@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 11:20:04 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/06 14:28:35 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/14 14:30:52 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 int	type_c(char c)
 {
-	write(1, &c, 1);
-	return (1);
+    write(1, &c, 1);
+    return (1);
 }
 
 int	buffer_type_c(char c, t_buffer *s_buffer)
 {
-	write_char_to_buffer(c, s_buffer);
-	return (1);
+    write_char_to_buffer(c, s_buffer);
+    return (1);
 }

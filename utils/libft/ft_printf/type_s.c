@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 12:06:54 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/06 14:28:14 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/14 14:51:48 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,15 +32,16 @@ int	type_s(char *str)
 
 int	buffer_type_s(char *str, t_buffer *s_buffer)
 {
-	size_t	i;
+	int	count;
 
-	i = 0;
-	if (str == NULL)
-		return (buffer_type_s("(null)", s_buffer));
-	while (str[i])
+	if (!str)
+		str = "(null)";
+	count = 0;
+	while (*str)
 	{
-		write_char_to_buffer(str[i], s_buffer);
-		i++;
+		write_char_to_buffer(*str, s_buffer);
+		str++;
+		count++;
 	}
-	return (i);
+	return (count);
 }

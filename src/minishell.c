@@ -119,7 +119,7 @@ static void print_ast_pretty_rec(t_node *node, const char *prefix, int is_last)
         for (t_redir *r = node->redirection; r; r = r->next, idx++)
         {
             char next_prefix[1024];
-            snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, pad);
+            ft_snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix, pad);
             int r_last = (idx == count - 1);
             printf("%s%sredir %s %s\n",
                    next_prefix,

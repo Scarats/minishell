@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/18 15:48:24 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/14 14:46:08 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,5 +178,7 @@ char				*find_bin(char *bin);
 void				my_array_addtolist(t_list **list, void **data);
 // Chose the output fd.
 int					fdprintf(int fd, const char *str, ...);
+int					ft_snprintf(char *buffer, size_t max_size,
+						const char *format, ...);
 
 #endif
