@@ -3,3 +3,4 @@
 .minishell_history
 minishell
 *.a
+*.o

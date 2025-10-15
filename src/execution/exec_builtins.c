@@ -11,7 +11,7 @@ int exec_builtins(t_node *node, t_main_data *data)
 	if (!node)
 		return (1);
 
-	lenght = ft_strlen(node->cmd_argv[0]);
+	length = ft_strlen(node->cmd_argv[0]);
 	for (int i = 0; node->cmd_argv[i]; i++)
 		ft_printf(GREEN"EXEC_BUILDINS %i: %s\n"RESET, i, node->cmd_argv[i]);
 	error = 0;
@@ -19,15 +19,15 @@ int exec_builtins(t_node *node, t_main_data *data)
 		error = cd(node);
 	else if (!ft_strncmp(node->cmd_argv[0], "pwd", length))
 		error = pwd();
-	else if (!ft_strncmp(node->cmd_argv[0], "echo", lenght))
+	else if (!ft_strncmp(node->cmd_argv[0], "echo", length))
 		error = echo(&node->cmd_argv[1]);
-	else if (!ft_strncmp(node->cmd_argv[0], "matrix", lenght))
+	else if (!ft_strncmp(node->cmd_argv[0], "matrix", length))
 		error = matrix(node->cmd_argv);
-	else if (!ft_strncmp(node->cmd_argv[0], "export", lenght))
+	else if (!ft_strncmp(node->cmd_argv[0], "export", length))
 		error = export(data->root, node->cmd_argv);
-	else if (!ft_strncmp(node->cmd_argv[0], "env", lenght))
+	else if (!ft_strncmp(node->cmd_argv[0], "env", length))
 		error = env(data->root->env);
-	else if (!ft_strncmp(node->cmd_argv[0], "unset", lenght))
+	else if (!ft_strncmp(node->cmd_argv[0], "unset", length))
 		error = unset(&data->root->env, &node->cmd_argv[1]);
 	else
 		printf(RED "error: built-in not found.\n" RESET);
