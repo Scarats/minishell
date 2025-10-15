@@ -7,7 +7,7 @@ SRCS = src/minishell.c \
 	   src/builtins/cd.c src/builtins/pwd.c src/builtins/echo.c \
 	   src/builtins/matrix.c
 
-FLAGS = -Wall -Wextra -Werror 
+FLAGS = -Wall -Wextra -Werror -fPIE
 CC    = cc
 RM    = rm -f
 OBJ_DIR = dot_o

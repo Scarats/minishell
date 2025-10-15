@@ -28,6 +28,7 @@
 # define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
 # define RESET "\x1B[0m"
 # define MATRIX 100
+# define MAX_REASONABLE_SIZE 100
 
 extern volatile sig_atomic_t stop_flag;   // declaration
 typedef enum e_char_type
@@ -198,5 +199,6 @@ int cd(t_node *node);
 int pwd(void);
 int echo(char **argv);
 int matrix(char **arg);
+void handler(int sig);
 
 #endif

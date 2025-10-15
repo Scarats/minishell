@@ -32,9 +32,9 @@ int create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node, int siz
 		node->cmd_argv[j] = NULL;
 	if (is_builtin(node->cmd_argv[0]))
 	{
-		printf(GREEN"%s\n"RESET, node->cmd_argv[0]);
+		//printf(GREEN"%s\n"RESET, node->cmd_argv[0]);
 		node->builtin = true;
-		printf(RED"SET TO BUILDIN\n"RESET);
+		//printf(RED"SET TO BUILDIN\n"RESET);
 	}
 	return (0);
 }

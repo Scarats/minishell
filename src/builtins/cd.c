@@ -6,8 +6,7 @@ int cd(t_node *node)
 
 	error = 0;
 	if (arraylen(node->cmd_argv) > 2)
-		return (printf(RED"error: too many arguments.\n"RESET), 1);
-	
+		return (printf(RED"error: too many arguments.\n"RESET), 1);	
 	if (error)
 		return (error);
 	error = chdir(node->cmd_argv[1]);
