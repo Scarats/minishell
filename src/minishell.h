@@ -30,7 +30,8 @@
 # define MATRIX 100
 # define MAX_REASONABLE_SIZE 100
 
-extern volatile sig_atomic_t stop_flag;   // declaration
+extern volatile sig_atomic_t stop_flag; // declaration
+
 typedef enum e_char_type
 {
 	CHAR_SPACE,
@@ -64,17 +65,28 @@ typedef enum e_token_type
 	TOKEN_DOLLAR,		// $
 	TOKEN_ENV_VAR,		//$variable
 	TOKEN_TEXT,
+	TOKEN_DOUBLE_QUOTE,
+	TOKEN_SINGLE_QUOTE,
 	TOKEN_EOF
 } t_token_type;
 
 typedef enum e_node_type
 {
 	NODE_COMMAND,
-	NODE_PIPE,	  // |
-	NODE_AND,	  // &&
-	NODE_OR,	  // ||
-	// NODE_SUBSHELL // ()
+	NODE_PIPE, // |
+	NODE_AND,  // &&
+	NODE_OR,   // ||
 } t_node_type;
+
+typedef struct s_env
+{
+	char *name;
+	char *value;
+
+	bool exported;
+
+	struct s_env *next;
+} t_env;
 
 typedef struct s_redir
 {
@@ -89,7 +101,7 @@ typedef struct s_node
 	t_node_type type;
 	bool builtin;
 	bool create_subshell; // Trigger a subshell creation.
-	int in_subshell; // increase each time we create a subshell, it's the depth of subshells.
+	int in_subshell;	  // increase each time we create a subshell, it's the depth of subshells.
 
 	struct s_node *left;
 	struct s_node *right;
@@ -98,6 +110,7 @@ typedef struct s_node
 	pid_t left_pid;
 	pid_t right_pid;
 
+	t_env *curr_env;
 	char **cmd_argv;
 	t_redir *redirection;
 	char *path;
@@ -112,6 +125,7 @@ typedef struct s_token
 {
 	t_token_type type;
 	char *word;
+	char *slice;
 
 	struct s_token *prev_token;
 	struct s_token *next_token;
@@ -145,6 +159,7 @@ typedef struct s_tokenizer
 	int token_list_size; // Keep track of the number of tokens
 } t_tokenizer;
 
+typedef struct s_root t_root;
 typedef struct s_main_data
 {
 	t_node *node;
@@ -160,7 +175,9 @@ typedef struct s_main_data
 
 	bool in_child;
 
-	int last_exit_status;
+	t_root *root; // Pointer to root, has to be casted at the beginning.
+	// Copy of the root env, to be passed to execve, it contains the local var of this command.
+	t_env *curr_env;
 
 	t_tokenizer *tok;
 } t_main_data;
@@ -173,22 +190,37 @@ typedef struct s_history
 	int current_pos;
 } t_history;
 
+typedef struct s_root
+{
+	t_main_data *data;
+
+	int last_exit_status;
+
+	t_env *env;
+
+	t_list *malloc_root;
+	t_list *list_of_list;
+} t_root;
+
 t_token_type get_tok_type(char c, char next);
 char check_next_char(char *str, int pos);
-t_token *add_to_list(t_main_data *data, t_token *prev, int start, int end);
+t_token *add_to_list(t_main_data *data, t_token *prev);
 int parser(t_main_data *data);
 int traverse_tree(t_node *node, t_main_data *data);
-int handle_quotes(t_main_data *data);
+int handle_quotes(t_tokenizer *tok, t_main_data *data);
 char *clean_string(char *input);
 t_node_type map_token_to_node(t_token_type t);
-int	is_redir(t_token_type type);
-t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type);
-int	is_and_or(t_token_type t);
+int is_redir(t_token_type type);
+t_redir *add_redirection(t_main_data *data, t_node *node, t_token_type type);
+int is_and_or(t_token_type t);
+int is_word_token(t_token_type t);
+int	is_op_or_redir(t_token_type t);
+int	is_operator(t_token_type t);
 t_node *build_tree(t_main_data *data, t_token *tok_list, int size, int depth);
 int get_cmd_argc(t_token *tok_list, int size);
 int check_paren_error(t_token *tok_list, int size);
 int wrapped_in_paren(t_token *tok_list, int size);
-int traverse_tree(t_node *node ,t_main_data *data);
+int traverse_tree(t_node *node, t_main_data *data);
 int exec_cmd(t_node *node, t_main_data *data);
 int and_and(t_node *node, t_main_data *data);
 int or_or(t_node *node, t_main_data *data);
@@ -200,5 +232,14 @@ int pwd(void);
 int echo(char **argv);
 int matrix(char **arg);
 void handler(int sig);
+t_env *copy_env(t_list **malloc_list, t_env *env);
+t_env *set_env_var_list(t_root *root, char **env);
+char *get_env_var(t_env *env, char *target);
+int export(t_root *root, char **var);
+int env(t_env *root_env);
+int unset(t_env **env, char **argv);
+int	set_last_exit_status_var(t_root *root, int status);
+void syntax_error(char *message);
+int	create_token(t_main_data *data, int start, int end, t_token_type type);
 
 #endif

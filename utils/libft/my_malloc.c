@@ -6,40 +6,11 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/20 18:08:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/03 15:18:54 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/09/24 18:35:04 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-// Same usage as malloc, but keep track of allocated memory in list.
-// memset memory.
-void	*my_malloc(t_list **list, size_t size)
-{
-	void	*ptr;
-
-	ptr = ft_calloc(1, size);
-	if (!ptr)
-		return (NULL);
-	if (list)
-	{
-		if (!*list)
-			*list = ft_lstnew(ptr);
-		else
-			ft_lstadd_back(list, ft_lstnew(ptr));
-	}
-	return (ptr);
-}
-
-// Free the allocated memory of the list.
-void	my_free(t_list **list)
-{
-	if (list && *list)
-	{
-		ft_lstclear(list, free);
-		*list = NULL;
-	}
-}
 
 // Check if it has already been allocated
 // and added to the list (avoid double free).
@@ -57,6 +28,33 @@ int	check_list(t_list **list, void *data)
 		temp = temp->next;
 	}
 	return (0);
+}
+
+// Same usage as malloc, but keep track of allocated memory in list.
+// Memset memory.
+// list_of_list keep track of all the malloc_list of the program.
+// In the case of a malloc error,
+// it will free all the allocated memory of the program and exit() cleanly.
+void	*my_malloc(t_list **list_of_list, t_list **malloc_list, size_t size)
+{
+	void	*ptr;
+
+	if (size < 1)
+		return (NULL);
+	if (list_of_list && malloc_list && !check_list(list_of_list, malloc_list))
+		my_addtolist(list_of_list, malloc_list);
+	ptr = ft_calloc(1, size);
+	if (!ptr)
+	{
+		if (list_of_list)
+			my_multi_free(list_of_list);
+		else
+			my_free(malloc_list);
+		exit(1);
+	}
+	if (malloc_list)
+		my_addtolist(malloc_list, ptr);
+	return (ptr);
 }
 
 // Add already allocated memory to the list.

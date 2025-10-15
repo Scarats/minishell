@@ -6,7 +6,11 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/10/14 14:46:08 by aadeikal         ###   ########.fr       */
+=======
+/*   Updated: 2025/09/24 16:34:24 by tcardair         ###   ########.fr       */
+>>>>>>> builtin
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +168,8 @@ unsigned long long	to_hexa(unsigned long long addr);
 char				*get_next_line(int fd);
 char				*ft_strcpy(char *dst, const char *src);
 char				*ft_strstr(const char *source, const char *target);
-void				*my_malloc(t_list **list, size_t size);
+void				*my_malloc(t_list **list_of_list, t_list **malloc_list,
+						size_t size);
 void				my_free(t_list **list);
 void				my_addtolist(t_list **list, void *data);
 char				*my_strdup(t_list **malloc_list, char *src);
@@ -178,7 +183,12 @@ char				*find_bin(char *bin);
 void				my_array_addtolist(t_list **list, void **data);
 // Chose the output fd.
 int					fdprintf(int fd, const char *str, ...);
+<<<<<<< HEAD
 int					ft_snprintf(char *buffer, size_t max_size,
 						const char *format, ...);
+=======
+void				free_2d_array(void **arr);
+void				my_multi_free(t_list **list_of_list);
+>>>>>>> builtin
 
 #endif

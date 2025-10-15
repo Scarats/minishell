@@ -1,34 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   free_2d_array.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/23 13:20:19 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/25 16:53:43 by tcardair         ###   ########.fr       */
+/*   Created: 2025/09/19 18:58:27 by tcardair          #+#    #+#             */
+/*   Updated: 2025/09/24 16:29:29 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-//#include <stdio.h>
-
-int	ft_strlen(const char *s)
+// Free any type of 2d array.
+void	free_2d_array(void **arr)
 {
-	int	i;
+	size_t	i;
 
-	if (!s)
-		return (0);
+	if (!arr)
+		return ;
 	i = 0;
-	while (s[i] != '\0')
+	while (arr[i])
+	{
+		free(arr[i]);
 		i++;
-	return (i);
+	}
+	free(arr);
 }
-/*int main()
-{
-	char str[] = "bite";
-	int a = ft_strlen(str);
-	printf("%d", a);
-	return (0);
-}*/

@@ -9,6 +9,7 @@ int create_subshell(t_node *node, t_main_data *data)
 	error = 0;
 	status = 0;
 	pid = -1;
+	printf(RED"SUBSHELL\n"RESET);
 	pid = fork();
 	if (pid < 0)
 		return (1);
@@ -16,6 +17,7 @@ int create_subshell(t_node *node, t_main_data *data)
 	{
 		node->create_subshell = false;
 		error = traverse_tree(node, data);
+		my_multi_free(&data->root->list_of_list);
 		exit(error);
 	}
 	if (waitpid(pid, &status, 0) == -1)
@@ -33,8 +35,10 @@ int create_subshell(t_node *node, t_main_data *data)
 // The recursion breakpoint is reached when a NODE_COMMAND is reached.
 int traverse_tree(t_node *node, t_main_data *data)
 {
-	// Create a subshell here.
-	if (node->create_subshell)
+
+	if (!node || !data)
+		return (1);
+	else if (node->create_subshell)
 		return (create_subshell(node, data));
 	else if (node->type == NODE_COMMAND)
 		return (exec_cmd(node, data));

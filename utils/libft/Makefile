@@ -22,7 +22,11 @@ SRCS	= ft_isalpha.c ft_isdigit.c ft_isalnum.c \
 		arraylen.c ft_strcpy.c my_malloc.c get_extension.c \
 		ft_isspace.c \
 		check_access.c find_bin.c my_strdup.c \
+<<<<<<< HEAD
 		fdprintf.c ./ft_printf/ft_snprintf.c ./ft_printf/ft_snprintf_utils.c \
+=======
+		fdprintf.c free_2d_array.c my_free.c
+>>>>>>> builtin
 
 FLAGS	= -Wall -Wextra -Werror 
 
