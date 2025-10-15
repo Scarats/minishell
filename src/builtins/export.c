@@ -84,7 +84,7 @@ int export(t_root *root, char **var)
 
 	if (!root)
 		return (1);
-	if (!var || !*var)
+	if (!var || !var[1])
 		return (env(root->env));
 	i = -1;
 	while (var[++i])
