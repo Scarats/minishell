@@ -3,6 +3,7 @@
 ## Testing
 ```
 valgrind --leak-check=full --track-fds=yes --show-leak-kinds=all ./minishell
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --suppressions=readline.supp ./minishell
 ```
 
 You can test the minishell with this inputs:
