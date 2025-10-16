@@ -23,6 +23,7 @@ int	init(t_main_data *data)
 
 static void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 {
+	printf(RED"RESET TOK\n"RESET);
 	tok->input = line;
 	tok->length = (int)ft_strlen(line);
 	tok->pos = 0;
@@ -41,6 +42,7 @@ static void	create_prompt(char *prompt, size_t size)
 	char	hostname[64] = {0};
 	char	username[64] = {0};
 
+	printf(RED"CREATE PROMPT\n"RESET);
 	gethostname(hostname, sizeof(hostname) - 1);
 	getlogin_r(username, sizeof(username) - 1);
 	ft_bzero(prompt, size);
@@ -76,10 +78,11 @@ void	handler(int sig)
 	rl_redisplay();
 }
 
-void	cleanup(t_main_data *data)
+void	cleanup(t_main_data *data, t_root *root)
 {
 	my_free(&data->malloc_tok);
 	my_free(&data->malloc_tree);
+	my_multi_free(&root->list_of_list);
 	if (data->tok)
 		free(data->tok);
 	write_history(".minishell_history");
@@ -88,6 +91,7 @@ void	cleanup(t_main_data *data)
 static int	initialize_shell(t_main_data *data, char *prompt,
 		size_t prompt_size)
 {
+	printf(RED"INIT SHELL\n"RESET);
 	create_prompt(prompt, prompt_size);
 	handle_signals();
 	if (init(data) != 0)
@@ -114,7 +118,10 @@ static void	handle_eof(char **line)
 
 static int	process_command(t_main_data *data, char *line)
 {
+
+	printf(RED"PROCESS CMD\n"RESET);
 	reset_tokenizer_for_line(data->tok, line);
+	printf(GREEN"BEFORE PARSER\n"RESET);
 	if (parser(data) == 0)
 		data->last_exit_status = traverse_tree(data->node, data);
 	else
@@ -139,6 +146,8 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
 {
 	char	*line;
 
+
+	printf(RED"EXEC CMD\n"RESET);
 	line = NULL;
 	fflush(stdout);
 	line = readline(prompt);
@@ -153,25 +162,43 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
 		return (true);
 	}
 	add_history(line);
-	if (!ft_strncmp(line, "exit", 5))
-	{
-		free(line);
-		return (false);
-	}
 	process_command(data, line);
 	cleanup_after_command(data, &line);
 	return (true);
 }
 
-int	main(void)
+int	main(int ac, char **av, char **envp)
 {
-	t_main_data	data;
-	char		prompt[256];
+    t_main_data	data;
+    t_root		root;
+    char		prompt[1024];
 
-	if (initialize_shell(&data, prompt, sizeof(prompt)) != 0)
-		return (1);
-	while (execute_command_loop(&data, prompt))
-		;
-	cleanup(&data);
-	return (data.last_exit_status);
+    /* Initialize root and data like the reference */
+    ft_memset(&root, 0, sizeof(root));
+    ft_memset(&data, 0, sizeof(data));
+    (void)ac;
+    (void)av;
+
+    root.malloc_root = NULL;
+    root.env = NULL;
+    root.list_of_list = NULL;
+    root.data = &data;
+    data.root = &root;
+
+    /* build env list (may modify root.env) */
+    root.env = set_env_var_list(&root, envp);
+
+    if (initialize_shell(&data, prompt, sizeof(prompt)) != 0)
+        return (1);
+    printf(RED"INIT DONE\n"RESET);
+    while (execute_command_loop(&data, prompt))
+        ;
+    cleanup(&data, &root);
+
+    /* free root-managed resources (if any were created) */
+    //my_multi_free(&root.list_of_list);
+    ft_lstclear(&root.list_of_list, NULL);
+    my_free(&root.malloc_root);
+
+    return (data.last_exit_status);
 }

@@ -423,6 +423,7 @@ int syntax_check(t_token *token_array, int size)
 // Tokenize it, then create a binary tree.
 int parser(t_main_data *data)
 {
+	printf(RED"PARSER\n"RESET);
 	if (tokenizer(data))
 		return (1);
 	if (list_to_array(data, data->tok->token_list, data->tok->token_list_size))

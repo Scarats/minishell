@@ -1,6 +1,9 @@
 # minishell
 
 ## Testing
+```
+valgrind --leak-check=full --track-fds=yes --show-leak-kinds=all ./minishell
+```
 
 You can test the minishell with this inputs:
 

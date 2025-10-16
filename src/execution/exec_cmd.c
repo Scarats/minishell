@@ -75,6 +75,7 @@ int redirections(t_node *node, t_main_data *data)
 // Should not return since the program will be replaced by execve.
 int execution(t_node *node, t_main_data *data)
 {
+    printf(GREEN"function : %s\n"RESET, node->cmd_argv[0]);
     if (!data)
         data = NULL;
     if (node->builtin)
