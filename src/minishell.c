@@ -81,7 +81,7 @@ void	handler(int sig)
 	}
 	else if (sig == SIGQUIT)
 	{
-		write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
