@@ -6,11 +6,11 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 16:47:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/09/30 17:22:20 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/16 16:45:29 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../minishell.h"
 
 char	*loop_find_bin(char **path, char *slash_bin)
 {
@@ -38,7 +38,7 @@ char	*loop_find_bin(char **path, char *slash_bin)
 
 // Will try to find the given bin name in PATH.
 // Returns an allocated path string or NULL. Caller must free.
-char	*find_bin(char *bin)
+char	*find_bin(t_env *tenv, char *bin)
 {
 	char	*env;
 	char	*tmp;
@@ -47,7 +47,7 @@ char	*find_bin(char *bin)
 
 	if (!bin || !*bin)
 		return (NULL);
-	env = getenv("PATH");
+	env = get_env_var(tenv, "PATH");
 	if (!env)
 		return (NULL);
 	path = ft_split(env, ':');

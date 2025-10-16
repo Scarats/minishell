@@ -3,15 +3,18 @@
 // Find the var's value in the shell's environment.
 char *get_env_var(t_env *env, char *target)
 {
-    if (!env || !target)
-        return (NULL);
-    while (env)
-    {
-        if (env->name && ft_strncmp(env->name, target, ft_strlen(env->name) + 1) == 0)
-            return (env->value);
-        env = env->next;
-    }
-    return (NULL);
+	t_env *ptr;
+
+	if (!env || !target)
+		return (NULL);
+	ptr = env;
+	while (ptr)
+	{
+		if (!ft_strcmp(target, ptr->name))
+			return (ptr->value);
+		ptr = ptr->next;
+	}
+	return (NULL);
 }
 
 // Create a t_env struct from a char **, spliting NAME=value.

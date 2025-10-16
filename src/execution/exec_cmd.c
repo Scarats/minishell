@@ -17,7 +17,7 @@ int get_bin_path(t_node *node, t_main_data *data)
 		}
 		return (1);
 	}
-	node->path = find_bin(node->cmd_argv[0]);
+	node->path = find_bin(data->root->env, node->cmd_argv[0]);
 	if (node->path)
 		return (0);
 	return (1);
@@ -75,13 +75,17 @@ int redirections(t_node *node, t_main_data *data)
 // Should not return since the program will be replaced by execve.
 int execution(t_node *node, t_main_data *data)
 {
+	t_env *path;
+
     printf(GREEN"function : %s\n"RESET, node->cmd_argv[0]);
     if (!data)
         data = NULL;
     if (node->builtin)
         return (exec_builtins(node, data));
-    else
-        execve(node->path, node->cmd_argv, t_env_to_char_arr(data->root, data->root->env));
+	path = get_env_var(data->root->env, "PATH");
+	if (!path || !path->value)
+		// execve(my_gwtcwd (+ / is none) + node->path, t_env_to_char_arr(data->root, data->root->env))
+    execve(node->path, node->cmd_argv, t_env_to_char_arr(data->root, data->root->env));
     return (1);
 }
 

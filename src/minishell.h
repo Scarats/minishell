@@ -244,5 +244,6 @@ int	set_last_exit_status_var(t_root *root, int status);
 void syntax_error(char *message);
 int	create_token(t_main_data *data, int start, int end, t_token_type type);
 char **t_env_to_char_arr(t_root *root, t_env *list);
+char	*find_bin(t_env *env, char *bin);
 
 #endif

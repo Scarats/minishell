@@ -8,7 +8,7 @@ SRCS = src/minishell.c \
 	   src/builtins/matrix.c src/env_var/get_env_var.c \
 	   src/builtins/export.c src/builtins/env.c src/builtins/unset.c \
 	   src/handlers/set_last_exit_status.c src/handlers/error_handler.c \
-	   src/env_var/copy_env.c
+	   src/env_var/copy_env.c src/env_var/find_bin.c
 
 FLAGS = -Wall -Wextra -Werror -fPIE
 CC    = cc

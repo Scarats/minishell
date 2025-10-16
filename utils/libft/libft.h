@@ -6,10 +6,9 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/15 16:35:04 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/16 16:43:11 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #ifndef LIBFT_H
 # define LIBFT_H
@@ -175,7 +174,6 @@ char				*get_extension(const char *source, const char *target);
 // Check access to a file.
 int					check_access(char *path, int r, int w, int x);
 /*, int silent*/
-char				*find_bin(char *bin);
 // Add full array to the garbadge collector.
 void				my_array_addtolist(t_list **list, void **data);
 // Chose the output fd.
@@ -184,5 +182,6 @@ int					ft_snprintf(char *buffer, size_t max_size,
 						const char *format, ...);
 void				free_2d_array(void **arr);
 void				my_multi_free(t_list **list_of_list);
+int					ft_strcmp(const char *s1, const char *s2);
 
 #endif
