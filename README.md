@@ -2,7 +2,7 @@
 
 ## Testing
 ```
-valgrind --leak-check=full --track-fds=yes --show-leak-kinds=all ./minishell
+valgrind --leak-check=full --show-leak-kinds=all --suppressions=./readline.supp --track-fds=yes ./minishell
 ```
 
 You can test the minishell with this inputs:

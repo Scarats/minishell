@@ -81,7 +81,7 @@ int execution(t_node *node, t_main_data *data)
     if (node->builtin)
         return (exec_builtins(node, data));
     else
-        execve(node->path, node->cmd_argv, NULL);
+        execve(node->path, node->cmd_argv, t_env_to_char_arr(data->root, data->root->env));
     return (1);
 }
 

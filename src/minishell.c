@@ -161,6 +161,12 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
 		handle_empty_input(&line);
 		return (true);
 	}
+	if (!ft_strncmp(line, "exit", 5))
+	{
+		free(line);
+		line = NULL;
+		return (false);
+	}
 	add_history(line);
 	process_command(data, line);
 	cleanup_after_command(data, &line);
@@ -194,11 +200,7 @@ int	main(int ac, char **av, char **envp)
     while (execute_command_loop(&data, prompt))
         ;
     cleanup(&data, &root);
-
-    /* free root-managed resources (if any were created) */
-    //my_multi_free(&root.list_of_list);
     ft_lstclear(&root.list_of_list, NULL);
     my_free(&root.malloc_root);
-
     return (data.last_exit_status);
 }
