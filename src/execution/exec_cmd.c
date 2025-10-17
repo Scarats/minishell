@@ -18,9 +18,9 @@ int get_bin_path(t_node *node, t_main_data *data)
 		return (1);
 	}
 	node->path = find_bin(data->root->env, node->cmd_argv[0]);
-	if (node->path)
-		return (0);
-	return (1);
+	// if (node->path)
+	return (0);
+	// return (1);
 }
 
 // Open with accrding flags to action number.
@@ -78,15 +78,18 @@ int execution(t_node *node, t_main_data *data)
 	t_env *path;
 
     printf(GREEN"function : %s\n"RESET, node->cmd_argv[0]);
-    if (!data)
-        data = NULL;
+    if (!data || !node)
+		return (1);
     if (node->builtin)
         return (exec_builtins(node, data));
-	path = get_env_var(data->root->env, "PATH");
-	if (!path || !path->value)
-		// execve(my_gwtcwd (+ / is none) + node->path, t_env_to_char_arr(data->root, data->root->env))
-    execve(node->path, node->cmd_argv, t_env_to_char_arr(data->root, data->root->env));
-    return (1);
+	path = find_tenv_var(data->root->env, "PATH");
+	if ((!path || !path->value) && !strchr(node->cmd_argv[0], '/'))
+ 		return (127);
+	if (strchr(node->cmd_argv[0], '/'))
+    	execve(node->cmd_argv[0], node->cmd_argv, t_env_to_char_arr(data->root, data->root->env));
+	else if(!node->path)
+		return (127);
+    return(execve(node->path, node->cmd_argv, t_env_to_char_arr(data->root, data->root->env)));
 }
 
 int set_io_fds(t_node *node, t_main_data *data)
@@ -122,13 +125,15 @@ int exec_handler(t_main_data *data, t_node *node)
     if (!node->cmd_argv || !node->cmd_argv[0])
         return (0);
 
+	printf("\n\nbefore builtin\n\n");
     /* Builtin: execution() handles it, but we can short‑circuit */
     if (node->builtin)
         return (execution(node, data));
 
     /* External command: resolve path; on failure return 127 */
-    if (get_bin_path(node, data) != 0 || !node->path)
+    if (get_bin_path(node, data) != 0/*|| !node->path*/)
         return (127);
+	printf("\n\nbefore exec\n\n");
     return (execution(node, data));
 }
 
@@ -169,6 +174,7 @@ int exec_cmd(t_node *node, t_main_data *data)
     int pid;
     int status;
     int error;
+	t_env *path;
 
 	printf("\n");
 	printf(BROWN"IN EXEC\nlength: %i\ntoken_list_size: %i\n"RESET, data->tok->length, data->tok->token_list_size);
@@ -188,9 +194,14 @@ int exec_cmd(t_node *node, t_main_data *data)
     if (pid == 0)
     {
         error = exec_handler(data, node);
-        if (error == 127 && node->cmd_argv && node->cmd_argv[0])
-            fdprintf(2, "minishell: %s: command not found\n", node->cmd_argv[0]);
-        /* No message for pure redirection (error == 0) */
+		if (error)
+		{
+			path = find_tenv_var(data->root->env, "PATH");
+			if (error == 127 && (!path || !path->value))
+				fdprintf(2, "minishell: %s: No such file or directory\n", node->cmd_argv[0]);
+			else
+				print_exec_error(error, node);
+		}
         my_multi_free(&data->root->list_of_list);
         exit(error);
     }
