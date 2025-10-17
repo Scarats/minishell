@@ -4,7 +4,7 @@ volatile sig_atomic_t	stop_flag = 0;
 
 int	init(t_main_data *data)
 {
-	data->tok = malloc(sizeof(t_tokenizer));
+	data->tok = my_malloc(&data->root->list_of_list, &data->root->malloc_root, sizeof(t_tokenizer));
 	if (!data->tok)
 		return (1);
 	ft_memset(data->tok, 0, sizeof(t_tokenizer));
@@ -83,8 +83,6 @@ void	cleanup(t_main_data *data, t_root *root)
 	my_free(&data->malloc_tok);
 	my_free(&data->malloc_tree);
 	my_multi_free(&root->list_of_list);
-	if (data->tok)
-		free(data->tok);
 	write_history(".minishell_history");
 }
 
