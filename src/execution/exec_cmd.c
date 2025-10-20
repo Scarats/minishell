@@ -196,7 +196,12 @@ int exec_cmd(t_node *node, t_main_data *data)
         close(node->output_fd);
 
     if (waitpid(pid, &status, 0) == -1)
-        return 1;
+    {
+        if (WIFEXITED(status))
+            data->root->last_exit_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            data->root->last_exit_status = 128 + WTERMSIG(status);
+    }
     handle_signals();
     if (WIFEXITED(status))
         return WEXITSTATUS(status);

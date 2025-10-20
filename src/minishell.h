@@ -180,8 +180,6 @@ typedef struct s_main_data
 	t_env *curr_env;
 
 	t_tokenizer *tok;
-	
-	int last_exit_status;
 } t_main_data;
 
 typedef struct s_history
@@ -237,6 +235,7 @@ void handler(int sig);
 t_env *copy_env(t_list **malloc_list, t_env *env);
 t_env *set_env_var_list(t_root *root, char **env);
 char *get_env_var(t_env *env, char *target);
+char	*get_expanded_var(t_main_data *data, const char *var_name);
 int export(t_root *root, char **var);
 int env(t_env *root_env);
 int unset(t_env **env, char **argv);

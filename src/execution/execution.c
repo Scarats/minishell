@@ -21,7 +21,12 @@ int create_subshell(t_node *node, t_main_data *data)
 		exit(error);
 	}
 	if (waitpid(pid, &status, 0) == -1)
-		return (1);
+    {
+        if (WIFEXITED(status))
+            data->root->last_exit_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            data->root->last_exit_status = 128 + WTERMSIG(status);
+    }
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))

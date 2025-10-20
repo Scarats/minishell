@@ -39,7 +39,7 @@ int	exit_builtin(t_node *node, t_main_data *data)
 
 	if (!data->in_child)
 		ft_printf("exit\n");
-	exit_code = data->last_exit_status;
+	exit_code = data->root->last_exit_status;
 	if (node->cmd_argv[1])
 	{
 		if (!is_numeric(node->cmd_argv[1]))

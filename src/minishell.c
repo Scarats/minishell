@@ -17,7 +17,6 @@ int	init(t_main_data *data)
 	data->malloc_tree = NULL;
 	data->error = 0;
 	data->in_child = false;
-	data->last_exit_status = 0;
 	return (0);
 }
 
@@ -132,13 +131,13 @@ static int	process_command(t_main_data *data, char *line)
 	reset_tokenizer_for_line(data->tok, line);
 	printf(GREEN "BEFORE PARSER\n" RESET);
 	if (parser(data) == 0)
-		data->last_exit_status = traverse_tree(data->node, data);
+		data->root->last_exit_status = traverse_tree(data->node, data);
 	else
 	{
 		fprintf(stderr, "minishell: syntax error\n");
-		data->last_exit_status = 2;
+		data->root->last_exit_status = 2;
 	}
-	return (data->last_exit_status);
+	return (data->root->last_exit_status);
 }
 
 static void	cleanup_after_command(t_main_data *data, char **line)
@@ -191,6 +190,7 @@ int	main(int ac, char **av, char **envp)
 	root.list_of_list = NULL;
 	root.data = &data;
 	data.root = &root;
+	root.last_exit_status = 0;
 	/* build env list (may modify root.env) */
 	root.env = set_env_var_list(&root, envp);
 	if (initialize_shell(&data, prompt, sizeof(prompt)) != 0)
@@ -203,5 +203,5 @@ int	main(int ac, char **av, char **envp)
 	// my_multi_free(&root.list_of_list);
 	ft_lstclear(&root.list_of_list, NULL);
 	my_free(&root.malloc_root);
-	return (data.last_exit_status);
+	return (root.last_exit_status);
 }

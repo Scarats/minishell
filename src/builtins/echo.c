@@ -38,7 +38,7 @@ int echo(char **argv)
 	bool n;
 
 	if (!argv || !*argv)
-		return (ft_printf("\n"));
+		return (ft_printf("\n"), 0);
 	for (int i = 0; argv[i]; i++)
 		ft_printf(RED"ECHO %i: %s\n"RESET, i, argv[i]);
 	n = false;
@@ -47,7 +47,7 @@ int echo(char **argv)
 	if (is_n(argv[0]))
 		n = true;
 	if (n && !argv[1])
-		return (ft_printf("\n"));
+		return (ft_printf("\n"), 0);
 	if (n)
 		print_array(&argv[1]);
 	else
