@@ -227,7 +227,7 @@ int or_or(t_node *node, t_main_data *data);
 int pipes(t_node *node, t_main_data *data);
 int exec_builtins(t_node *node, t_main_data *data);
 int is_builtin(char *cmd);
-int cd(t_node *node);
+int cd(t_root *root, t_node *node);
 int pwd(void);
 int echo(char **argv);
 int matrix(char **arg);
@@ -246,5 +246,6 @@ char	*find_bin(t_env *env, char *bin);
 t_env *find_tenv_var(t_env *env, char *name);
 void print_exec_error(int error, t_node *node);
 int export_env(t_env *root_env);
+char *my_getcwd(t_root *root);
 
 #endif

@@ -16,7 +16,7 @@ int exec_builtins(t_node *node, t_main_data *data)
 		ft_printf(GREEN"EXEC_BUILDINS %i: %s\n"RESET, i, node->cmd_argv[i]);
 	error = 0;
 	if (!ft_strncmp(node->cmd_argv[0], "cd", length))
-		error = cd(node);
+		error = cd(data->root, node);
 	else if (!ft_strncmp(node->cmd_argv[0], "pwd", length))
 		error = pwd();
 	else if (!ft_strncmp(node->cmd_argv[0], "echo", length))

@@ -61,7 +61,10 @@ int export_env(t_env *root_env)
 	sort_env(ptr);
     while (ptr->next)
     {
-        printf("export %s=\"%s\"\n", ptr->name, ptr->value);
+		if (!ptr->value)
+     	   printf("export %s\n", ptr->name);
+		else
+     	   printf("export %s=\"%s\"\n", ptr->name, ptr->value);
         ptr = ptr->next;
     }
     return (0);
