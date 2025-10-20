@@ -26,7 +26,7 @@ char **split_env_var(t_root *root, char *env)
 
 	if (!env || !root)
 		return (NULL);
-	env_var = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char *) * 3); // for the end of env_var[3], env_var[0][i] and env_var[1][y]
+	env_var = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char *) * 3); 
 	i = 0;
 	y = -1;
 	while (env[i] && env[i] != '=')	

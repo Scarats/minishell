@@ -8,7 +8,6 @@ int	init(t_main_data *data)
 			sizeof(t_tokenizer));
 	if (!data->tok)
 		return (1);
-	ft_memset(data->tok, 0, sizeof(t_tokenizer));
 	data->tok->prev_char_type = CHAR_SPACE;
 	data->tok->curr_char_type = CHAR_NULL;
 	data->tok->double_quote = false;
