@@ -245,5 +245,6 @@ char **t_env_to_char_arr(t_root *root, t_env *list);
 char	*find_bin(t_env *env, char *bin);
 t_env *find_tenv_var(t_env *env, char *name);
 void print_exec_error(int error, t_node *node);
+int export_env(t_env *root_env);
 
 #endif
