@@ -131,17 +131,34 @@ int expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_d
     char *expanded;
     size_t var_len;
 
+    expanded = NULL;
     var_len = 0;
-    if (tok->slice && (ft_isalpha((unsigned char)tok->slice[0]) || tok->slice[0] == '_'))
+
+    if (!tok || !tok->slice)
+        return (1);
+
+    // Special-case $?: expand to last exit status
+    if (tok->slice[0] == '?')
+    {
+        var_len = 1;
+        expanded = ft_itoa(data->root->last_exit_status);
+        if (expanded)
+            my_addtolist(&data->malloc_tok, expanded);
+    }
+    else if (ft_isalpha((unsigned char)tok->slice[0]) || tok->slice[0] == '_')
     {
         var_len = 1;
         while (tok->slice[var_len] && (ft_isalnum((unsigned char)tok->slice[var_len]) || tok->slice[var_len] == '_'))
             var_len++;
+
+        // Temporarily terminate to lookup env var name
+        saved = tok->slice[var_len];
+        tok->slice[var_len] = '\0';
+        expanded = get_env_var(data->root->env, tok->slice);
+        tok->slice[var_len] = saved;
     }
-    saved = tok->slice[var_len];
-    tok->slice[var_len] = '\0';
-    expanded = get_env_var(data->root->env, tok->slice);
-    tok->slice[var_len] = saved;
+    // else: no valid var name, treat as empty expansion + keep suffix
+
     if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
     {
         remove_token(&data->tok->token_list, removed);
@@ -150,7 +167,8 @@ int expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_d
         *removed_dollar = 1; // remember we just removed '$'
     }
     tok->type = get_word_type(tok); // CMD/ARG/FILE based on new prev
-    /* Build token->word as (expanded value or "") + the suffix (rest of slice) */
+
+    // Build token->word as (expanded value or "") + the suffix (rest of slice)
     if (set_token_word_with_suffix(data, tok, expanded, var_len))
         return (1);
     return (0);

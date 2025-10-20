@@ -180,8 +180,6 @@ typedef struct s_main_data
 	t_env *curr_env;
 
 	t_tokenizer *tok;
-	
-	int last_exit_status;
 } t_main_data;
 
 typedef struct s_history
