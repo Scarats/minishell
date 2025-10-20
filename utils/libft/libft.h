@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/16 16:43:11 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:25:26 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,7 @@ int					fdprintf(int fd, const char *str, ...);
 int					ft_snprintf(char *buffer, size_t max_size,
 						const char *format, ...);
 void				free_2d_array(void **arr);
+void				my_free_one(t_list **list, void *target);
 void				my_multi_free(t_list **list_of_list);
 int					ft_strcmp(const char *s1, const char *s2);
 

@@ -28,7 +28,7 @@ int exec_builtins(t_node *node, t_main_data *data)
 	else if (!ft_strncmp(node->cmd_argv[0], "env", length))
 		error = env(data->root->env);
 	else if (!ft_strncmp(node->cmd_argv[0], "unset", length))
-		error = unset(&data->root->env, &node->cmd_argv[1]);
+		error = unset(data->root, &data->root->env, &node->cmd_argv[1]);
 	else
 		printf(RED "error: built-in not found.\n" RESET);
 	return (error);

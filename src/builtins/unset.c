@@ -1,48 +1,54 @@
 #include "../minishell.h"
 
-int del_one(t_env **head, const char *name)
+int	del_one(t_root *root, t_env **head, const char *name)
 {
-    t_env   *prev;
-    t_env   *curr;
-    int     length;
+	t_env	*prev;
+	t_env	*curr;
+	int		length;
 
-    if (!head || !*head || !name)
-        return (1);
-    prev = NULL;
-    curr = *head;
-    length = ft_strlen(name);
-    while (curr)
-    {
-        if (curr->name
-            && (int)ft_strlen(curr->name) == length
-            && ft_strncmp(curr->name, name, length) == 0)
-        {
-            if (prev)
-                prev->next = curr->next;
-            else
-                *head = curr->next;
-            return (0);
-        }
-        prev = curr;
-        curr = curr->next;
-    }
-    return (1);
+	if (!head || !*head || !name)
+		return (1);
+	prev = NULL;
+	curr = *head;
+	length = ft_strlen(name);
+	while (curr)
+	{
+		if (curr->name && ft_strcmp(curr->name, name))
+		{
+			if (prev)
+			{
+				my_free_one(&root->malloc_root, (void *)curr->name);
+				my_free_one(&root->malloc_root, (void *)curr->value);
+				prev->next = curr->next;
+			}
+			else
+			{
+				my_free_one(&root->malloc_root, (void *)curr->name);
+				my_free_one(&root->malloc_root, (void *)curr->value);
+				*head = curr->next;
+			}
+			return (0);
+		}
+		prev = curr;
+		curr = curr->next;
+	}
+	return (1);
 }
 
-int unset(t_env **env, char **argv)
+int	unset(t_root *root, t_env **env, char **argv)
 {
-    int i;
-    int error;
+	int i;
+	int error;
 
-    if (!env || !*env || !argv)
-        return (1);
-    error = 0;
-    i = 0;
-    while (argv[i])
-    {
-        if (del_one(env, argv[i]))
-            error++;
-        i++;
-    }
-    return (0);
+	if (!env || !*env || !argv)
+		return (1);
+	error = 0;
+	i = 0;
+	while (argv[i])
+	{
+		if (del_one(root, env, argv[i]))
+			error++;
+		i++;
+	}
+	return (error);
 }

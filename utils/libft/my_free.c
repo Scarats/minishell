@@ -6,11 +6,39 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 16:27:19 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/20 17:18:04 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/20 18:29:26 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+
+// Free only one node of the list.
+void my_free_one(t_list **list, void *target)
+{
+    t_list *prev;
+    t_list *next;
+    t_list *curr;
+
+    if (!list || !*list || !target)
+        return ;
+    curr = *list;
+    if (curr->content == target)
+    {
+        next = curr->next;
+        ft_lstdelone(curr, free);
+        *list = next;
+        return ;
+    }
+    prev = *list;
+    while (prev->next && prev->next->content != target)
+        prev = prev->next;
+    if (!prev->next)
+        return ;
+    curr = prev->next;
+    next = curr->next;
+    ft_lstdelone(curr, free);
+    prev->next = next;
+}
 
 // Free the allocated memory of the list.
 void	my_free(t_list **list)

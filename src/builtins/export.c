@@ -24,7 +24,7 @@ void clean_prev_env_var(t_root *root, char *src)
 
 	name_arr[0] = src;
 	name_arr[1] = NULL;
-	unset(&root->env, name_arr);
+	unset(root, &root->env, name_arr);
 }
 
 void add_var_to_list(t_root *root, t_env **head, t_env *new_var, char **args)
@@ -43,7 +43,6 @@ void add_var_to_list(t_root *root, t_env **head, t_env *new_var, char **args)
 		ptr->next = new_var;
 	}
 	my_array_addtolist(&root->malloc_root, (void **)args);
-	new_var->exported = true;
 	new_var->name = args[0];
 	new_var->value = args[1];
 	new_var->next = NULL;
