@@ -219,4 +219,41 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);
+    if (node->builtin)
+    {
+        if (data->in_child)
+            return exec_handler(data, node);
+        return exec_builtin_in_parent(node, data);
+    }
+    pid = fork();
+    if (pid == -1)
+        return 1;
+    if (pid == 0)
+    {
+        signal(SIGQUIT, SIG_DFL);
+        error = exec_handler(data, node);
+        if (error == 127 && node->cmd_argv && node->cmd_argv[0])
+            fdprintf(2, "minishell: %s: command not found\n", node->cmd_argv[0]);
+        my_multi_free(&data->root->list_of_list);
+        exit(error);
+    }
+
+    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+        close(node->input_fd);
+    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+        close(node->output_fd);
+
+    if (waitpid(pid, &status, 0) == -1)
+    {
+        if (WIFEXITED(status))
+            data->root->last_exit_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            data->root->last_exit_status = 128 + WTERMSIG(status);
+    }
+    handle_signals();
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    else if (WIFSIGNALED(status))
+        return (128 + WTERMSIG(status));
+    return 1;
 }

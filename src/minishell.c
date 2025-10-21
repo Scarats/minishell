@@ -24,6 +24,7 @@ int	init(t_main_data *data)
 static void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 {
 	printf(RED "RESET TOK\n" RESET);
+	printf(RED "RESET TOK\n" RESET);
 	tok->input = line;
 	tok->length = (int)ft_strlen(line);
 	tok->pos = 0;
@@ -42,6 +43,7 @@ static void	create_prompt(char *prompt, size_t size)
 	char	hostname[64] = {0};
 	char	username[64] = {0};
 
+	printf(RED "CREATE PROMPT\n" RESET);
 	printf(RED "CREATE PROMPT\n" RESET);
 	gethostname(hostname, sizeof(hostname) - 1);
 	getlogin_r(username, sizeof(username) - 1);
@@ -62,7 +64,8 @@ void	handle_signals(void)
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
-	sa_quit.sa_handler = SIG_IGN;
+	
+	sa_quit.sa_handler = handler;
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_flags = 0;
 	sigaction(SIGQUIT, &sa_quit, NULL);
@@ -70,12 +73,21 @@ void	handle_signals(void)
 
 void	handler(int sig)
 {
-	(void)sig;
-	stop_flag = 1;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	if (sig == SIGINT)
+	{
+		stop_flag = 1;
+		write(STDOUT_FILENO, "\n", 1);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
+	else if (sig == SIGQUIT)
+	{
+		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
+	}
 }
 
 void	cleanup(t_main_data *data, t_root *root)
@@ -89,6 +101,7 @@ void	cleanup(t_main_data *data, t_root *root)
 static int	initialize_shell(t_main_data *data, char *prompt,
 		size_t prompt_size)
 {
+	printf(RED "INIT SHELL\n" RESET);
 	printf(RED "INIT SHELL\n" RESET);
 	create_prompt(prompt, prompt_size);
 	handle_signals();
@@ -117,6 +130,7 @@ static void	handle_eof(char **line)
 static int	process_command(t_main_data *data, char *line)
 {
 	printf(RED "PROCESS CMD\n" RESET);
+	printf(RED "PROCESS CMD\n" RESET);
 	reset_tokenizer_for_line(data->tok, line);
 	printf(GREEN "BEFORE PARSER\n" RESET);
 	if (!parser(data))
@@ -140,6 +154,7 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
 {
 	char	*line;
 
+	printf(RED "EXEC CMD\n" RESET);
 	printf(RED "EXEC CMD\n" RESET);
 	line = NULL;
 	fflush(stdout);

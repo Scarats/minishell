@@ -233,6 +233,7 @@ void handler(int sig);
 t_env *copy_env(t_list **malloc_list, t_env *env);
 t_env *set_env_var_list(t_root *root, char **env);
 char *get_env_var(t_env *env, char *target);
+char	*get_expanded_var(t_main_data *data, const char *var_name);
 int export(t_root *root, char **var);
 int env(t_env *root_env);
 int unset(t_root *root, t_env **env, char **argv);
@@ -245,5 +246,8 @@ t_env *find_tenv_var(t_env *env, char *name);
 void print_exec_error(int error, t_node *node);
 int export_env(t_env *root_env);
 char *my_getcwd(t_root *root);
+void	handle_signals(void);
+int exit_builtin(t_node *node, t_main_data *data);
+void	cleanup(t_main_data *data, t_root *root);
 
 #endif
