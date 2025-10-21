@@ -77,6 +77,15 @@ typedef enum e_node_type
 	NODE_OR,   // ||
 } t_node_type;
 
+typedef struct s_env_utils
+{
+	t_env	*head;
+	t_env	*tail;
+	t_env	*node;
+	char	**tmp;
+	int		i;
+} t_env_utils;
+
 typedef struct s_env
 {
 	char *name;
