@@ -13,7 +13,7 @@ int	del_one(t_root *root, t_env **head, const char *name)
 	length = ft_strlen(name);
 	while (curr)
 	{
-		if (curr->name && ft_strcmp(curr->name, name))
+		if (curr->name && !ft_strcmp(curr->name, name))
 		{
 			if (prev)
 			{
