@@ -1,10 +1,10 @@
 #include "../minishell.h"
 
 // remove_token: unlink a token from a doubly-linked list
-void remove_token(t_token **head, t_token *t)
+void	remove_token(t_token **head, t_token *t)
 {
 	if (!t)
-		return;
+		return ;
 	if (t->prev_token)
 		t->prev_token->next_token = t->next_token;
 	else
@@ -15,17 +15,20 @@ void remove_token(t_token **head, t_token *t)
 
 // Determine if the word is a command, argument, filename etc...
 // It will be done according to the previous tokens created.
-t_token_type get_word_type(t_token *tok)
+t_token_type	get_word_type(t_token *tok)
 {
-	t_token_type prev_type;
+	t_token_type	prev_type;
 
 	// It's the first node, then COMMAND
 	if (tok->prev_token == NULL)
 		return (TOKEN_CMD);
 	prev_type = tok->prev_token->type;
-	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN || prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
+	if (prev_type == TOKEN_REDIRECT_OUT || prev_type == TOKEN_REDIRECT_IN
+		|| prev_type == TOKEN_APPEND || prev_type == TOKEN_HEREDOC)
 		return (TOKEN_FILE);
-	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND || prev_type == TOKEN_OR || prev_type == TOKEN_LPAREN || prev_type == TOKEN_RPAREN)
+	else if (prev_type == TOKEN_PIPE || prev_type == TOKEN_AND_AND
+		|| prev_type == TOKEN_OR || prev_type == TOKEN_LPAREN
+		|| prev_type == TOKEN_RPAREN)
 		return (TOKEN_CMD);
 	else if (prev_type == TOKEN_DOLLAR)
 		return (TOKEN_ENV_VAR);
@@ -35,12 +38,12 @@ t_token_type get_word_type(t_token *tok)
 
 // Return 1 if there is NO space immediately before the token start.
 // - Skip quote delimiters.
-// - If allow_skip_dollar=1 and the immediate previous char is '$', skip that '$' too.
+// - If allow_skip_dollar=1 and the immediate previous char is '$',
+// skip that '$' too.
 // - Otherwise, never merge across a '$'.
-int no_space_before_token_start(const char *s, int start,
-							int allow_skip_dollar)
+int	no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
 {
-	int i;
+	int	i;
 
 	if (start <= 0)
 		return (0);
@@ -68,19 +71,20 @@ int no_space_before_token_start(const char *s, int start,
 
 // Merge current word-like token into the previous one if adjacent (no space).
 // just_removed_dollar indicates we removed a preceding '$' for this token.
-int merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start, int just_removed_dollar)
+int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
+		int just_removed_dollar)
 {
-	t_token *prev;
-	size_t a;
-	size_t b;
-	char *joined;
+	t_token	*prev;
+	size_t	a;
+	size_t	b;
+	char	*joined;
 
 	if (!tok || !(prev = tok->prev_token))
 		return (0);
 	if (!is_word_token(prev->type) || !is_word_token(tok->type))
 		return (0);
 	if (!no_space_before_token_start(data->tok->input, start,
-									 just_removed_dollar))
+			just_removed_dollar))
 		return (0);
 	a = ft_strlen(prev->word);
 	b = ft_strlen(tok->word);
@@ -98,38 +102,40 @@ int merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start, int 
 	return (1);
 }
 
-int set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded, size_t var_len)
+int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
+		size_t var_len)
 {
-    char *rest;
-    size_t vlen;
-    size_t rlen;
-    char *joined;
+	char	*rest;
+	size_t	vlen;
+	size_t	rlen;
+	char	*joined;
 
-    if (!tok || !tok->slice)
-        return (1);
-    rest = tok->slice + var_len;
+	if (!tok || !tok->slice)
+		return (1);
+	rest = tok->slice + var_len;
 	if (expanded)
 		vlen = ft_strlen(expanded);
 	else
-		vlen = 0;	
-    rlen = ft_strlen(rest);
-    joined = my_malloc(&data->root->list_of_list, &data->malloc_tok, vlen + rlen + 1);
-    if (!joined)
-        return (fdprintf(2, "minishell: allocation error\n"), 1);
-    if (vlen)
-        ft_memcpy(joined, expanded, vlen);
-    if (rlen)
-        ft_memcpy(joined + vlen, rest, rlen);
-    joined[vlen + rlen] = '\0';
-    tok->word = joined;
-    return (0);
+		vlen = 0;
+	rlen = ft_strlen(rest);
+	joined = my_malloc(&data->root->list_of_list, &data->malloc_tok, vlen + rlen
+			+ 1);
+	if (!joined)
+		return (fdprintf(2, "minishell: allocation error\n"), 1);
+	if (vlen)
+		ft_memcpy(joined, expanded, vlen);
+	if (rlen)
+		ft_memcpy(joined + vlen, rest, rlen);
+	joined[vlen + rlen] = '\0';
+	tok->word = joined;
+	return (0);
 }
 
-int expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_dollar)
+int	expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_dollar)
 {
-    char saved;
-    char *expanded;
-    size_t var_len;
+    char	saved;
+    char	*expanded;
+    size_t	var_len;
 
     expanded = NULL;
     var_len = 0;
@@ -148,7 +154,9 @@ int expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_d
     else if (ft_isalpha((unsigned char)tok->slice[0]) || tok->slice[0] == '_')
     {
         var_len = 1;
-        while (tok->slice[var_len] && (ft_isalnum((unsigned char)tok->slice[var_len]) || tok->slice[var_len] == '_'))
+        while (tok->slice[var_len]
+            && (ft_isalnum((unsigned char)tok->slice[var_len])
+                || tok->slice[var_len] == '_'))
             var_len++;
 
         // Temporarily terminate to lookup env var name
@@ -175,11 +183,11 @@ int expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_d
 }
 
 // Create token, add them to the list and add type.
-int create_token(t_main_data *data, int start, int end, t_token_type type)
+int	create_token(t_main_data *data, int start, int end, t_token_type type)
 {
-	t_token *tok;
-	t_token *removed;
-	int removed_dollar;
+	t_token	*tok;
+	t_token	*removed;
+	int		removed_dollar;
 
 	removed_dollar = 0;
 	if (type == TOKEN_SPACE)
@@ -201,7 +209,7 @@ int create_token(t_main_data *data, int start, int end, t_token_type type)
 	return (0);
 }
 
-t_char_type get_char_type(char c)
+t_char_type	get_char_type(char c)
 {
 	if (c == ' ')
 		return (CHAR_SPACE);
@@ -216,7 +224,7 @@ t_char_type get_char_type(char c)
 	return (CHAR_TEXT);
 }
 
-t_token_type get_tok_type(char c, char next)
+t_token_type	get_tok_type(char c, char next)
 {
 	if (c == '&' && next == '&')
 		return (TOKEN_AND_AND);
@@ -249,56 +257,61 @@ t_token_type get_tok_type(char c, char next)
 	return (TOKEN_TEXT);
 }
 
-int handle_operator(t_main_data *data, t_token_type *tok_type)
+int	handle_operator(t_main_data *data, t_token_type *tok_type)
 {
-	int len;
+	int	len;
 
 	len = 0;
 	if (!data || !tok_type)
 		return (1);
-	if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR || *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
+	if (*tok_type == TOKEN_AND_AND || *tok_type == TOKEN_OR
+		|| *tok_type == TOKEN_HEREDOC || *tok_type == TOKEN_APPEND)
 		len = 2;
 	else
 		len = 1;
 	create_token(data, data->tok->prev_pos, data->tok->prev_pos + len,
-				 *tok_type);
+		*tok_type);
 	data->tok->prev_pos += len;
 	return (0);
 }
 
-int handle_normal_token(t_main_data *data, t_token_type *tok_type)
+int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
-	t_token_type effective;
+	t_token_type	effective;
 
 	if (!data || !tok_type)
 		return (1);
 	// If the previous run is an OPERATOR starting with '$', emit only '$'
 	// so the following word can become TOKEN_ENV_VAR.
-	if (data->tok->prev_char_type == CHAR_OPERATOR && data->tok->prev_pos < data->tok->pos && data->tok->input[data->tok->prev_pos] == '$')
+	if (data->tok->prev_char_type == CHAR_OPERATOR
+		&& data->tok->prev_pos < data->tok->pos
+		&& data->tok->input[data->tok->prev_pos] == '$')
 	{
 		create_token(data, data->tok->prev_pos, data->tok->prev_pos + 1,
-					 TOKEN_DOLLAR);
+			TOKEN_DOLLAR);
 		data->tok->prev_pos = data->tok->prev_pos + 1;
 		return (0);
 	}
-	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos)
+	if (data->tok->prev_char_type != CHAR_SPACE
+		&& data->tok->prev_pos < data->tok->pos)
 	{
-		// Force TEXT when the previous run was TEXT (e.g., inside single quotes),
+		// Force TEXT when the previous run was TEXT (e.g.,
+		//	inside single quotes),
 		// so '$' inside single quotes is not mis-typed as TOKEN_DOLLAR.
 		effective = *tok_type;
-			if (data->tok->prev_char_type == CHAR_TEXT)
-				effective = TOKEN_TEXT;
-			create_token(data, data->tok->prev_pos, data->tok->pos, effective);
-			printf("\n");
-			printf(RED "CREATE_TOK %s, type %i\nin single quote: %i\n" RESET,
-				   data->tok->last_token->word, effective, data->tok->single_quote);
-			printf("\n");
+		if (data->tok->prev_char_type == CHAR_TEXT)
+			effective = TOKEN_TEXT;
+		create_token(data, data->tok->prev_pos, data->tok->pos, effective);
+		printf("\n");
+		printf(RED "CREATE_TOK %s, type %i\nin single quote: %i\n" RESET,
+			data->tok->last_token->word, effective, data->tok->single_quote);
+		printf("\n");
 	}
 	data->tok->prev_pos = data->tok->pos;
 	return (0);
 }
 
-int handle_parenthesis(t_main_data *data, t_token_type *tok_type)
+int	handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 {
 	if (!data || !tok_type)
 		return (1);
@@ -307,9 +320,9 @@ int handle_parenthesis(t_main_data *data, t_token_type *tok_type)
 	return (0);
 }
 
-int tokenizer(t_main_data *data)
+int	tokenizer(t_main_data *data)
 {
-	t_token_type tok_type;
+	t_token_type	tok_type;
 
 	tok_type = TOKEN_NULL;
 	while (data->tok->pos < data->tok->length)
@@ -320,20 +333,26 @@ int tokenizer(t_main_data *data)
 		// Now compute token type at the start of the current run,
 		// after quote handling decided how to treat characters.
 		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-								check_next_char(data->tok->input, data->tok->prev_pos));
-		if (data->tok->curr_char_type == CHAR_PARENTHESIS && data->tok->prev_char_type == CHAR_PARENTHESIS && data->tok->pos > data->tok->prev_pos)
+				check_next_char(data->tok->input, data->tok->prev_pos));
+		if (data->tok->curr_char_type == CHAR_PARENTHESIS
+			&& data->tok->prev_char_type == CHAR_PARENTHESIS
+			&& data->tok->pos > data->tok->prev_pos)
 			handle_parenthesis(data, &tok_type);
-		else if (data->tok->curr_char_type == CHAR_OPERATOR && data->tok->prev_char_type == CHAR_OPERATOR && data->tok->pos > data->tok->prev_pos)
+		else if (data->tok->curr_char_type == CHAR_OPERATOR
+			&& data->tok->prev_char_type == CHAR_OPERATOR
+			&& data->tok->pos > data->tok->prev_pos)
 			handle_operator(data, &tok_type);
 		else if (data->tok->curr_char_type != data->tok->prev_char_type)
 			handle_normal_token(data, &tok_type);
 		data->tok->prev_char_type = data->tok->curr_char_type;
 		data->tok->pos++;
 	}
-	if (data->tok->prev_char_type != CHAR_SPACE && data->tok->prev_pos < data->tok->pos && data->tok->prev_pos < data->tok->length && !data->tok->single_quote)
+	if (data->tok->prev_char_type != CHAR_SPACE
+		&& data->tok->prev_pos < data->tok->pos
+		&& data->tok->prev_pos < data->tok->length && !data->tok->single_quote)
 	{
 		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
-								check_next_char(data->tok->input, data->tok->prev_pos));
+				check_next_char(data->tok->input, data->tok->prev_pos));
 		create_token(data, data->tok->prev_pos, data->tok->pos, tok_type);
 	}
 	if (data->tok->double_quote || data->tok->single_quote)
@@ -342,11 +361,11 @@ int tokenizer(t_main_data *data)
 }
 
 // Turn the token linked list in an array, easier for AST.
-int list_to_array(t_main_data *data, t_token *token_list, int size)
+int	list_to_array(t_main_data *data, t_token *token_list, int size)
 {
-	t_token *curr_tok;
-	int i;
-	int real_size;
+	t_token	*curr_tok;
+	int		i;
+	int		real_size;
 
 	// Recompute size after possible removals (e.g., '$' tokens)
 	real_size = 0;
@@ -362,7 +381,7 @@ int list_to_array(t_main_data *data, t_token *token_list, int size)
 	if (size < 1)
 		size = 1;
 	data->tok->token_array = my_malloc(&data->root->list_of_list,
-									   &data->malloc_tok, sizeof(t_token) * size);
+			&data->malloc_tok, sizeof(t_token) * size);
 	if (!data->tok->token_array && size > 0)
 		return (1);
 	curr_tok = token_list;
@@ -375,7 +394,7 @@ int list_to_array(t_main_data *data, t_token *token_list, int size)
 	return (0);
 }
 
-int check_op_syntax(t_token *tok)
+int	check_op_syntax(t_token *tok)
 {
 	if (!tok)
 		return (1);
@@ -389,27 +408,29 @@ int check_op_syntax(t_token *tok)
 }
 
 // A command can start with a word-like token or a left parenthesis
-int is_command_start(t_token_type t)
+int	is_command_start(t_token_type t)
 {
 	return (is_word_token(t) || t == TOKEN_LPAREN || t == TOKEN_REDIRECT_OUT);
 }
 
 // A command can end with a word-like token or a right parenthesis
-int is_command_end(t_token_type t)
+int	is_command_end(t_token_type t)
 {
 	return (is_word_token(t) || t == TOKEN_RPAREN);
 }
 
-int syntax_check(t_token *token_array, int size)
+int	syntax_check(t_token *token_array, int size)
 {
-	int i;
-	t_token_type t;
+	int				i;
+	t_token_type	t;
 
 	if (!token_array || size <= 0)
 		return (1);
-	if (size == 1 && !((token_array[0].type) || is_word_token(token_array[0].type)))
+	if (size == 1 && !((token_array[0].type)
+			|| is_word_token(token_array[0].type)))
 		return (syntax_error(token_array[0].word), 1);
-	else if (size == 1 && ft_strlen(token_array[0].word) == 1 && token_array[0].word[0] == '$')
+	else if (size == 1 && ft_strlen(token_array[0].word) == 1
+		&& token_array[0].word[0] == '$')
 		return (fdprintf(2, "minishell: $: command not found\n"), 1);
 	i = 0;
 	while (i < size)
@@ -439,9 +460,9 @@ int syntax_check(t_token *token_array, int size)
 
 // Parse the input.
 // Tokenize it, then create a binary tree.
-int parser(t_main_data *data)
+int	parser(t_main_data *data)
 {
-	printf(RED"PARSER\n"RESET);
+	printf(RED "PARSER\n" RESET);
 	if (tokenizer(data))
 		return (1);
 	if (list_to_array(data, data->tok->token_list, data->tok->token_list_size))
@@ -449,10 +470,10 @@ int parser(t_main_data *data)
 	if (syntax_check(data->tok->token_array, data->tok->token_list_size))
 		return (1);
 	data->node = build_tree(data, data->tok->token_array,
-							data->tok->token_list_size, 0);
+			data->tok->token_list_size, 0);
 	for (int i = 0; i < data->tok->token_list_size; i++)
 		printf(RED "EOFP node %i: '%s' = type %i\n" RESET, i,
-			   data->tok->token_array[i].word, data->tok->token_array[i].type);
+			data->tok->token_array[i].word, data->tok->token_array[i].type);
 	if (!data->node)
 		return (1);
 	return (0);

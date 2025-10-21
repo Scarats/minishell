@@ -1,7 +1,7 @@
 #include "../minishell.h"
 
 // Find the var's value in the shell's environment.
-char *get_env_var(t_env *env, char *target)
+char	*get_env_var(t_env *env, char *target)
 {
 	t_env *ptr;
 
@@ -43,13 +43,13 @@ char **split_env_var(t_root *root, char *env)
 }
 
 // Create a t_env struct from a char **, spliting NAME=value.
-t_env *set_env_var_list(t_root *root, char **env)
+t_env	*set_env_var_list(t_root *root, char **env)
 {
-    t_env	*head;
-    t_env	*tail;
-    t_env	*node;
-    char	**tmp;
-    int		i;
+	t_env	*head;
+	t_env	*tail;
+	t_env	*node;
+	char	**tmp;
+	int		i;
 
     if (!env)
         return (NULL);
