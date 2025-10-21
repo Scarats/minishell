@@ -44,51 +44,16 @@ to test cd:
 ```
 ls && (cd src && ls)
 ```
-
-## Return values
-
-Functions should return integers, 1 for error and 0 for success.
-They should receive pointers.
-It's not mandatory, just simplify everything imo.
-
 # ToDo
 
 **Thomas**
-Matrix:
 
-- [ ] handle enclosed quotes : echo "'lol'".
+- [ ] norminette.
 - [ ] if / in command, return bash: `/src`: No such file or directory instead of `command not found`.
 - [ ] `$?`
-	- [ ] should not be in the env.
-	- [ ] should be set to 0 at the beginning.
 	- [ ] should not be modifiable.
-- [ ] env_var should only contain chars.
-- [ ] exit codes.
-- [ ] pass env to execve.
-- [ ] use execve for builtins.
-- [ ] Builtins.
-  - [ ] exit
-  - [x] unset
-  - [x] env
-  - [x] echo
-  - [x] export
-  - [x] pwd
-  - [x] cd
-    - [ ] Check access permissions for builtins.
-- [ ] Signals.
-- [ ] See exit_status / code.
-- [ ] $ in quotes "
-- [x] Append >> 
-- [x] $? exit status.
-- [x] Handle PATH (not the current hardcoded version).
-- [x] Make find bin look at the current dir as well.
-- [x] Check output when command doesn't exist. (just input `lol` or `$donotexist`).
-- [x] Execution.
-- [x] Shells variables, 1 list, bool exported, non exported var are erased at the end of the process. Exported are kept.
-- [x] Error handling system.
-- [x] Create subshell. 
-
+- [ ] Check access permissions for builtins.
 **Albert**
 
+- [ ] fds not closed after exit(some given exit code).
 - [ ] Heredoc.
-- [ ] Readline & continuous input system (it's currently a AI generated one for testing)
