@@ -64,7 +64,7 @@ void	handle_signals(void)
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
-	
+
 	sa_quit.sa_handler = handler;
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_flags = 0;

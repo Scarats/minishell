@@ -1,33 +1,5 @@
 #include "../minishell.h"
 
-// Read from random, else generate an int from a memory address.
-int gen_random(int size)
-{
-	int fd;
-	int seed;
-	char *addr;
-
-	if (size == 0)
-		size = MATRIX;
-	addr = NULL;
-	seed = 0;
-	fd = open("/dev/urandom", O_RDONLY);
-	if (fd == -1)
-		fd = open("/dev/random", O_RDONLY);
-	if (fd == -1)
-	{
-		addr = malloc(1);
-		seed = (int)(uintptr_t)addr;
-		free(addr);
-	}
-	else
-	{
-		read(fd, &seed, sizeof(seed));
-		close(fd);
-	}
-	return ((seed % size + 1) - size);
-}
-
 // Apply random numbers within height and -height to an array of int.
 void gen_matrix(int *array, int width, int height)
 {
@@ -55,11 +27,10 @@ void fill_buff(int *array, char *buff, int width, int height)
 {
 	int i;
 	int r;
-	int ch;
 	const int printable_count = 126 - 33 + 1;
 
-	i = 0;
-	while (i < width)
+	i = -1;
+	while (++i < width)
 	{
 		if (array[i] > 0)
 		{
@@ -68,8 +39,7 @@ void fill_buff(int *array, char *buff, int width, int height)
 				r = -r;
 			if (r == 0)
 				r = 1;
-			ch = 33 + (r % printable_count);
-			buff[i] = (char)ch;
+			buff[i] = (char)(33 + (r % printable_count));
 		}
 		else
 			buff[i] = ' ';
@@ -77,7 +47,6 @@ void fill_buff(int *array, char *buff, int width, int height)
 			array[i] = -height;
 		else
 			array[i] += 1;
-		i++;
 	}
 	buff[width] = '\0';
 }
@@ -102,6 +71,19 @@ void print_matrix(int *array, char *buff, int width, int height)
 	}
 }
 
+void matrix_rest(int height, int width, int *array, char *buff)
+{
+	if (height == 0)
+		height = MATRIX;
+	printf(GREEN "\n\nFollow the white rabbit.\n\n" RESET);
+	printf(GREEN "\n\nKnock, knock, Neo.\n\n" RESET);
+	gen_matrix(array, width, height);
+	print_matrix(array, buff, width, height);
+	printf(GREEN "\n\nWake Up, Neo...\n\n" RESET);
+	free(array);
+	free(buff);
+}
+
 // Usage:
 // matrix width height
 int matrix(char **argv)
@@ -123,25 +105,12 @@ int matrix(char **argv)
 	}
 	if (width == 0)
 		width = MATRIX;
-
 	array = malloc(width * sizeof(*array));
 	buff = malloc(width + 1);
-
 	if (argv[2])
 		height = atoi(argv[2]);
 	else
 		height = MATRIX;
-	if (height == 0)
-		height = MATRIX;
-
-	printf(GREEN "\n\nFollow the white rabbit.\n\n" RESET);
-	printf(GREEN "\n\nKnock, knock, Neo.\n\n" RESET);
-	gen_matrix(array, width, height);
-	print_matrix(array, buff, width, height);
-
-	printf(GREEN "\n\nWake Up, Neo...\n\n" RESET);
-
-	free(array);
-	free(buff);
+	matrix_rest(height, width, array, buff);
 	return (0);
 }

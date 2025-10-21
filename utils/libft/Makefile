@@ -23,7 +23,7 @@ SRCS	= ft_isalpha.c ft_isdigit.c ft_isalnum.c \
 		ft_isspace.c \
 		check_access.c my_strdup.c \
 		fdprintf.c ./ft_printf/ft_snprintf.c ./ft_printf/ft_snprintf_utils.c \
-		free_2d_array.c my_free.c ft_strcmp.c
+		free_2d_array.c my_free.c ft_strcmp.c gen_random.c \
 
 
 FLAGS	= -Wall -Wextra -Werror 

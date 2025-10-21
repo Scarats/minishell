@@ -6,13 +6,14 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/20 18:25:26 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/21 19:15:41 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
 
+# include <fcntl.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
@@ -24,6 +25,8 @@
 # define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
 # define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
 # define RESET "\x1B[0m"
+
+# define MATRIX 100
 
 // # include <stddef.h>
 typedef struct s_list
@@ -184,5 +187,6 @@ void				free_2d_array(void **arr);
 void				my_free_one(t_list **list, void *target);
 void				my_multi_free(t_list **list_of_list);
 int					ft_strcmp(const char *s1, const char *s2);
+int					gen_random(int size);
 
 #endif

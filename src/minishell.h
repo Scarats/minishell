@@ -27,7 +27,6 @@
 # define BROWN "\x1B[31m"  // Approximation using red (no true brown in ANSI)
 # define PURPLE "\x1B[35m" // Magenta (common substitute for purple)
 # define RESET "\x1B[0m"
-# define MATRIX 100
 # define MAX_REASONABLE_SIZE 100
 
 extern volatile sig_atomic_t stop_flag; // declaration

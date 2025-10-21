@@ -1,18 +1,18 @@
 #include "../minishell.h"
 
-char *my_getcwd(t_root *root)
+char	*my_getcwd(t_root *root)
 {
-	char *path;
+	char	*path;
 
 	path = my_malloc(&root->list_of_list, &root->malloc_root, PATH_MAX + 1);
 	if (!path)
 		return (NULL);
 	if (getcwd(path, PATH_MAX + 1) == NULL)
 		return (NULL);
-	return(path);
+	return (path);
 }
 
-int pwd(void)
+int	pwd(void)
 {
 	char *path;
 

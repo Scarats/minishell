@@ -1,26 +1,24 @@
 #include "../minishell.h"
 
 // Swap the values stored in node, not the node directly.
-void swap_node(t_env *n1, t_env *n2)
+void	swap_node(t_env *n1, t_env *n2)
 {
-	char *name;
-	char *value;
+	char	*name;
+	char	*value;
 
 	if (!n1 || !n2)
 		return ;
 	name = n1->name;
 	value = n1->value;
-	
 	n1->name = n2->name;
 	n1->value = n2->value;
-
 	n2->name = name;
 	n2->value = value;
 }
 
-int is_sorted(t_env *env)
+int	is_sorted(t_env *env)
 {
-	t_env *tmp;
+	t_env	*tmp;
 
 	if (!env)
 		return (1);
@@ -34,9 +32,9 @@ int is_sorted(t_env *env)
 	return (1);
 }
 
-void sort_env(t_env *env)
+void	sort_env(t_env *env)
 {
-	t_env *ptr;
+	t_env	*ptr;
 
 	if (!env)
 		return ;
@@ -51,37 +49,37 @@ void sort_env(t_env *env)
 	}
 }
 
-int export_env(t_env *root_env)
+int	export_env(t_env *root_env)
 {
-    t_env *ptr;
+	t_env	*ptr;
 
-    if (!root_env)
-        return (1);
-    ptr = root_env;
+	if (!root_env)
+		return (1);
+	ptr = root_env;
 	sort_env(ptr);
-    while (ptr->next)
-    {
+	while (ptr->next)
+	{
 		if (!ptr->value)
-     	   printf("export %s\n", ptr->name);
+			printf("export %s\n", ptr->name);
 		else
-     	   printf("export %s=\"%s\"\n", ptr->name, ptr->value);
-        ptr = ptr->next;
-    }
-    return (0);
+			printf("export %s=\"%s\"\n", ptr->name, ptr->value);
+		ptr = ptr->next;
+	}
+	return (0);
 }
 
 // Print n1 variables.
-int env(t_env *root_env)
+int	env(t_env *root_env)
 {
-    t_env *ptr;
+	t_env	*ptr;
 
-    if (!root_env)
-        return (1);
-    ptr = root_env;
-    while (ptr)
-    {
-        printf("%s=%s\n", ptr->name, ptr->value);
-        ptr = ptr->next;
-    }
-    return (0);
+	if (!root_env)
+		return (1);
+	ptr = root_env;
+	while (ptr)
+	{
+		printf("%s=%s\n", ptr->name, ptr->value);
+		ptr = ptr->next;
+	}
+	return (0);
 }

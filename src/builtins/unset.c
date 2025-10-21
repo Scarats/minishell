@@ -1,5 +1,21 @@
 #include "../minishell.h"
 
+void	ici_ca_bz(t_env *prev, t_root *root, t_env *curr, t_env **head)
+{
+	if (prev)
+	{
+		my_free_one(&root->malloc_root, (void *)curr->name);
+		my_free_one(&root->malloc_root, (void *)curr->value);
+		prev->next = curr->next;
+	}
+	else
+	{
+		my_free_one(&root->malloc_root, (void *)curr->name);
+		my_free_one(&root->malloc_root, (void *)curr->value);
+		*head = curr->next;
+	}
+}
+
 int	del_one(t_root *root, t_env **head, const char *name)
 {
 	t_env	*prev;
@@ -14,21 +30,7 @@ int	del_one(t_root *root, t_env **head, const char *name)
 	while (curr)
 	{
 		if (curr->name && !ft_strcmp(curr->name, name))
-		{
-			if (prev)
-			{
-				my_free_one(&root->malloc_root, (void *)curr->name);
-				my_free_one(&root->malloc_root, (void *)curr->value);
-				prev->next = curr->next;
-			}
-			else
-			{
-				my_free_one(&root->malloc_root, (void *)curr->name);
-				my_free_one(&root->malloc_root, (void *)curr->value);
-				*head = curr->next;
-			}
-			return (0);
-		}
+			return (ici_ca_bz(prev, root, curr, head), 0);
 		prev = curr;
 		curr = curr->next;
 	}
