@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   unset.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:02:25 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/22 14:04:11 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 void	ici_ca_bz(t_env *prev, t_root *root, t_env *curr, t_env **head)
@@ -39,8 +51,8 @@ int	del_one(t_root *root, t_env **head, const char *name)
 
 int	unset(t_root *root, t_env **env, char **argv)
 {
-	int i;
-	int error;
+	int	i;
+	int	error;
 
 	if (!env || !*env || !argv)
 		return (1);

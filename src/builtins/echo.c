@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   echo.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:02:08 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/22 14:02:57 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
-void print_array(char **argv)
+void	print_array(char **argv)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (argv[i])
@@ -13,16 +25,16 @@ void print_array(char **argv)
 	}
 }
 
-int is_n(char *str)
+int	is_n(char *str)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	if (!str[0] || !str[1])
 		return (0);
 	if (str[0] == '-' && str[1] == 'n')
 	{
-		while(str[++i])
+		while (str[++i])
 		{
 			if (str[i] != 'n')
 				return (0);
@@ -33,14 +45,12 @@ int is_n(char *str)
 	return (1);
 }
 
-int echo(char **argv)
+int	echo(char **argv)
 {
-	bool n;
+	bool	n;
 
 	if (!argv || !*argv)
 		return (ft_printf("\n"), 0);
-	for (int i = 0; argv[i]; i++)
-		ft_printf(RED"ECHO %i: %s\n"RESET, i, argv[i]);
 	n = false;
 	if (argv[0] == NULL)
 		return ((void)printf("\n"), 0);

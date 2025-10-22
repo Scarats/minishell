@@ -17,9 +17,7 @@ int	get_bin_path(t_node *node, t_main_data *data)
 		return (1);
 	}
 	node->path = find_bin(data->root->env, node->cmd_argv[0]);
-	// if (node->path)
 	return (0);
-	// return (1);
 }
 
 // Open with accrding flags to action number.
@@ -35,12 +33,9 @@ int	open_file(char *filename, int action)
 	else if (action == 3)
 		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd < 0)
-	{
-		fdprintf(2, "minishell: %s: %s\n", filename, strerror(errno));
-		return (1); // Error.
-	}
+		return ((void)fdprintf(2, "minishell: %s: %s\n", filename, strerror(errno)), 1);
 	if (action == 1 && dup2(fd, STDIN_FILENO) == -1)
-		return (close(fd), 1); // Error.
+		return (close(fd), 1);
 	else if (action > 1 && dup2(fd, STDOUT_FILENO) == -1)
 		return (close(fd), 1);
 	close(fd);
@@ -74,23 +69,20 @@ int	redirections(t_node *node, t_main_data *data)
 // Should not return since the program will be replaced by execve.
 int	execution(t_node *node, t_main_data *data)
 {
-	t_env	*path;
-	struct stat st;
+	t_env		*path;
+	struct stat	st;
 
-	printf(GREEN "function : %s\n" RESET, node->cmd_argv[0]);
 	if (!data || !node)
 		return (1);
 	if (node->builtin)
 		return (exec_builtins(node, data));
 	path = find_tenv_var(data->root->env, "PATH");
-	// Command not found
 	if ((!path || !path->value) && !strchr(node->cmd_argv[0], '/'))
 		return (127);
-	// Is a directory
 	if (stat(node->cmd_argv[0], &st) == 0 && S_ISDIR(st.st_mode))
 	{
 		errno = EISDIR;
-        return (126);
+		return (126);
 	}
 	if (strchr(node->cmd_argv[0], '/'))
 		execve(node->cmd_argv[0], node->cmd_argv, t_env_to_char_arr(data->root,
@@ -124,20 +116,16 @@ int	exec_handler(t_main_data *data, t_node *node)
 	int	error;
 
 	error = 0;
-	/* Apply pipes / inherited fds and explicit redirections first */
 	if ((error = set_io_fds(node, data)) != 0)
 		return (error);
 	if ((error = redirections(node, data)) != 0)
 		return (error);
-	/* Pure redirection: nothing to execute */
 	if (!node->cmd_argv || !node->cmd_argv[0])
 		return (0);
-	printf("\n\nbefore builtin\n\n");
 	if (node->builtin)
 		return (execution(node, data));
-	if (get_bin_path(node, data) != 0 /*|| !node->path*/)
+	if (get_bin_path(node, data) != 0)
 		return (127);
-	printf("\n\nbefore exec\n\n");
 	return (execution(node, data));
 }
 
@@ -169,47 +157,50 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 	return (error);
 }
 
+// check if builtin and redirect to the according functions.
+int	if_builtin(t_node *node, t_main_data *data)
+{
+	if (data->in_child)
+		return (exec_handler(data, node));
+	return (exec_builtin_in_parent(node, data));
+}
+
+void	handle_child(t_main_data *data, t_node *node)
+{
+	int		error;
+	t_env	*path;
+
+	error = exec_handler(data, node);
+	if (error)
+	{
+		path = find_tenv_var(data->root->env, "PATH");
+		if (error == 127 && (!path || !path->value))
+			fdprintf(2, "minishell: %s: No such file or directory\n",
+				node->cmd_argv[0]);
+		else
+			print_exec_error(error, node);
+	}
+	my_multi_free(&data->root->list_of_list);
+	exit(error);
+}
+
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
 int	exec_cmd(t_node *node, t_main_data *data)
 {
-	int		pid;
-	int		status;
-	int		error;
-	t_env	*path;
+	int	pid;
+	int	status;
 
-	printf("\n");
-	printf(BROWN "IN EXEC\nlength: %i\ntoken_list_size: %i\n" RESET,
-		data->tok->length, data->tok->token_list_size);
-	for (int i = 0; node->cmd_argv[i]; i++)
-		ft_printf(BLUE "EXEC_CMD node: %s\n" RESET, node->cmd_argv[i]);
-	printf("\n");
 	if (node->builtin)
-	{
-		if (data->in_child)
-			return (exec_handler(data, node));
-		return (exec_builtin_in_parent(node, data));
-	}
+		return (if_builtin(node, data));
+	status = 0;
 	pid = fork();
 	if (pid == -1)
 		return (1);
 	if (pid == 0)
-	{
-		error = exec_handler(data, node);
-		if (error)
-		{
-			path = find_tenv_var(data->root->env, "PATH");
-			if (error == 127 && (!path || !path->value))
-				fdprintf(2, "minishell: %s: No such file or directory\n",
-					node->cmd_argv[0]);
-			else
-				print_exec_error(error, node);
-		}
-		my_multi_free(&data->root->list_of_list);
-		exit(error);
-	}
-	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-		close(node->input_fd);
+		handle_child(data, node);
+	if (node->input_fd != -1
+			&& node->input_fd != STDIN_FILENO) close(node->input_fd);
 	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
 		close(node->output_fd);
 	if (waitpid(pid, &status, 0) == -1)
@@ -219,41 +210,4 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);
-    if (node->builtin)
-    {
-        if (data->in_child)
-            return exec_handler(data, node);
-        return exec_builtin_in_parent(node, data);
-    }
-    pid = fork();
-    if (pid == -1)
-        return 1;
-    if (pid == 0)
-    {
-        signal(SIGQUIT, SIG_DFL);
-        error = exec_handler(data, node);
-        if (error == 127 && node->cmd_argv && node->cmd_argv[0])
-            fdprintf(2, "minishell: %s: command not found\n", node->cmd_argv[0]);
-        my_multi_free(&data->root->list_of_list);
-        exit(error);
-    }
-
-    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-        close(node->input_fd);
-    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-        close(node->output_fd);
-
-    if (waitpid(pid, &status, 0) == -1)
-    {
-        if (WIFEXITED(status))
-            data->root->last_exit_status = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            data->root->last_exit_status = 128 + WTERMSIG(status);
-    }
-    handle_signals();
-    if (WIFEXITED(status))
-        return WEXITSTATUS(status);
-    else if (WIFSIGNALED(status))
-        return (128 + WTERMSIG(status));
-    return 1;
 }

@@ -1,11 +1,23 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   matrix.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:02:19 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/22 14:03:18 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 // Apply random numbers within height and -height to an array of int.
-void gen_matrix(int *array, int width, int height)
+void	gen_matrix(int *array, int width, int height)
 {
-	int i;
-	int prev;
-	int range;
+	int	i;
+	int	prev;
+	int	range;
 
 	i = 1;
 	array[0] = gen_random(width);
@@ -23,11 +35,11 @@ void gen_matrix(int *array, int width, int height)
 }
 
 // Add random char if array[i] is positive, else add space.
-void fill_buff(int *array, char *buff, int width, int height)
+void	fill_buff(int *array, char *buff, int width, int height)
 {
-	int i;
-	int r;
-	const int printable_count = 126 - 33 + 1;
+	int			i;
+	int			r;
+	const int	printable_count = 126 - 33 + 1;
 
 	i = -1;
 	while (++i < width)
@@ -51,9 +63,9 @@ void fill_buff(int *array, char *buff, int width, int height)
 	buff[width] = '\0';
 }
 
-void print_matrix(int *array, char *buff, int width, int height)
+void	print_matrix(int *array, char *buff, int width, int height)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (!stop_flag)
@@ -71,7 +83,7 @@ void print_matrix(int *array, char *buff, int width, int height)
 	}
 }
 
-void matrix_rest(int height, int width, int *array, char *buff)
+void	matrix_rest(int height, int width, int *array, char *buff)
 {
 	if (height == 0)
 		height = MATRIX;
@@ -86,12 +98,12 @@ void matrix_rest(int height, int width, int *array, char *buff)
 
 // Usage:
 // matrix width height
-int matrix(char **argv)
+int	matrix(char **argv)
 {
-	int width;
-	int height;
-	int *array;
-	char *buff;
+	int		width;
+	int		height;
+	int		*array;
+	char	*buff;
 
 	buff = NULL;
 	if (argv[1])
