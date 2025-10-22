@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:16 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 17:11:59 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 17:43:13 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ void	add_var_to_list(t_root *root, t_env **head, t_env *new_var, char **args)
 		ptr->next = new_var;
 	}
 	my_array_addtolist(&root->malloc_root, (void **)args);
-	//new_var->exported = true;
 	new_var->name = args[0];
 	new_var->value = args[1];
 	new_var->next = NULL;

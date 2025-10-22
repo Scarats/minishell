@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:05:40 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:05:41 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 17:48:01 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,16 +44,30 @@ char	**split_env_var(t_root *root, char *env)
 	y = -1;
 	while (env[i] && env[i] != '=')
 		i++;
+	if (!env[i])
+	{
+		env_var[0] = my_malloc(&root->list_of_list, &root->malloc_root, i + 1);
+		if (!env_var[0])
+			return (NULL);
+		ft_memcpy(env_var[0], env, i);
+		env_var[0][i] = '\0';
+		env_var[1] = NULL;
+		env_var[2] = NULL;
+		return (env_var);
+	}
 	env_var[0] = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char)
 			* (i + 1));
 	while (++y < i)
 		env_var[0][y] = env[y];
+	env_var[0][y] = '\0';
 	env_var[1] = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char)
 			* ((ft_strlen(env) - i) + 1));
 	y = 0;
 	i++;
 	while (env[i])
 		env_var[1][y++] = env[i++];
+	env_var[1][y] = '\0';
+	env_var[2] = NULL;
 	return (env_var);
 }
 
