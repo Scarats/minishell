@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/21 19:15:41 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 14:35:34 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+#include <stdint.h>
 
 # define RED "\x1B[91m"    // Lighter red
 # define ORANGE "\x1B[33m" // Orange/yellow

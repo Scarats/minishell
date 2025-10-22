@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipes.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 14:55:44 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/22 14:55:53 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 // Will call the left node.
@@ -7,14 +19,11 @@ int	left(t_node *node, t_main_data *data)
 
 	error = 0;
 	close(node->pipefd[0]);
-	// Make pipe the default stdout in this child first
 	if (dup2(node->pipefd[1], STDOUT_FILENO) == -1)
 		exit(1);
 	close(node->pipefd[1]);
-	// Pass parent's input fd into the left subtree so set_io_fds can use it
 	if (node->input_fd != -1)
 		node->left->input_fd = node->input_fd;
-	// ensure not to pre-set left->output_fd here; pipe is already set via dup2
 	data->in_child = true;
 	error = traverse_tree(node->left, data);
 	my_multi_free(&data->root->list_of_list);
@@ -28,28 +37,19 @@ int	right(t_node *node, t_main_data *data)
 
 	error = 0;
 	close(node->pipefd[1]);
-	// Make pipe the default stdin in this child first
 	if (dup2(node->pipefd[0], STDIN_FILENO) == -1)
 		exit(1);
 	close(node->pipefd[0]);
-	// Pass parent's output fd into the right subtree so set_io_fds can use it
 	if (node->output_fd != -1)
 		node->right->output_fd = node->output_fd;
-	// ensure not to pre-set right->input_fd here; pipe is already set via dup2
 	data->in_child = true;
 	error = traverse_tree(node->right, data);
 	my_multi_free(&data->root->list_of_list);
 	exit(error);
 }
 
-// Will create two childs, left and right, for each end of the pipe.
-int	pipes(t_node *node, t_main_data *data)
+int	pipes_logic(t_node *node, t_main_data *data)
 {
-	int	status_left;
-	int	status_right;
-
-	if (!node || !data)
-		return (1);
 	if (pipe(node->pipefd) == -1)
 		return (perror("pipe"), 1);
 	printf(RED "PIPE\n" RESET);
@@ -65,6 +65,21 @@ int	pipes(t_node *node, t_main_data *data)
 		right(node, data);
 	close(node->pipefd[0]);
 	close(node->pipefd[1]);
+	return (0);
+}
+
+// Will create two childs, left and right, for each end of the pipe.
+int	pipes(t_node *node, t_main_data *data)
+{
+	int	status_left;
+	int	status_right;
+	int	error;
+
+	if (!node || !data)
+		return (1);
+	error = pipes_logic(node, data);
+	if (error)
+		return (error);
 	if (waitpid(node->left_pid, &status_left, 0) == -1
 		|| waitpid(node->right_pid, &status_right, 0) == -1)
 		return (1);
