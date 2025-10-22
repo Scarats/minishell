@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   gen_random.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 19:11:39 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/21 19:15:02 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 15:11:14 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdint.h>
 
 // Read from random, else generate an int from a memory address.
 int gen_random(int size)

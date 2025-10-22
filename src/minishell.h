@@ -77,6 +77,14 @@ typedef enum e_node_type
 	NODE_OR,   // ||
 } t_node_type;
 
+typedef struct s_env
+{
+	char *name;
+	char *value;
+
+	struct s_env *next;
+} t_env;
+
 typedef struct s_env_utils
 {
 	t_env	*head;
@@ -85,14 +93,6 @@ typedef struct s_env_utils
 	char	**tmp;
 	int		i;
 } t_env_utils;
-
-typedef struct s_env
-{
-	char *name;
-	char *value;
-
-	struct s_env *next;
-} t_env;
 
 typedef struct s_redir
 {
@@ -257,5 +257,8 @@ char *my_getcwd(t_root *root);
 void	handle_signals(void);
 int exit_builtin(t_node *node, t_main_data *data);
 void	cleanup(t_main_data *data, t_root *root);
+
+int heredoc(t_redir *redir, t_main_data *data);
+void cleanup_heredocs(t_node *node);
 
 #endif

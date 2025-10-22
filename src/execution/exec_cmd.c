@@ -52,12 +52,23 @@ int	open_file(char *filename, int action)
 int	redirections(t_node *node, t_main_data *data)
 {
 	t_redir	*redir;
+	int		fd;
 
 	if (!data)
 		data = NULL;
 	redir = node->redirection;
 	while (redir)
 	{
+		if (redir->type == TOKEN_HEREDOC)
+		{
+			fd = heredoc(redir, data);
+			if (fd == -1)
+				return (data->root->last_exit_status);
+			if (dup2(fd, STDIN_FILENO) == -1)
+				return (close(fd), 1);
+			close(fd);
+			redir->fd = fd;
+		}
 		if (redir->type == TOKEN_REDIRECT_IN && open_file(redir->filename, 1))
 			return (1);
 		else if (redir->type == TOKEN_REDIRECT_OUT && open_file(redir->filename,
@@ -69,13 +80,27 @@ int	redirections(t_node *node, t_main_data *data)
 	}
 	return (0);
 }
+// Cleanup heredoc temp files
+
+void cleanup_heredocs(t_node *node)
+{
+	t_redir *redir;
+
+	redir = node->redirection;
+    while (redir)
+    {
+        if (redir->type == TOKEN_HEREDOC && redir->filename)
+            unlink(redir->filename);
+        redir = redir->next;
+    }
+}
 
 // Execute the command.
 // Should not return since the program will be replaced by execve.
 int	execution(t_node *node, t_main_data *data)
 {
-	t_env	*path;
-	struct stat st;
+	t_env		*path;
+	struct stat	st;
 
 	printf(GREEN "function : %s\n" RESET, node->cmd_argv[0]);
 	if (!data || !node)
@@ -90,7 +115,7 @@ int	execution(t_node *node, t_main_data *data)
 	if (stat(node->cmd_argv[0], &st) == 0 && S_ISDIR(st.st_mode))
 	{
 		errno = EISDIR;
-        return (126);
+		return (126);
 	}
 	if (strchr(node->cmd_argv[0], '/'))
 		execve(node->cmd_argv[0], node->cmd_argv, t_env_to_char_arr(data->root,
@@ -166,7 +191,10 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 		error = 1;
 	close(saved_in);
 	close(saved_out);
-	return (error);
+	/* If heredoc was interrupted, propagate 130 instead of a generic error */
+	if (error != 0 && data->root->last_exit_status == 130)
+		return 130;
+	return error;
 }
 
 // Handle the execution process.
@@ -214,46 +242,10 @@ int	exec_cmd(t_node *node, t_main_data *data)
 		close(node->output_fd);
 	if (waitpid(pid, &status, 0) == -1)
 		return (1);
+	cleanup_heredocs(node);
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);
-    if (node->builtin)
-    {
-        if (data->in_child)
-            return exec_handler(data, node);
-        return exec_builtin_in_parent(node, data);
-    }
-    pid = fork();
-    if (pid == -1)
-        return 1;
-    if (pid == 0)
-    {
-        signal(SIGQUIT, SIG_DFL);
-        error = exec_handler(data, node);
-        if (error == 127 && node->cmd_argv && node->cmd_argv[0])
-            fdprintf(2, "minishell: %s: command not found\n", node->cmd_argv[0]);
-        my_multi_free(&data->root->list_of_list);
-        exit(error);
-    }
-
-    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-        close(node->input_fd);
-    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-        close(node->output_fd);
-
-    if (waitpid(pid, &status, 0) == -1)
-    {
-        if (WIFEXITED(status))
-            data->root->last_exit_status = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            data->root->last_exit_status = 128 + WTERMSIG(status);
-    }
-    handle_signals();
-    if (WIFEXITED(status))
-        return WEXITSTATUS(status);
-    else if (WIFSIGNALED(status))
-        return (128 + WTERMSIG(status));
-    return 1;
 }
