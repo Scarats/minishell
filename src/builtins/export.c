@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:16 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 17:43:13 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 17:57:02 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	export(t_root *root, char **var)
 		return (1);
 	if (!var || !var[1])
 		return (export_env(root->env));
-	i = -1;
+	i = 0;
 	while (var[++i])
 		set_new_var(root, var[i]);
 	return (0);
