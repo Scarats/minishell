@@ -93,6 +93,13 @@ typedef struct s_env_utils
 	int					i;
 }						t_env_utils;
 
+typedef struct s_expand
+{
+	char	saved;
+	char	*expanded;
+	size_t	var_len;
+} t_expand;
+
 typedef struct s_redir
 {
 	t_token_type		type;
