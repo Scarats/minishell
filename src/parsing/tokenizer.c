@@ -6,12 +6,11 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 15:14:03 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 16:52:53 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
 
 // remove_token: unlink a token from a doubly-linked list
 void	remove_token(t_token **head, t_token *t)
@@ -80,6 +79,22 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
 	return (0);
 }
 
+void	tokenizer_logic(t_main_data *data, t_token_type *tok_type)
+{
+	if (data->tok->curr_char_type == CHAR_PARENTHESIS
+		&& data->tok->prev_char_type == CHAR_PARENTHESIS
+		&& data->tok->pos > data->tok->prev_pos)
+		handle_parenthesis(data, tok_type);
+	else if (data->tok->curr_char_type == CHAR_OPERATOR
+		&& data->tok->prev_char_type == CHAR_OPERATOR
+		&& data->tok->pos > data->tok->prev_pos)
+		handle_operator(data, tok_type);
+	else if (data->tok->curr_char_type != data->tok->prev_char_type)
+		handle_normal_token(data, tok_type);
+	data->tok->prev_char_type = data->tok->curr_char_type;
+	data->tok->pos++;
+}
+
 int	tokenizer(t_main_data *data)
 {
 	t_token_type	tok_type;
@@ -87,22 +102,12 @@ int	tokenizer(t_main_data *data)
 	tok_type = TOKEN_NULL;
 	while (data->tok->pos < data->tok->length)
 	{
-		data->tok->curr_char_type = get_char_type(data->tok->input[data->tok->pos]);
+		data->tok->curr_char_type = get_char_type(data->tok->input
+			[data->tok->pos]);
 		handle_quotes(data->tok, data);
 		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
 				check_next_char(data->tok->input, data->tok->prev_pos));
-		if (data->tok->curr_char_type == CHAR_PARENTHESIS
-			&& data->tok->prev_char_type == CHAR_PARENTHESIS
-			&& data->tok->pos > data->tok->prev_pos)
-			handle_parenthesis(data, &tok_type);
-		else if (data->tok->curr_char_type == CHAR_OPERATOR
-			&& data->tok->prev_char_type == CHAR_OPERATOR
-			&& data->tok->pos > data->tok->prev_pos)
-			handle_operator(data, &tok_type);
-		else if (data->tok->curr_char_type != data->tok->prev_char_type)
-			handle_normal_token(data, &tok_type);
-		data->tok->prev_char_type = data->tok->curr_char_type;
-		data->tok->pos++;
+		tokenizer_logic(data, &tok_type);
 	}
 	if (data->tok->prev_char_type != CHAR_SPACE
 		&& data->tok->prev_pos < data->tok->pos

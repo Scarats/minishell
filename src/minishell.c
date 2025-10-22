@@ -23,8 +23,6 @@ int	init(t_main_data *data)
 
 static void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 {
-	printf(RED "RESET TOK\n" RESET);
-	printf(RED "RESET TOK\n" RESET);
 	tok->input = line;
 	tok->length = (int)ft_strlen(line);
 	tok->pos = 0;
@@ -43,8 +41,6 @@ static void	create_prompt(char *prompt, size_t size)
 	char	hostname[64] = {0};
 	char	username[64] = {0};
 
-	printf(RED "CREATE PROMPT\n" RESET);
-	printf(RED "CREATE PROMPT\n" RESET);
 	gethostname(hostname, sizeof(hostname) - 1);
 	getlogin_r(username, sizeof(username) - 1);
 	ft_bzero(prompt, size);
@@ -101,8 +97,6 @@ void	cleanup(t_main_data *data, t_root *root)
 static int	initialize_shell(t_main_data *data, char *prompt,
 		size_t prompt_size)
 {
-	printf(RED "INIT SHELL\n" RESET);
-	printf(RED "INIT SHELL\n" RESET);
 	create_prompt(prompt, prompt_size);
 	handle_signals();
 	if (init(data))
@@ -129,10 +123,7 @@ static void	handle_eof(char **line)
 
 static int	process_command(t_main_data *data, char *line)
 {
-	printf(RED "PROCESS CMD\n" RESET);
-	printf(RED "PROCESS CMD\n" RESET);
 	reset_tokenizer_for_line(data->tok, line);
-	printf(GREEN "BEFORE PARSER\n" RESET);
 	if (!parser(data))
 		data->root->last_exit_status = traverse_tree(data->node, data);
 	else
@@ -154,8 +145,6 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
 {
 	char	*line;
 
-	printf(RED "EXEC CMD\n" RESET);
-	printf(RED "EXEC CMD\n" RESET);
 	line = NULL;
 	fflush(stdout);
 	line = readline(prompt);
@@ -201,7 +190,6 @@ int	main(int ac, char **av, char **envp)
 	root.env = set_env_var_list(&root, envp);
 	if (initialize_shell(&data, prompt, sizeof(prompt)))
 		return (1);
-	printf(RED "INIT DONE\n" RESET);
 	while (execute_command_loop(&data, prompt))
 		;
 	exit_status = root.last_exit_status;

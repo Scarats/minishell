@@ -34,10 +34,35 @@ int	is_command_end(t_token_type t)
 	return (is_word_token(t) || t == TOKEN_RPAREN);
 }
 
+int	syntax_check_logic(int *i, t_token *token_array, int size)
+{
+	t_token_type	t;
+
+	t = token_array[*i].type;
+	if (is_operator(t))
+	{
+		if (*i == 0 || !is_command_end(token_array[*i - 1].type))
+			return (syntax_error(token_array[*i].word), 1);
+		if (*i + 1 >= size)
+			return (syntax_error("newline"), 1);
+		if (!is_command_start(token_array[*i + 1].type))
+			return (syntax_error(token_array[*i + 1].word), 1);
+	}
+	else if (is_redir(t))
+	{
+		if (*i + 1 >= size)
+			return (syntax_error("newline"), 1);
+		if (!is_word_token(token_array[*i + 1].type))
+			return (syntax_error(token_array[*i + 1].word), 1);
+		*i += 1;
+	}
+	return (0);
+}
+
 int	syntax_check(t_token *token_array, int size)
 {
-	int				i;
-	t_token_type	t;
+	int	i;
+	int error;
 
 	if (!token_array || size <= 0)
 		return (1);
@@ -48,26 +73,12 @@ int	syntax_check(t_token *token_array, int size)
 		&& token_array[0].word[0] == '$')
 		return (fdprintf(2, "minishell: $: command not found\n"), 1);
 	i = 0;
+	error = 0;
 	while (i < size)
 	{
-		t = token_array[i].type;
-		if (is_operator(t))
-		{
-			if (i == 0 || !is_command_end(token_array[i - 1].type))
-				return (syntax_error(token_array[i].word), 1);
-			if (i + 1 >= size)
-				return (syntax_error("newline"), 1);
-			if (!is_command_start(token_array[i + 1].type))
-				return (syntax_error(token_array[i + 1].word), 1);
-		}
-		else if (is_redir(t))
-		{
-			if (i + 1 >= size)
-				return (syntax_error("newline"), 1);
-			if (!is_word_token(token_array[i + 1].type))
-				return (syntax_error(token_array[i + 1].word), 1);
-			i++;
-		}
+		error = syntax_check_logic(&i, token_array, size);
+		if (error)
+			return (error);
 		i++;
 	}
 	return (0);

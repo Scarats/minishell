@@ -9,9 +9,10 @@ SRCS = src/minishell.c \
 	   src/builtins/export.c src/builtins/env.c src/builtins/unset.c \
 	   src/handlers/set_last_exit_status.c src/handlers/error_handler.c \
 	   src/env_var/copy_env.c src/env_var/find_bin.c src/env_var/find_tenv_var.c \
-	   src/handlers/redirections.c
+	   src/handlers/redirections.c src/parsing/tokenizer.c src/parsing/parsing_handlers.c \
+	   src/env_var/expand_env_var.c src/parsing/parsing_utils.c
 
-FLAGS = -Wall -Wextra -Werror -fPIE
+FLAGS = -Wall -Wextra -Werror -fPIE -g
 CC    = cc
 RM    = rm -f
 OBJ_DIR = dot_o
