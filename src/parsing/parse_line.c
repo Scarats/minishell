@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_line.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 18:28:01 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/22 18:29:12 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 // Determine if the word is a command, argument, filename etc...
@@ -20,18 +32,6 @@ t_token_type	get_word_type(t_token *tok)
 		return (TOKEN_ENV_VAR);
 	else
 		return (TOKEN_ARGUMENT);
-}
-
-// A command can start with a word-like token or a left parenthesis
-int	is_command_start(t_token_type t)
-{
-	return (is_word_token(t) || t == TOKEN_LPAREN || t == TOKEN_REDIRECT_OUT);
-}
-
-// A command can end with a word-like token or a right parenthesis
-int	is_command_end(t_token_type t)
-{
-	return (is_word_token(t) || t == TOKEN_RPAREN);
 }
 
 int	syntax_check_logic(int *i, t_token *token_array, int size)
@@ -62,7 +62,7 @@ int	syntax_check_logic(int *i, t_token *token_array, int size)
 int	syntax_check(t_token *token_array, int size)
 {
 	int	i;
-	int error;
+	int	error;
 
 	if (!token_array || size <= 0)
 		return (1);

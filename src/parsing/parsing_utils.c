@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:05:42 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 15:06:56 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 18:36:43 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,17 +27,9 @@ t_char_type	get_char_type(char c)
 	return (CHAR_TEXT);
 }
 
-t_token_type	get_tok_type(char c, char next)
+t_token_type	get_tok_type_rest(char c)
 {
-	if (c == '&' && next == '&')
-		return (TOKEN_AND_AND);
-	else if (c == '|' && next == '|')
-		return (TOKEN_OR);
-	else if (c == '<' && next == '<')
-		return (TOKEN_HEREDOC);
-	else if (c == '>' && next == '>')
-		return (TOKEN_APPEND);
-	else if (c == '$')
+	if (c == '$')
 		return (TOKEN_DOLLAR);
 	else if (c == '&')
 		return (TOKEN_AND);
@@ -60,22 +52,28 @@ t_token_type	get_tok_type(char c, char next)
 	return (TOKEN_TEXT);
 }
 
+t_token_type	get_tok_type(char c, char next)
+{
+	if (c == '&' && next == '&')
+		return (TOKEN_AND_AND);
+	else if (c == '|' && next == '|')
+		return (TOKEN_OR);
+	else if (c == '<' && next == '<')
+		return (TOKEN_HEREDOC);
+	else if (c == '>' && next == '>')
+		return (TOKEN_APPEND);
+	return (get_tok_type_rest(c));
+}
+
 // Turn the token linked list in an array, easier for AST.
 int	list_to_array(t_main_data *data, t_token *token_list, int size)
 {
 	t_token	*curr_tok;
 	int		i;
-	int		real_size;
 
-	real_size = 0;
 	curr_tok = token_list;
 	while (curr_tok)
-	{
-		real_size++;
 		curr_tok = curr_tok->next_token;
-	}
-	size = real_size;
-	data->tok->token_list_size = real_size;
 	i = 0;
 	if (size < 1)
 		size = 1;

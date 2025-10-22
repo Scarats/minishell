@@ -95,10 +95,10 @@ typedef struct s_env_utils
 
 typedef struct s_expand
 {
-	char	saved;
-	char	*expanded;
-	size_t	var_len;
-} t_expand;
+	char				saved;
+	char				*expanded;
+	size_t				var_len;
+}						t_expand;
 
 typedef struct s_redir
 {
@@ -108,13 +108,15 @@ typedef struct s_redir
 	struct s_redir		*next;
 }						t_redir;
 
+
+
 typedef struct s_node
 {
 	t_node_type			type;
 	bool				builtin;
 	bool create_subshell; // Trigger a subshell creation.
 	int in_subshell;      // increase each time we create a subshell,
-		// it's the depth of subshells.
+							// it's the depth of subshells.
 
 	struct s_node		*left;
 	struct s_node		*right;
@@ -188,7 +190,7 @@ typedef struct s_main_data
 
 	bool				in_child;
 
-	t_root *root; // Pointer to root, has to be casted at the beginning. 
+	t_root *root; // Pointer to root, has to be casted at the beginning.
 	// Copy of the root env, to be passed to execve,
 	// it contains the local var of this command.
 	t_env				*curr_env;
@@ -216,79 +218,107 @@ typedef struct s_root
 	t_list				*list_of_list;
 }						t_root;
 
+typedef struct s_cmd_builder
+{
+    t_main_data	*data;
+    t_token		*tok_array;
+    t_node		*node;
+    int			size;
+}	t_cmd_builder;
+
+/* -------------------- Lexer / Tokenizer -------------------- */
 t_token_type			get_tok_type(char c, char next);
 t_char_type				get_char_type(char c);
-t_token_type			get_word_type(t_token *tok);
 char					check_next_char(char *str, int pos);
-t_token					*add_to_list(t_main_data *data, t_token *prev);
-int						parser(t_main_data *data);
-int						traverse_tree(t_node *node, t_main_data *data);
+int						tokenizer(t_main_data *data);
 int						handle_quotes(t_tokenizer *tok, t_main_data *data);
 char					*clean_string(char *input);
+int						create_token(t_main_data *data, int start, int end,
+							t_token_type type);
+t_token					*add_to_list(t_main_data *data, t_token *prev);
+int						list_to_array(t_main_data *data, t_token *token_list,
+							int size);
+
+/* -------------------- Token helpers / expansion -------------------- */
+t_token_type			get_word_type(t_token *tok);
+int						expand_var(t_main_data *data, t_token *tok,
+							t_token *removed, int *removed_dollar);
+int						merge_with_prev_if_adjacent(t_main_data *data,
+							t_token *tok, int start, int just_removed_dollar);
+void					remove_token(t_token **head, t_token *t);
+char					**split_env_var(t_root *root, char *env);
+char					*get_expanded_var(t_main_data *data,
+							const char *var_name);
+
+/* -------------------- Parser / AST construction -------------------- */
 t_node_type				map_token_to_node(t_token_type t);
 int						is_redir(t_token_type type);
-t_redir					*add_redirection(t_main_data *data, t_node *node,
-							t_token_type type);
 int						is_and_or(t_token_type t);
 int						is_word_token(t_token_type t);
 int						is_op_or_redir(t_token_type t);
 int						is_operator(t_token_type t);
-t_node					*build_tree(t_main_data *data, t_token *tok_list,
-							int size, int depth);
-int						get_cmd_argc(t_token *tok_list, int size);
+int						is_command_start(t_token_type t);
+int						is_command_end(t_token_type t);
+int						handle_parenthesis(t_main_data *data,
+							t_token_type *tok_type);
+int						handle_operator(t_main_data *data,
+							t_token_type *tok_type);
 int						check_paren_error(t_token *tok_list, int size);
 int						wrapped_in_paren(t_token *tok_list, int size);
+int						get_cmd_argc(t_token *tok_list, int size);
+t_redir					*add_redirection(t_main_data *data, t_node *node,
+							t_token_type type);
+t_node					*build_tree(t_main_data *data, t_token *tok_list,
+							int size, int depth);
+t_node					*create_node(t_main_data *data, t_token *tok_array,
+							t_node_type type, int size);
+
+/* -------------------- Tree traversal
+	/ Execution control -------------------- */
+int						parser(t_main_data *data);
 int						traverse_tree(t_node *node, t_main_data *data);
+int						execution(t_node *node, t_main_data *data);
+int						exec_handler(t_main_data *data, t_node *node);
 int						exec_cmd(t_node *node, t_main_data *data);
 int						and_and(t_node *node, t_main_data *data);
 int						or_or(t_node *node, t_main_data *data);
 int						pipes(t_node *node, t_main_data *data);
-int						exec_builtins(t_node *node, t_main_data *data);
-int						is_builtin(char *cmd);
-int						cd(t_root *root, t_node *node);
-int						pwd(void);
-int						echo(char **argv);
-int						matrix(char **arg);
-void					handler(int sig);
-t_env					*copy_env(t_list **malloc_list, t_env *env);
-t_env					*set_env_var_list(t_root *root, char **env);
-char					*get_env_var(t_env *env, char *target);
-char					*get_expanded_var(t_main_data *data,
-							const char *var_name);
-int						export(t_root *root, char **var);
-int						env(t_env *root_env);
-int						unset(t_root *root, t_env **env, char **argv);
-int						set_last_exit_status_var(t_root *root, int status);
-void					syntax_error(char *message);
-int						create_token(t_main_data *data, int start, int end,
-							t_token_type type);
-char					**t_env_to_char_arr(t_root *root, t_env *list);
-char					*find_bin(t_env *env, char *bin);
-t_env					*find_tenv_var(t_env *env, char *name);
-void					print_exec_error(int error, t_node *node);
-int						export_env(t_env *root_env);
-char					*my_getcwd(t_root *root);
-void					handle_signals(void);
-int						exit_builtin(t_node *node, t_main_data *data);
-void					cleanup(t_main_data *data, t_root *root);
-int						if_builtin(t_node *node, t_main_data *data);
-int						exec_builtin_in_parent(t_node *node, t_main_data *data);
-int						execution(t_node *node, t_main_data *data);
 int						set_io_fds(t_node *node, t_main_data *data);
 int						redirections(t_node *node, t_main_data *data);
 int						open_file(char *filename, int action);
 int						get_bin_path(t_node *node, t_main_data *data);
-int						exec_handler(t_main_data *data, t_node *node);
-int						tokenizer(t_main_data *data);
-int						list_to_array(t_main_data *data, t_token *token_list,
-							int size);
-int						expand_var(t_main_data *data, t_token *tok,
-							t_token *removed, int *removed_dollar);
-int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
-		int just_removed_dollar);
-int	handle_parenthesis(t_main_data *data, t_token_type *tok_type);
-int	handle_operator(t_main_data *data, t_token_type *tok_type);
-void	remove_token(t_token **head, t_token *t);
-char	**split_env_var(t_root *root, char *env);
+void					print_exec_error(int error, t_node *node);
+
+/* -------------------- Builtins / Command helpers -------------------- */
+int						exec_builtins(t_node *node, t_main_data *data);
+int						is_builtin(char *cmd);
+int						if_builtin(t_node *node, t_main_data *data);
+int						exec_builtin_in_parent(t_node *node, t_main_data *data);
+int						exit_builtin(t_node *node, t_main_data *data);
+int						cd(t_root *root, t_node *node);
+int						pwd(void);
+int						echo(char **argv);
+int						matrix(char **arg);
+
+/* -------------------- Environment / vars / export
+	/ unset -------------------- */
+t_env					*copy_env(t_list **malloc_list, t_env *env);
+t_env					*set_env_var_list(t_root *root, char **env);
+char					*get_env_var(t_env *env, char *target);
+char					*find_bin(t_env *env, char *bin);
+t_env					*find_tenv_var(t_env *env, char *name);
+int						export(t_root *root, char **var);
+int						env(t_env *root_env);
+int						unset(t_root *root, t_env **env, char **argv);
+int						export_env(t_env *root_env);
+char					**t_env_to_char_arr(t_root *root, t_env *list);
+int						set_last_exit_status_var(t_root *root, int status);
+char					*my_getcwd(t_root *root);
+
+/* -------------------- Signals / cleanup / utilities -------------------- */
+void					handler(int sig);
+void					handle_signals(void);
+void					cleanup(t_main_data *data, t_root *root);
+void					syntax_error(char *message);
 
 #endif

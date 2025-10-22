@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:14:12 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 18:17:47 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,8 @@ int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
 	size_t	b;
 	char	*joined;
 
-	if (!tok || !(prev = tok->prev_token))
-		return (0);
-	if (!is_word_token(prev->type) || !is_word_token(tok->type)
+	prev = tok->prev_token;
+	if (!tok || !prev || !is_word_token(prev->type) || !is_word_token(tok->type)
 		|| !no_space_before_token_start(data->tok->input, start,
 			just_removed_dollar))
 		return (0);
@@ -124,15 +123,15 @@ void	expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
 }
 
 int	expand_var(t_main_data *data, t_token *tok, t_token *removed,
-        int *removed_dollar)
+		int *removed_dollar)
 {
-    t_expand	var;
+	t_expand	var;
 
-    ft_bzero(&var, sizeof(var));
-    if (!tok || !tok->slice)
-        return (1);
-    expand_var_logic(&var, data, tok);
-    if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
+	ft_bzero(&var, sizeof(var));
+	if (!tok || !tok->slice)
+		return (1);
+	expand_var_logic(&var, data, tok);
+	if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
 	{
 		remove_token(&data->tok->token_list, removed);
 		if (data->tok->last_token == removed)
