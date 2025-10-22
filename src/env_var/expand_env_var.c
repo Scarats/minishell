@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 16:47:07 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/22 18:01:49 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,24 +24,20 @@ int	no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
 	if (start <= 0)
 		return (0);
 	i = start - 1;
-	// Skip immediate quote delimiters
 	while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
 		i--;
 	if (i < 0)
 		return (0);
-	// Handle a preceding '$'
 	if (s[i] == '$')
 	{
 		if (!allow_skip_dollar)
 			return (0);
-		// Skip this '$' and any quote delimiters before it
 		i--;
 		while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
 			i--;
 		if (i < 0)
 			return (0);
 	}
-	// Merge only when there is no space separating
 	return (s[i] != ' ');
 }
 
@@ -105,44 +101,45 @@ int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
 	return (0);
 }
 
-int	expand_var(t_main_data *data, t_token *tok, t_token *removed, int *removed_dollar)
+int	expand_var(t_main_data *data, t_token *tok, t_token *removed,
+		int *removed_dollar)
 {
-    char	saved;
-    char	*expanded;
-    size_t	var_len;
+	char	saved;
+	char	*expanded;
+	size_t	var_len;
 
-    expanded = NULL;
-    var_len = 0;
-    if (!tok || !tok->slice)
-        return (1);
-    if (tok->slice[0] == '?')
-    {
-        var_len = 1;
-        expanded = ft_itoa(data->root->last_exit_status);
-        if (expanded)
-            my_addtolist(&data->malloc_tok, expanded);
-    }
-    else if (ft_isalpha((unsigned char)tok->slice[0]) || tok->slice[0] == '_')
-    {
-        var_len = 1;
-        while (tok->slice[var_len]
-            && (ft_isalnum((unsigned char)tok->slice[var_len])
-                || tok->slice[var_len] == '_'))
-            var_len++;
-        saved = tok->slice[var_len];
-        tok->slice[var_len] = '\0';
-        expanded = get_env_var(data->root->env, tok->slice);
-        tok->slice[var_len] = saved;
-    }
-    if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
-    {
-        remove_token(&data->tok->token_list, removed);
-        if (data->tok->last_token == removed)
-            data->tok->last_token = tok;
-        *removed_dollar = 1;
-    }
-    tok->type = get_word_type(tok);
+	expanded = NULL;
+	var_len = 0;
+	if (!tok || !tok->slice)
+		return (1);
+	if (tok->slice[0] == '?')
+	{
+		var_len = 1;
+		expanded = ft_itoa(data->root->last_exit_status);
+		if (expanded)
+			my_addtolist(&data->malloc_tok, expanded);
+	}
+	else if (ft_isalpha((unsigned char)tok->slice[0]) || tok->slice[0] == '_')
+	{
+		var_len = 1;
+		while (tok->slice[var_len]
+			&& (ft_isalnum((unsigned char)tok->slice[var_len])
+				|| tok->slice[var_len] == '_'))
+			var_len++;
+		saved = tok->slice[var_len];
+		tok->slice[var_len] = '\0';
+		expanded = get_env_var(data->root->env, tok->slice);
+		tok->slice[var_len] = saved;
+	}
+	if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
+	{
+		remove_token(&data->tok->token_list, removed);
+		if (data->tok->last_token == removed)
+			data->tok->last_token = tok;
+		*removed_dollar = 1;
+	}
+	tok->type = get_word_type(tok);
 	if (set_token_word_with_suffix(data, tok, expanded, var_len))
-        return (1);
-    return (0);
+		return (1);
+	return (0);
 }
