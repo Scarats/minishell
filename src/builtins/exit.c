@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exit.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/22 15:00:35 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/22 15:01:31 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../minishell.h"
 
 static int	is_numeric(char *str)
@@ -52,10 +64,8 @@ int	exit_builtin(t_node *node, t_main_data *data)
 		{
 			exit_code = ft_atoi(node->cmd_argv[1]);
 			if (node->cmd_argv[2])
-			{
-				fdprintf(2, "minishell: exit: too many arguments\n");
-				return (1);
-			}
+				return ((void)fdprintf(2,
+						"minishell: exit: too many arguments\n"), 1);
 		}
 	}
 	perform_exit(data, exit_code);
