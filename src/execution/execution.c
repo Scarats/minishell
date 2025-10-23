@@ -20,7 +20,7 @@ int create_subshell(t_node *node, t_main_data *data)
 		my_multi_free(&data->root->list_of_list);
 		exit(error);
 	}
-	if (waitpid(pid, &status, 0) == -1)
+	if (waitpid(pid, &status, 0) != -1)
     {
         if (WIFEXITED(status))
             data->root->last_exit_status = WEXITSTATUS(status);

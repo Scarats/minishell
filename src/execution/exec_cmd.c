@@ -36,7 +36,7 @@ int	open_file(char *filename, int action)
 		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd < 0)
 	{
-		fdprintf(2, "minishell: %s: %s\n", filename, strerror(errno));
+		//fdprintf(2, "minishell: %s: %s\n", filename, strerror(errno));
 		return (1); // Error.
 	}
 	if (action == 1 && dup2(fd, STDIN_FILENO) == -1)
@@ -62,8 +62,12 @@ int	redirections(t_node *node, t_main_data *data)
 		if (redir->type == TOKEN_HEREDOC)
 		{
 			fd = heredoc(redir, data);
-			if (fd == -1)
-				return (data->root->last_exit_status);
+			if (fd < 0)
+			{
+				if(data->root->last_exit_status == 130)
+					return (130);
+				return (1);
+			}
 			if (dup2(fd, STDIN_FILENO) == -1)
 				return (close(fd), 1);
 			close(fd);
@@ -102,7 +106,7 @@ int	execution(t_node *node, t_main_data *data)
 	t_env		*path;
 	struct stat	st;
 
-	printf(GREEN "function : %s\n" RESET, node->cmd_argv[0]);
+	//printf(GREEN "function : %s\n" RESET, node->cmd_argv[0]);
 	if (!data || !node)
 		return (1);
 	if (node->builtin)
@@ -153,7 +157,12 @@ int	exec_handler(t_main_data *data, t_node *node)
 	if ((error = set_io_fds(node, data)) != 0)
 		return (error);
 	if ((error = redirections(node, data)) != 0)
+	{
+		if (error == 130 || data->root->last_exit_status == 130)
+			return (130);
 		return (error);
+	}
+	//	return (error);
 	/* Pure redirection: nothing to execute */
 	if (!node->cmd_argv || !node->cmd_argv[0])
 		return (0);
@@ -162,6 +171,8 @@ int	exec_handler(t_main_data *data, t_node *node)
 		return (execution(node, data));
 	if (get_bin_path(node, data) != 0 /*|| !node->path*/)
 		return (127);
+	if (data->root->last_exit_status == 130)
+		return (130);
 	printf("\n\nbefore exec\n\n");
 	return (execution(node, data));
 }
@@ -184,16 +195,16 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 		return (1);
 	}
 	error = exec_handler(data, node);
-	// Restore stdio no matter what
+	// Restore stdio no matter what 
 	if (dup2(saved_in, STDIN_FILENO) == -1)
 		error = 1;
 	if (dup2(saved_out, STDOUT_FILENO) == -1)
 		error = 1;
 	close(saved_in);
 	close(saved_out);
-	/* If heredoc was interrupted, propagate 130 instead of a generic error */
-	if (error != 0 && data->root->last_exit_status == 130)
-		return 130;
+/* If heredoc was interrupted, always propagate 130 regardless of builtin success */
+	if (data->root->last_exit_status == 130)
+    	return 130;
 	return error;
 }
 
@@ -224,7 +235,7 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	if (pid == 0)
 	{
 		error = exec_handler(data, node);
-		if (error)
+		if (error && error != 130)
 		{
 			path = find_tenv_var(data->root->env, "PATH");
 			if (error == 127 && (!path || !path->value))
@@ -234,6 +245,8 @@ int	exec_cmd(t_node *node, t_main_data *data)
 				print_exec_error(error, node);
 		}
 		my_multi_free(&data->root->list_of_list);
+		if(data->root->last_exit_status == 130)
+			exit(130);
 		exit(error);
 	}
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)

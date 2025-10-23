@@ -2,6 +2,19 @@
 
 volatile sig_atomic_t	stop_flag = 0;
 
+void signal_init(void)
+{
+    struct sigaction sa;
+    
+    sa.sa_handler = handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    
+    if (sigaction(SIGINT, &sa, NULL) == -1 ||
+        sigaction(SIGQUIT, &sa, NULL) == -1)
+        exit(1);
+}
+
 int	init(t_main_data *data)
 {
 	data->tok = my_malloc(&data->root->list_of_list, &data->root->malloc_root,
@@ -134,9 +147,14 @@ static int	process_command(t_main_data *data, char *line)
 	reset_tokenizer_for_line(data->tok, line);
 	printf(GREEN "BEFORE PARSER\n" RESET);
 	if (!parser(data))
-		data->root->last_exit_status = traverse_tree(data->node, data);
+	{
+		if (data->root->last_exit_status != 130)
+			data->root->last_exit_status = traverse_tree(data->node, data);
+		//fdprintf(STDERR_FILENO, "DEBUG: Final last_exit_status: %d\n", data->root->last_exit_status);
+	}
 	else
 		return (1);
+	fdprintf(STDERR_FILENO, "DEBUG: FINAL exit status: %d\n", data->root->last_exit_status);
 	return (data->root->last_exit_status);
 }
 
@@ -154,14 +172,13 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
 {
 	char	*line;
 
-	printf(RED "EXEC CMD\n" RESET);
-	printf(RED "EXEC CMD\n" RESET);
 	line = NULL;
 	fflush(stdout);
 	line = readline(prompt);
 	if (!line)
 	{
 		handle_eof(&line);
+		ft_printf("no line");
 		return (false);
 	}
 	if (line[0] == '\0')

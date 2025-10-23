@@ -25,8 +25,8 @@ void print_exec_error(int error, t_node *node)
             fdprintf(2, "minishell: %s: Exec format error\n", cmd);
         else if (errno == EISDIR)
             fdprintf(2, "minishell: %s: Is a directory\n", cmd);
-        else
-            fdprintf(2, "minishell: %s: %s\n", cmd, strerror(errno));
+        //else
+            //fdprintf(2, "minishell: %s: %s\n", cmd, strerror(errno));
     }
 }
 

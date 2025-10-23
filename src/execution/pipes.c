@@ -78,6 +78,6 @@ int	pipes(t_node *node, t_main_data *data)
 		data->root->last_exit_status = 128 + WTERMSIG(status_right);
 		return (data->root->last_exit_status);
 	}
-	data->root->last_exit_status = 0;
-	return (0);
+	//data->root->last_exit_status = 0;
+	return (data->root->last_exit_status);
 }

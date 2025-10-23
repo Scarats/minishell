@@ -37,6 +37,7 @@ int echo(char **argv)
 {
 	bool n;
 
+	fdprintf(STDERR_FILENO, "DEBUG: echo argv[0]=%s\n", argv[0]);
 	if (!argv || !*argv)
 		return (ft_printf("\n"), 0);
 	for (int i = 0; argv[i]; i++)
