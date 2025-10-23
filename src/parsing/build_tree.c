@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:50:28 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 19:28:40 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:45:51 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,13 +68,15 @@ int	create_node_cmd(t_main_data *data, t_token *tok_array, t_node *node,
 {
 	t_cmd_builder	builder;
 	int				cmd_argc;
+	t_root			*root;
 
+	root = data->root;
 	builder.data = data;
 	builder.tok_array = tok_array;
 	builder.node = node;
 	builder.size = size;
 	cmd_argc = get_cmd_argc(tok_array, size);
-	node->cmd_argv = my_malloc(&data->root->list_of_list, &data->malloc_tree,
+	node->cmd_argv = my_malloc(&root->list_of_list, &data->malloc_tree,
 			sizeof(char *) * (cmd_argc + 2));
 	if (!node->cmd_argv)
 		return (1);
@@ -90,9 +92,10 @@ t_node	*create_node(t_main_data *data, t_token *tok_array, t_node_type type,
 		int size)
 {
 	t_node	*node;
+	t_root	*root;
 
-	node = my_malloc(&data->root->list_of_list, &data->malloc_tree,
-			sizeof(t_node));
+	root = data->root;
+	node = my_malloc(&root->list_of_list, &data->malloc_tree, sizeof(t_node));
 	node->type = type;
 	node->create_subshell = false;
 	node->builtin = false;

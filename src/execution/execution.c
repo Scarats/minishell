@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:44:54 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:48:06 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:48:23 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,14 @@ int	execution(t_node *node, t_main_data *data)
 {
 	t_env		*path;
 	struct stat	st;
+	t_root		*root;
 
+	root = data->root;
 	if (!data || !node)
 		return (1);
 	if (node->builtin)
 		return (exec_builtins(node, data));
-	path = find_tenv_var(data->root->env, "PATH");
+	path = find_tenv_var(root->env, "PATH");
 	if ((!path || !path->value) && !strchr(node->cmd_argv[0], '/'))
 		return (127);
 	if (stat(node->cmd_argv[0], &st) == 0 && S_ISDIR(st.st_mode))
@@ -32,30 +34,34 @@ int	execution(t_node *node, t_main_data *data)
 		return (126);
 	}
 	if (strchr(node->cmd_argv[0], '/'))
-		execve(node->cmd_argv[0], node->cmd_argv, t_env_to_char_arr(data->root,
-				data->root->env));
+		execve(node->cmd_argv[0], node->cmd_argv, t_env_to_char_arr(root,
+				root->env));
 	else if (!node->path)
 		return (127);
-	return (execve(node->path, node->cmd_argv, t_env_to_char_arr(data->root,
-				data->root->env)));
+	return (execve(node->path, node->cmd_argv, t_env_to_char_arr(root,
+				root->env)));
 }
 
 void	subshell_child(t_main_data *data, t_node *node)
 {
-	int	error;
+	int		error;
+	t_root	*root;
 
+	root = data->root;
 	error = 0;
 	node->create_subshell = false;
 	error = traverse_tree(node, data);
-	my_multi_free(&data->root->list_of_list);
+	my_multi_free(&root->list_of_list);
 	exit(error);
 }
 
 int	create_subshell(t_node *node, t_main_data *data)
 {
-	int	pid;
-	int	status;
+	int		pid;
+	int		status;
+	t_root	*root;
 
+	root = data->root;
 	status = 0;
 	pid = -1;
 	pid = fork();
@@ -66,9 +72,9 @@ int	create_subshell(t_node *node, t_main_data *data)
 	if (waitpid(pid, &status, 0) == -1)
 	{
 		if (WIFEXITED(status))
-			data->root->last_exit_status = WEXITSTATUS(status);
+			root->last_exit_status = WEXITSTATUS(status);
 		else if (WIFSIGNALED(status))
-			data->root->last_exit_status = 128 + WTERMSIG(status);
+			root->last_exit_status = 128 + WTERMSIG(status);
 	}
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));

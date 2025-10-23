@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:17:47 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:31:50 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,8 @@ int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
 		return (0);
 	a = ft_strlen(prev->word);
 	b = ft_strlen(tok->word);
-	joined = my_malloc(&data->root->list_of_list, &data->malloc_tok, a + b + 1);
+	joined = my_malloc(&((t_root *)data->root)->list_of_list, &data->malloc_tok,
+			a + b + 1);
 	ft_memcpy(joined, prev->word, a);
 	ft_memcpy(joined + a, tok->word, b);
 	joined[a + b] = '\0';
@@ -88,8 +89,8 @@ int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
 	else
 		vlen = 0;
 	rlen = ft_strlen(rest);
-	joined = my_malloc(&data->root->list_of_list, &data->malloc_tok, vlen + rlen
-			+ 1);
+	joined = my_malloc(&((t_root *)data->root)->list_of_list, &data->malloc_tok,
+			vlen + rlen + 1);
 	if (vlen)
 		ft_memcpy(joined, expanded, vlen);
 	if (rlen)
@@ -101,10 +102,13 @@ int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
 
 void	expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
 {
+	t_root	*root;
+
+	root = data->root;
 	if (tok->slice[0] == '?')
 	{
 		var->var_len = 1;
-		var->expanded = ft_itoa(data->root->last_exit_status);
+		var->expanded = ft_itoa(root->last_exit_status);
 		if (var->expanded)
 			my_addtolist(&data->malloc_tok, var->expanded);
 	}
@@ -117,7 +121,7 @@ void	expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
 			var->var_len++;
 		var->saved = tok->slice[var->var_len];
 		tok->slice[var->var_len] = '\0';
-		var->expanded = get_env_var(data->root->env, tok->slice);
+		var->expanded = get_env_var(root->env, tok->slice);
 		tok->slice[var->var_len] = var->saved;
 	}
 }

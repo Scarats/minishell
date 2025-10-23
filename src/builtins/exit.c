@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:00:35 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 15:01:31 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:45:19 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,21 +37,26 @@ static int	is_numeric(char *str)
 
 static void	perform_exit(t_main_data *data, int exit_code)
 {
+	t_root	*root;
+
+	root = data->root;
 	if (data->in_child)
 		exit(exit_code & 255);
 	cleanup(data, data->root);
-	ft_lstclear(&data->root->list_of_list, NULL);
-	my_free(&data->root->malloc_root);
+	ft_lstclear(&root->list_of_list, NULL);
+	my_free(&root->malloc_root);
 	exit(exit_code & 255);
 }
 
 int	exit_builtin(t_node *node, t_main_data *data)
 {
-	int	exit_code;
+	int		exit_code;
+	t_root	*root;
 
+	root = data->root;
 	if (!data->in_child)
 		ft_printf("exit\n");
-	exit_code = data->root->last_exit_status;
+	exit_code = root->last_exit_status;
 	if (node->cmd_argv[1])
 	{
 		if (!is_numeric(node->cmd_argv[1]))

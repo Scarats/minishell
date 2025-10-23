@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:29:33 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:29:39 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:20:36 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,9 +25,10 @@ char	check_next_char(char *str, int pos)
 t_token	*add_to_list(t_main_data *data, t_token *prev)
 {
 	t_token	*new;
+	t_root	*root;
 
-	new = my_malloc(&data->root->list_of_list, &data->malloc_tok,
-			sizeof(t_token));
+	root = data->root;
+	new = my_malloc(&root->list_of_list, &data->malloc_tok, sizeof(t_token));
 	if (!new)
 		return (NULL);
 	if (prev == NULL)

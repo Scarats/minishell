@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 13:34:32 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:07:12 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,10 +183,6 @@ typedef struct s_tokenizer
 	int					token_list_size; // Keep track of the number of tokens
 }						t_tokenizer;
 
-typedef struct s_root
-{
-}				t_root;
-
 typedef struct s_main_data
 {
 	t_node				*node;
@@ -202,7 +198,7 @@ typedef struct s_main_data
 
 	bool				in_child;
 
-	t_root				*root; // Pointer to root,
+	void				*root; // Pointer to root,
 	// has to be casted at the beginning.
 	// Copy of the root env, to be passed to execve,
 	// it contains the local var of this command.
@@ -333,10 +329,10 @@ void					handler(int sig);
 void					handle_signals(void);
 void					cleanup(t_main_data *data, t_root *root);
 void					syntax_error(char *message);
-int						initialize_shell(t_main_data *data,
+int						initialize_shell(t_root *root,
 							char *prompt, size_t prompt_size);
 void					reset_tokenizer_for_line(t_tokenizer *tok, char *line);
-int						init(t_main_data *data);
+int						init(t_root *root);
 void					create_prompt(char *prompt, size_t size);
 void					cleanup_after_command(t_main_data *data, char **line);
 void					handle_eof(char **line);

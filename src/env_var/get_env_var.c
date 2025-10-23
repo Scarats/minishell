@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:05:40 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:27:18 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:13:28 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	*get_env_var(t_env *env, char *target)
 }
 
 // allocate and build NAME with no '=' (no value)
-static char	**env_var_no_value(t_root *root, char *env, int name_len)
+char	**env_var_no_value(t_root *root, char *env, int name_len)
 {
 	char	**env_var;
 
@@ -50,7 +50,7 @@ static char	**env_var_no_value(t_root *root, char *env, int name_len)
 }
 
 // allocate and build NAME and VALUE from NAME=VALUE
-static char	**env_var_with_value(t_root *root, char *env, int i)
+char	**env_var_with_value(t_root *root, char *env, int i)
 {
 	char	**env_var;
 	int		y;

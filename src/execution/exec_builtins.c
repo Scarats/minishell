@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:09:55 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:40:10 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:48:37 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,11 @@ int	if_builtin(t_node *node, t_main_data *data)
 
 void	find_builtin(int *error, t_node *node, int length, t_main_data *data)
 {
+	t_root	*root;
+
+	root = data->root;
 	if (!ft_strncmp(node->cmd_argv[0], "cd", length))
-		*error = cd(data->root, node);
+		*error = cd(root, node);
 	else if (!ft_strncmp(node->cmd_argv[0], "pwd", length))
 		*error = pwd();
 	else if (!ft_strncmp(node->cmd_argv[0], "echo", length))
@@ -58,11 +61,11 @@ void	find_builtin(int *error, t_node *node, int length, t_main_data *data)
 	else if (!ft_strncmp(node->cmd_argv[0], "matrix", length))
 		*error = matrix(node->cmd_argv);
 	else if (!ft_strncmp(node->cmd_argv[0], "export", length))
-		*error = export(data->root, node->cmd_argv);
+		*error = export(root, node->cmd_argv);
 	else if (!ft_strncmp(node->cmd_argv[0], "env", length))
-		*error = env(data->root->env);
+		*error = env(root->env);
 	else if (!ft_strncmp(node->cmd_argv[0], "unset", length))
-		*error = unset(data->root, &data->root->env, &node->cmd_argv[1]);
+		*error = unset(root, &root->env, &node->cmd_argv[1]);
 	else if (!ft_strncmp(node->cmd_argv[0], "exit", length))
 		*error = exit_builtin(node, data);
 	else

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:42:15 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:58:11 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:48:13 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 // Check if binary exist and if user has access.
 int	get_bin_path(t_node *node, t_main_data *data)
 {
+	t_root	*root;
+
+	root = data->root;
 	if (!data)
 		data = NULL;
 	if (!node->cmd_argv || !node->cmd_argv[0])
@@ -28,7 +31,7 @@ int	get_bin_path(t_node *node, t_main_data *data)
 		}
 		return (1);
 	}
-	node->path = find_bin(data->root->env, node->cmd_argv[0]);
+	node->path = find_bin(root->env, node->cmd_argv[0]);
 	return (0);
 }
 

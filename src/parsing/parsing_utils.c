@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:05:42 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:36:43 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:47:26 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,15 +70,17 @@ int	list_to_array(t_main_data *data, t_token *token_list, int size)
 {
 	t_token	*curr_tok;
 	int		i;
+	t_root	*root;
 
+	root = data->root;
 	curr_tok = token_list;
 	while (curr_tok)
 		curr_tok = curr_tok->next_token;
 	i = 0;
 	if (size < 1)
 		size = 1;
-	data->tok->token_array = my_malloc(&data->root->list_of_list,
-			&data->malloc_tok, sizeof(t_token) * size);
+	data->tok->token_array = my_malloc(&root->list_of_list, &data->malloc_tok,
+			sizeof(t_token) * size);
 	if (!data->tok->token_array && size > 0)
 		return (1);
 	curr_tok = token_list;

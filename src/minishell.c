@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 13:07:43 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:48:47 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,20 @@ void	handler(int sig)
 	}
 }
 
-static int	process_command(t_main_data *data, char *line)
+int	process_command(t_main_data *data, char *line)
 {
+	t_root	*root;
+
+	root = data->root;
 	reset_tokenizer_for_line(data->tok, line);
 	if (!parser(data))
-		data->root->last_exit_status = traverse_tree(data->node, data);
+		root->last_exit_status = traverse_tree(data->node, data);
 	else
 		return (1);
-	return (data->root->last_exit_status);
+	return (root->last_exit_status);
 }
 
-bool	execute_command_loop(t_main_data *data, char *prompt)
+bool	execute_command_loop(t_root *root, char *prompt)
 {
 	char	*line;
 
@@ -75,15 +78,13 @@ bool	execute_command_loop(t_main_data *data, char *prompt)
 		handle_empty_input(&line);
 		return (true);
 	}
-	if (!ft_strncmp(line, "exit", 5))
-	{
-		free(line);
-		line = NULL;
+	printf(RED "BEFORE INIT\n" RESET);
+	if (init(root))
 		return (false);
-	}
+	printf(RED "NOPE\n" RESET);
 	add_history(line);
-	process_command(data, line);
-	cleanup_after_command(data, &line);
+	process_command(root->data, line);
+	cleanup_after_command(root->data, &line);
 	return (true);
 }
 
@@ -99,15 +100,12 @@ int	main(int ac, char **av, char **envp)
 	(void)ac;
 	(void)av;
 	exit_status = 0;
-	root.malloc_root = NULL;
-	root.env = NULL;
-	root.list_of_list = NULL;
 	root.data = &data;
 	data.root = &root;
 	root.env = set_env_var_list(&root, envp);
-	if (initialize_shell(&data, prompt, sizeof(prompt)))
+	if (initialize_shell(&root, prompt, sizeof(prompt)))
 		return (1);
-	while (execute_command_loop(&data, prompt))
+	while (execute_command_loop(&root, prompt))
 		;
 	exit_status = root.last_exit_status;
 	cleanup(&data, &root);

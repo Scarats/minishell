@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:44:19 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:48:29 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,18 +37,20 @@ void	handle_child(t_main_data *data, t_node *node)
 {
 	int		error;
 	t_env	*path;
+	t_root	*root;
 
+	root = data->root;
 	error = exec_handler(data, node);
 	if (error)
 	{
-		path = find_tenv_var(data->root->env, "PATH");
+		path = find_tenv_var(root->env, "PATH");
 		if (error == 127 && (!path || !path->value))
 			fdprintf(2, "minishell: %s: No such file or directory\n",
 				node->cmd_argv[0]);
 		else
 			print_exec_error(error, node);
 	}
-	my_multi_free(&data->root->list_of_list);
+	my_multi_free(&root->list_of_list);
 	exit(error);
 }
 

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:01:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 13:32:43 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:44:57 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,12 @@ void	handle_eof(char **line)
 
 void	cleanup_after_command(t_main_data *data, char **line)
 {
+	t_root	*root;
+
+	root = data->root;
 	my_free(&data->malloc_tok);
 	my_free(&data->malloc_tree);
-	data->node = NULL;
+	ft_memset(data, 0, sizeof(t_main_data));
 	g_stop_flag = 0;
 	free(*line);
 	*line = NULL;

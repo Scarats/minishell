@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 13:06:32 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:44:48 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,14 @@ void	create_prompt(char *prompt, size_t size)
 	ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", size);
 }
 
-int	init(t_main_data *data)
+int	init(t_root *root)
 {
-	data->tok = my_malloc(&data->root->list_of_list, &data->root->malloc_root,
+	t_main_data	*data;
+
+	data = root->data;
+	ft_memset(data, 0, sizeof(*data));
+	data->root = root;
+	data->tok = my_malloc(&root->list_of_list, &root->malloc_root,
 			sizeof(t_tokenizer));
 	if (!data->tok)
 		return (1);
@@ -44,7 +49,6 @@ int	init(t_main_data *data)
 	data->malloc_tree = NULL;
 	data->error = 0;
 	data->in_child = false;
-	data->root->last_exit_status = 0;
 	return (0);
 }
 
@@ -63,11 +67,11 @@ void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 	tok->token_list_size = 0;
 }
 
-int	initialize_shell(t_main_data *data, char *prompt, size_t prompt_size)
+int	initialize_shell(t_root *root, char *prompt, size_t prompt_size)
 {
 	create_prompt(prompt, prompt_size);
 	handle_signals();
-	if (init(data))
+	if (init(root))
 	{
 		fdprintf(2, "Initialization failed\n");
 		return (1);

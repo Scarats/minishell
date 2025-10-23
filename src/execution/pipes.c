@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:55:44 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:55:53 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:34:52 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,10 @@
 // Will call the left node.
 int	left(t_node *node, t_main_data *data)
 {
-	int	error;
+	int		error;
+	t_root	*root;
 
+	root = data->root;
 	error = 0;
 	close(node->pipefd[0]);
 	if (dup2(node->pipefd[1], STDOUT_FILENO) == -1)
@@ -26,15 +28,17 @@ int	left(t_node *node, t_main_data *data)
 		node->left->input_fd = node->input_fd;
 	data->in_child = true;
 	error = traverse_tree(node->left, data);
-	my_multi_free(&data->root->list_of_list);
+	my_multi_free(&root->list_of_list);
 	exit(error);
 }
 
 // Will call the right node.
 int	right(t_node *node, t_main_data *data)
 {
-	int	error;
+	int		error;
+	t_root	*root;
 
+	root = data->root;
 	error = 0;
 	close(node->pipefd[1]);
 	if (dup2(node->pipefd[0], STDIN_FILENO) == -1)
@@ -44,7 +48,7 @@ int	right(t_node *node, t_main_data *data)
 		node->right->output_fd = node->output_fd;
 	data->in_child = true;
 	error = traverse_tree(node->right, data);
-	my_multi_free(&data->root->list_of_list);
+	my_multi_free(&root->list_of_list);
 	exit(error);
 }
 
@@ -71,28 +75,28 @@ int	pipes_logic(t_node *node, t_main_data *data)
 // Will create two childs, left and right, for each end of the pipe.
 int	pipes(t_node *node, t_main_data *data)
 {
-	int	status_left;
-	int	status_right;
-	int	error;
+	int		status_left;
+	int		status_right;
+	t_root	*root;
 
 	if (!node || !data)
 		return (1);
-	error = pipes_logic(node, data);
-	if (error)
-		return (error);
+	root = data->root;
+	if (pipes_logic(node, data))
+		return (1);
 	if (waitpid(node->left_pid, &status_left, 0) == -1
 		|| waitpid(node->right_pid, &status_right, 0) == -1)
 		return (1);
 	if (WIFEXITED(status_right))
 	{
-		data->root->last_exit_status = WEXITSTATUS(status_right);
-		return (data->root->last_exit_status);
+		root->last_exit_status = WEXITSTATUS(status_right);
+		return (root->last_exit_status);
 	}
 	if (WIFSIGNALED(status_right))
 	{
-		data->root->last_exit_status = 128 + WTERMSIG(status_right);
-		return (data->root->last_exit_status);
+		root->last_exit_status = 128 + WTERMSIG(status_right);
+		return (root->last_exit_status);
 	}
-	data->root->last_exit_status = 0;
+	root->last_exit_status = 0;
 	return (0);
 }

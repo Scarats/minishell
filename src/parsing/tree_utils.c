@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:41:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:42:31 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 15:47:51 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,10 @@ t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type)
 {
 	t_redir	*redirection;
 	t_redir	*last;
+	t_root	*root;
 
-	redirection = my_malloc(&data->root->list_of_list, &data->malloc_tree,
+	root = data->root;
+	redirection = my_malloc(&root->list_of_list, &data->malloc_tree,
 			sizeof(t_redir));
 	redirection->type = type;
 	redirection->fd = -1;
