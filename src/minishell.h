@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
+/*   Updated: 2025/10/23 13:34:32 by tcardair         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -28,7 +40,7 @@
 # define RESET "\x1B[0m"
 # define MAX_REASONABLE_SIZE 100
 
-extern volatile sig_atomic_t stop_flag; // declaration
+extern volatile sig_atomic_t	g_stop_flag; // declaration
 
 typedef enum e_char_type
 {
@@ -45,23 +57,24 @@ typedef enum e_char_type
 typedef enum e_token_type
 {
 	TOKEN_ERROR,
-	TOKEN_CMD,          // ex: cat, sleep, ls ...
-	TOKEN_ARGUMENT,     // ex: -a, -l, file.txt ... (a file without a redirection)
-	TOKEN_FILE,         // ex: > file.txt, file.txt ... (file with redirection)
-	TOKEN_PIPE,         // |
-	TOKEN_REDIRECT_OUT, // >
-	TOKEN_REDIRECT_IN,  // <
-	TOKEN_APPEND,       // >>
-	TOKEN_HEREDOC,      // <<
-	TOKEN_AND_AND,      // &&
-	TOKEN_AND,          // &
-	TOKEN_OR,           // ||
-	TOKEN_LPAREN,       // (
-	TOKEN_RPAREN,       // )
-	TOKEN_SPACE,        // " "
-	TOKEN_NULL,         // \0
-	TOKEN_DOLLAR,       // $
-	TOKEN_ENV_VAR,      //$variable
+	TOKEN_CMD,			// ex: cat, sleep, ls ...
+	TOKEN_ARGUMENT,		// ex: -a, -l,
+						// file.txt ... (a file without a redirection)
+	TOKEN_FILE,			// ex: > file.txt, file.txt ... (file with redirection)
+	TOKEN_PIPE,			// |
+	TOKEN_REDIRECT_OUT,	// >
+	TOKEN_REDIRECT_IN,	// <
+	TOKEN_APPEND,		// >>
+	TOKEN_HEREDOC,		// <<
+	TOKEN_AND_AND,		// &&
+	TOKEN_AND,			// &
+	TOKEN_OR,			// ||
+	TOKEN_LPAREN,		// (
+	TOKEN_RPAREN,		// )
+	TOKEN_SPACE,		// " "
+	TOKEN_NULL,			// \0
+	TOKEN_DOLLAR,		// $
+	TOKEN_ENV_VAR,		//$variable
 	TOKEN_TEXT,
 	TOKEN_DOUBLE_QUOTE,
 	TOKEN_SINGLE_QUOTE,
@@ -71,9 +84,9 @@ typedef enum e_token_type
 typedef enum e_node_type
 {
 	NODE_COMMAND,
-	NODE_PIPE, // |
-	NODE_AND,  // &&
-	NODE_OR,   // ||
+	NODE_PIPE,	// |
+	NODE_AND,	// &&
+	NODE_OR,	// ||
 }						t_node_type;
 
 typedef struct s_env
@@ -108,16 +121,12 @@ typedef struct s_redir
 	struct s_redir		*next;
 }						t_redir;
 
-
-
 typedef struct s_node
 {
 	t_node_type			type;
 	bool				builtin;
-	bool create_subshell; // Trigger a subshell creation.
-	int in_subshell;      // increase each time we create a subshell,
-							// it's the depth of subshells.
-
+	bool				create_subshell;	// Trigger a subshell creation.
+	int					in_subshell;		// increase each time we subshell.
 	struct s_node		*left;
 	struct s_node		*right;
 
@@ -171,10 +180,13 @@ typedef struct s_tokenizer
 
 	t_token				*token_array;
 
-	int token_list_size; // Keep track of the number of tokens
+	int					token_list_size; // Keep track of the number of tokens
 }						t_tokenizer;
 
-typedef struct s_root	t_root;
+typedef struct s_root
+{
+}				t_root;
+
 typedef struct s_main_data
 {
 	t_node				*node;
@@ -190,7 +202,8 @@ typedef struct s_main_data
 
 	bool				in_child;
 
-	t_root *root; // Pointer to root, has to be casted at the beginning.
+	t_root				*root; // Pointer to root,
+	// has to be casted at the beginning.
 	// Copy of the root env, to be passed to execve,
 	// it contains the local var of this command.
 	t_env				*curr_env;
@@ -220,11 +233,11 @@ typedef struct s_root
 
 typedef struct s_cmd_builder
 {
-    t_main_data	*data;
-    t_token		*tok_array;
-    t_node		*node;
-    int			size;
-}	t_cmd_builder;
+	t_main_data			*data;
+	t_token				*tok_array;
+	t_node				*node;
+	int					size;
+}						t_cmd_builder;
 
 /* -------------------- Lexer / Tokenizer -------------------- */
 t_token_type			get_tok_type(char c, char next);
@@ -320,5 +333,14 @@ void					handler(int sig);
 void					handle_signals(void);
 void					cleanup(t_main_data *data, t_root *root);
 void					syntax_error(char *message);
+int						initialize_shell(t_main_data *data,
+							char *prompt, size_t prompt_size);
+void					reset_tokenizer_for_line(t_tokenizer *tok, char *line);
+int						init(t_main_data *data);
+void					create_prompt(char *prompt, size_t size);
+void					cleanup_after_command(t_main_data *data, char **line);
+void					handle_eof(char **line);
+void					handle_empty_input(char **line);
+void					cleanup(t_main_data *data, t_root *root);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:19 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:03:18 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 13:07:48 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ void	print_matrix(int *array, char *buff, int width, int height)
 	int	i;
 
 	i = 0;
-	while (!stop_flag)
+	while (!g_stop_flag)
 	{
 		fill_buff(array, buff, width, height);
 		printf(GREEN "%s\n" RESET, buff);
