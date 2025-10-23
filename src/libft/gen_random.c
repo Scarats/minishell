@@ -6,18 +6,18 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 19:11:39 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/21 19:15:02 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:01:26 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
 // Read from random, else generate an int from a memory address.
-int gen_random(int size)
+int	gen_random(int size)
 {
-	int fd;
-	int seed;
-	char *addr;
+	int		fd;
+	int		seed;
+	char	*addr;
 
 	if (size == 0)
 		size = MATRIX;

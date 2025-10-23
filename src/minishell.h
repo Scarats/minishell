@@ -6,14 +6,14 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:07:12 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:03:48 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include "../utils/libft/libft.h"
+# include "./libft/libft.h"
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>

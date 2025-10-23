@@ -28,13 +28,13 @@ $(OBJ_DIR)/%.o: %.c
 
 # Remove the LDFLAGS
 $(NAME): $(OBJS)
-	@make -C ./utils/libft
-	$(CC) $(OBJS) $(LDFLAGS) -Lutils/libft -lft -lreadline -lhistory -o $(NAME)
+	@make -C ./src/libft
+	$(CC) $(OBJS) $(LDFLAGS) -Lsrc/libft -lft -lreadline -lhistory -o $(NAME)
 
 all: $(NAME)
 
 clean:	
-	@make fclean -C ./utils/libft
+	@make fclean -C ./src/libft
 	$(RM) -r $(OBJ_DIR)
 
 fclean: clean

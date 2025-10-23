@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/23 14:24:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:35:34 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:00:59 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 # define LIBFT_H
 
 # include <fcntl.h>
+# include <stdint.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-#include <stdint.h>
 
 # define RED "\x1B[91m"    // Lighter red
 # define ORANGE "\x1B[33m" // Orange/yellow

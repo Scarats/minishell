@@ -6,14 +6,14 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 16:30:34 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/16 16:38:24 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:00:50 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
 // Return 0 if s1 and s2 are identicals.
-int ft_strcmp(const char *s1, const char *s2)
+int	ft_strcmp(const char *s1, const char *s2)
 {
 	unsigned char	*ps1;
 	unsigned char	*ps2;
