@@ -18,6 +18,8 @@ static void heredoc_child_signal_handler(int sig)
 {
     if (sig == SIGINT)
     {
+        rl_on_new_line();
+        rl_replace_line("", 0);
         write(STDOUT_FILENO, "\n", 1);
         exit(130);
     }
@@ -66,6 +68,25 @@ static void setup_child_signals(void)
     sa_new.sa_flags = 0;
     sigaction(SIGINT, &sa_new, NULL);
     sigaction(SIGQUIT, &sa_new, NULL);
+}
+
+static void	set_parent_heredoc_signals(struct sigaction *old_int,
+        struct sigaction *old_quit)
+{
+    struct sigaction	ignore;
+
+    ignore.sa_handler = SIG_IGN;
+    sigemptyset(&ignore.sa_mask);
+    ignore.sa_flags = 0;
+    sigaction(SIGINT, &ignore, old_int);
+    sigaction(SIGQUIT, &ignore, old_quit);
+}
+
+static void	restore_parent_signals(struct sigaction *old_int,
+        struct sigaction *old_quit)
+{
+    sigaction(SIGINT, old_int, NULL);
+    sigaction(SIGQUIT, old_quit, NULL);
 }
 
 static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
@@ -128,21 +149,29 @@ static int cleanup_and_return_error(int fd, char *filename)
 
 static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
 {
-    int pid, status;
-    
+    int					pid;
+    int					status;
+    struct sigaction	old_int;
+    struct sigaction	old_quit;
+
+    set_parent_heredoc_signals(&old_int, &old_quit);
     pid = fork();
     if (pid == -1)
+    {
+        restore_parent_signals(&old_int, &old_quit);
         return (cleanup_and_return_error(fd, filename));
+    }
     if (pid == 0)
         return (handle_child_process(fd, redir, data));
     close(fd);
     if (waitpid(pid, &status, 0) == -1)
-        return (cleanup_and_return_error(-1, filename));
-    if (handle_wait_status(status, data, filename) == -1)
     {
-        handle_signals();
+        restore_parent_signals(&old_int, &old_quit);
         return (cleanup_and_return_error(-1, filename));
     }
+    restore_parent_signals(&old_int, &old_quit);
+    if (handle_wait_status(status, data, filename) == -1)
+        return (cleanup_and_return_error(-1, filename));
     return (0);
 }
 

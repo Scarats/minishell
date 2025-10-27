@@ -76,17 +76,15 @@ void	handler(int sig)
     if (sig == SIGINT)
     {
         stop_flag = 1;
-        write(STDOUT_FILENO, "\n", 1);
+		write(STDOUT_FILENO, "\0", 1);
+		rl_replace_line("", 0);
+        rl_crlf();
         rl_on_new_line();
-        rl_replace_line("", 0);
-        rl_redisplay();
+		rl_done = 1;
     }
     else if (sig == SIGQUIT)
     {
         write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
-        rl_on_new_line();
-        rl_replace_line("", 0);
-        rl_redisplay();
     }
 }
 
@@ -168,6 +166,8 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
     fflush(stdout);
     
     line = readline(prompt);
+	if (rl_done)
+		rl_done = 0;
     if (stop_flag)
     {
         data->root->last_exit_status = 130;
