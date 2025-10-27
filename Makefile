@@ -2,7 +2,7 @@ SRCS = src/minishell.c \
 	   src/parsing/parse_line.c src/parsing/parse_utils.c \
 	   src/parsing/tree.c src/parsing/tree_utils.c \
 	   src/execution/and_and.c src/execution/exec_cmd.c \
-	   src/execution/execution.c src/execution/or_or.c \
+	   src/execution/execution.c src/execution/or_or.c src/execution/heredoc.c \
 	   src/execution/pipes.c src/execution/exec_builtins.c \
 	   src/builtins/cd.c src/builtins/pwd.c src/builtins/echo.c \
 	   src/builtins/exit.c src/builtins/matrix.c src/env_var/get_env_var.c \

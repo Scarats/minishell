@@ -57,37 +57,37 @@ static void	create_prompt(char *prompt, size_t size)
 
 void	handle_signals(void)
 {
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
+    struct sigaction	sa_int;
+    struct sigaction	sa_quit;
 
-	sa_int.sa_handler = handler;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
-	
-	sa_quit.sa_handler = handler;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+    sa_int.sa_handler = handler;
+    sa_int.sa_flags = 0;
+    sigemptyset(&sa_int.sa_mask);
+    sigaction(SIGINT, &sa_int, NULL);
+    
+    sa_quit.sa_handler = handler;
+    sa_quit.sa_flags = 0;
+    sigemptyset(&sa_quit.sa_mask);
+    sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 void	handler(int sig)
 {
-	if (sig == SIGINT)
-	{
-		stop_flag = 1;
-		write(STDOUT_FILENO, "\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
-	else if (sig == SIGQUIT)
-	{
-		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	}
+    if (sig == SIGINT)
+    {
+        stop_flag = 1;
+        write(STDOUT_FILENO, "\n", 1);
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
+    else if (sig == SIGQUIT)
+    {
+        write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
 }
 
 void	cleanup(t_main_data *data, t_root *root)
@@ -104,7 +104,7 @@ static int	initialize_shell(t_main_data *data, char *prompt,
 	printf(RED "INIT SHELL\n" RESET);
 	printf(RED "INIT SHELL\n" RESET);
 	create_prompt(prompt, prompt_size);
-	handle_signals();
+	handle_signals(); // Keep as is if using the simpler approach
 	if (init(data))
 	{
 		fdprintf(2, "Initialization failed\n");
@@ -129,15 +129,25 @@ static void	handle_eof(char **line)
 
 static int	process_command(t_main_data *data, char *line)
 {
-	printf(RED "PROCESS CMD\n" RESET);
-	printf(RED "PROCESS CMD\n" RESET);
-	reset_tokenizer_for_line(data->tok, line);
-	printf(GREEN "BEFORE PARSER\n" RESET);
-	if (!parser(data))
-		data->root->last_exit_status = traverse_tree(data->node, data);
-	else
-		return (1);
-	return (data->root->last_exit_status);
+    printf(RED "PROCESS CMD\n" RESET);
+    printf(RED "PROCESS CMD\n" RESET);
+    reset_tokenizer_for_line(data->tok, line);
+    
+    // Check if interrupted by signal before processing
+    if (stop_flag)
+    {
+        data->root->last_exit_status = 130;
+        stop_flag = 0;  // Reset here after setting exit code
+        return (130);
+    }
+
+    printf(GREEN "BEFORE PARSER\n" RESET);
+    if (!parser(data))
+        data->root->last_exit_status = traverse_tree(data->node, data);
+    else
+        return (1);
+    
+    return (data->root->last_exit_status);
 }
 
 static void	cleanup_after_command(t_main_data *data, char **line)
@@ -145,40 +155,51 @@ static void	cleanup_after_command(t_main_data *data, char **line)
 	my_free(&data->malloc_tok);
 	my_free(&data->malloc_tree);
 	data->node = NULL;
-	stop_flag = 0;
+	//stop_flag = 0;
 	free(*line);
 	*line = NULL;
 }
 
 static bool	execute_command_loop(t_main_data *data, char *prompt)
 {
-	char	*line;
+    char	*line;
 
-	printf(RED "EXEC CMD\n" RESET);
-	printf(RED "EXEC CMD\n" RESET);
-	line = NULL;
-	fflush(stdout);
-	line = readline(prompt);
-	if (!line)
+    line = NULL;
+    fflush(stdout);
+    
+    line = readline(prompt);
+    if (stop_flag)
+    {
+        data->root->last_exit_status = 130;
+        stop_flag = 0;
+        if (!line)
+			return (true);
+    }
+    if (!line)
+    {
+        handle_eof(&line);
+        return (false);
+    }
+	//stop_flag = 0;
+/* 	if (stop_flag)
 	{
-		handle_eof(&line);
-		return (false);
-	}
-	if (line[0] == '\0')
-	{
-		handle_empty_input(&line);
-		return (true);
-	}
-	if (!ft_strncmp(line, "exit", 5))
-	{
-		free(line);
-		line = NULL;
-		return (false);
-	}
-	add_history(line);
-	process_command(data, line);
-	cleanup_after_command(data, &line);
-	return (true);
+		stop_flag = 0;
+	} */
+    if (line[0] == '\0')
+    {
+        handle_empty_input(&line);
+        return (true);
+    }
+    if (!ft_strncmp(line, "exit", 5))
+    {
+        free(line);
+        line = NULL;
+        return (false);
+    }
+    add_history(line);
+    process_command(data, line);  // This will handle stop_flag
+    cleanup_after_command(data, &line);
+    return (true);
 }
 
 int	main(int ac, char **av, char **envp)

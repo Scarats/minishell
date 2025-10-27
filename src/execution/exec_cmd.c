@@ -47,27 +47,44 @@ int	open_file(char *filename, int action)
 	return (0);
 }
 
-// Check the redirections, change accordingly the inpout and output fds
+// Check the redirections, change accordingly the input and output fds
 // If redirected, changes the fd.
 int	redirections(t_node *node, t_main_data *data)
 {
-	t_redir	*redir;
+    t_redir	*redir;
 
-	if (!data)
-		data = NULL;
-	redir = node->redirection;
-	while (redir)
-	{
-		if (redir->type == TOKEN_REDIRECT_IN && open_file(redir->filename, 1))
-			return (1);
-		else if (redir->type == TOKEN_REDIRECT_OUT && open_file(redir->filename,
-				2))
-			return (1);
-		else if (redir->type == TOKEN_APPEND && open_file(redir->filename, 3))
-			return (1);
-		redir = redir->next;
-	}
-	return (0);
+    if (!data)
+        data = NULL;
+    redir = node->redirection;
+    while (redir)
+    {
+        if (redir->type == TOKEN_REDIRECT_IN && open_file(redir->filename, 1))
+            return (1);
+        else if (redir->type == TOKEN_REDIRECT_OUT && open_file(redir->filename, 2))
+            return (1);
+        else if (redir->type == TOKEN_APPEND && open_file(redir->filename, 3))
+            return (1);
+        else if (redir->type == TOKEN_HEREDOC)
+        {
+            int fd = heredoc(redir, data);
+            if (fd < 0)
+            {
+                // Check if interrupted by Ctrl+C
+                if (data->root->last_exit_status == 130)
+                    return (130);
+                return (1);
+            }
+            // Redirect stdin to heredoc file
+            if (dup2(fd, STDIN_FILENO) == -1)
+            {
+                close(fd);
+                return (1);
+            }
+            close(fd);
+        }
+        redir = redir->next;
+    }
+    return (0);
 }
 
 // Execute the command.

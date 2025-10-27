@@ -249,5 +249,6 @@ t_env *find_tenv_var(t_env *env, char *name);
 void print_exec_error(int error, t_node *node);
 int export_env(t_env *root_env);
 char *my_getcwd(t_root *root);
+int heredoc(t_redir *redir, t_main_data *data);
 
 #endif

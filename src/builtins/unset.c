@@ -4,13 +4,13 @@ int	del_one(t_root *root, t_env **head, const char *name)
 {
 	t_env	*prev;
 	t_env	*curr;
-	int		length;
+	//int		length;
 
 	if (!head || !*head || !name)
 		return (1);
 	prev = NULL;
 	curr = *head;
-	length = ft_strlen(name);
+	//length = ft_strlen(name);
 	while (curr)
 	{
 		if (curr->name && !ft_strcmp(curr->name, name))
