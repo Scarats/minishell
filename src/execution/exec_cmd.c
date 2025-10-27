@@ -216,6 +216,7 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	int		status;
 	int		error;
 	t_env	*path;
+	int		exit_status;
 
 	printf("\n");
 	printf(BROWN "IN EXEC\nlength: %i\ntoken_list_size: %i\n" RESET,
@@ -234,6 +235,22 @@ int	exec_cmd(t_node *node, t_main_data *data)
 		return (1);
 	if (pid == 0)
 	{
+        // First handle set_io_fds for pipes
+        if ((error = set_io_fds(node, data)) != 0)
+            exit(error);
+
+        // Process all redirections in the child process including heredocs
+        // This way the SIGINT handling is all in one process
+        if ((error = redirections(node, data)) != 0)
+        {
+            if(data->root->last_exit_status == 130)
+                exit(130);
+            exit(error);
+        }
+
+        // Continue with command execution...
+        if (!node->cmd_argv || !node->cmd_argv[0])
+            exit(0);
 		error = exec_handler(data, node);
 		if (error && error != 130)
 		{
@@ -257,7 +274,12 @@ int	exec_cmd(t_node *node, t_main_data *data)
 		return (1);
 	cleanup_heredocs(node);
 	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
+	{
+		exit_status = WEXITSTATUS(status);
+		if (exit_status == 130)
+			data->root->last_exit_status = 130;
+		return (exit_status);
+	}
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);

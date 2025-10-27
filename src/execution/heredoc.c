@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:53:25 by aadeikal          #+#    #+#             */
-/*   Updated: 2025/10/23 15:35:28 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/23 16:26:10 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,6 +147,48 @@ static int	handle_parent_process(pid_t pid, char *filename, t_redir *redir,
     free(filename);
     sigaction(SIGINT, sa_old_int, NULL);
     return (fd);
+}
+
+// A new function for non-forking heredoc
+int heredoc_no_fork(t_redir *redir, t_main_data *data)
+{
+    char *filename = heredoc_filename();
+    if (!filename)
+        return (-1);
+    
+    int fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    if (fd == -1) {
+        free(filename);
+        return (-1);
+    }
+    
+    // Set up signal handlers directly
+    struct sigaction sa_int, sa_old_int;
+    sa_int.sa_handler = heredoc_signal_handler;
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;
+    sigaction(SIGINT, &sa_int, &sa_old_int);
+    
+    // Read heredoc content directly
+    read_heredoc_input_no_fork(fd, redir->filename);
+    
+    // Restore signal handler
+    sigaction(SIGINT, &sa_old_int, NULL);
+    
+    // If interrupted, propagate 130
+    if (stop_flag) {
+        data->root->last_exit_status = 130;
+        unlink(filename);
+        free(filename);
+        close(fd);
+        return (-1);
+    }
+    
+    // Success path
+    redir->filename = my_strdup(&data->root->list_of_list, filename);
+    int read_fd = open(filename, O_RDONLY);
+    free(filename);
+    return read_fd;
 }
 
 int	heredoc(t_redir *redir, t_main_data *data)
