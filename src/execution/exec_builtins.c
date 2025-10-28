@@ -13,7 +13,7 @@ int exec_builtins(t_node *node, t_main_data *data)
 
 	length = ft_strlen(node->cmd_argv[0]);
 	for (int i = 0; node->cmd_argv[i]; i++)
-		ft_printf(GREEN"EXEC_BUILDINS %i: %s\n"RESET, i, node->cmd_argv[i]);
+		ft_printf("EXEC_BUILDINS %i: %s\n", i, node->cmd_argv[i]);
 	error = 0;
 	if (!ft_strncmp(node->cmd_argv[0], "cd", length))
 		error = cd(data->root, node);
@@ -32,6 +32,6 @@ int exec_builtins(t_node *node, t_main_data *data)
 	else if (!ft_strncmp(node->cmd_argv[0], "exit", length))
     	error = exit_builtin(node, data);
 	else
-		printf(RED "error: built-in not found.\n" RESET);
+		printf("error: built-in not found.\n");
 	return (error);
 }

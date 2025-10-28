@@ -94,7 +94,7 @@ int	execution(t_node *node, t_main_data *data)
 	t_env	*path;
 	struct stat st;
 
-	printf(GREEN "function : %s\n" RESET, node->cmd_argv[0]);
+	//printf(GREEN "function : %s\n" RESET, node->cmd_argv[0]);
 	if (!data || !node)
 		return (1);
 	if (node->builtin)
@@ -149,12 +149,12 @@ int	exec_handler(t_main_data *data, t_node *node)
 	/* Pure redirection: nothing to execute */
 	if (!node->cmd_argv || !node->cmd_argv[0])
 		return (0);
-	printf("\n\nbefore builtin\n\n");
+/* 	printf("\n\nbefore builtin\n\n"); */
 	if (node->builtin)
 		return (execution(node, data));
 	if (get_bin_path(node, data) != 0 /*|| !node->path*/)
 		return (127);
-	printf("\n\nbefore exec\n\n");
+/* 	printf("\n\nbefore exec\n\n"); */
 	return (execution(node, data));
 }
 

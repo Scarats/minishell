@@ -40,34 +40,35 @@ static void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 
 static void	create_prompt(char *prompt, size_t size)
 {
-	char	hostname[64] = {0};
+/* 	char	hostname[64] = {0};
 	char	username[64] = {0};
 
 	printf(RED "CREATE PROMPT\n" RESET);
 	printf(RED "CREATE PROMPT\n" RESET);
 	gethostname(hostname, sizeof(hostname) - 1);
-	getlogin_r(username, sizeof(username) - 1);
+	getlogin_r(username, sizeof(username) - 1); */
 	ft_bzero(prompt, size);
-	ft_strlcat(prompt, BLUE, size);
+/* 	ft_strlcat(prompt, BLUE, size);
 	ft_strlcat(prompt, username, size);
 	ft_strlcat(prompt, RESET "@" GREEN, size);
 	ft_strlcat(prompt, hostname, size);
-	ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", size);
+	ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", size); */
+	ft_strlcat(prompt, "> ", size);
 }
 
 void	handle_signals(void)
 {
-    struct sigaction	sa_int;
-    struct sigaction	sa_quit;
+    struct sigaction sa_int;
+    struct sigaction sa_quit;
 
-    sa_int.sa_handler = handler;
-    sa_int.sa_flags = 0;
     sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;               // let readline be interrupted
+    sa_int.sa_handler = handler;
     sigaction(SIGINT, &sa_int, NULL);
-    
-    sa_quit.sa_handler = handler;
-    sa_quit.sa_flags = 0;
+
     sigemptyset(&sa_quit.sa_mask);
+    sa_quit.sa_flags = 0;
+    sa_quit.sa_handler = SIG_IGN;      // ignore SIGQUIT at the prompt
     sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
@@ -76,12 +77,30 @@ void	handler(int sig)
     if (sig == SIGINT)
     {
         stop_flag = 1;
-		write(STDOUT_FILENO, "\0", 1);
-		rl_replace_line("", 0);
-        rl_crlf();
-        rl_on_new_line();
+		write(STDOUT_FILENO, "\n", 1);
+		//printf("\n");
+        // Clear the current input line and terminate readline()
+		//rl_crlf();
 		rl_done = 1;
+        rl_replace_line("", 0);
+        rl_on_new_line();
+		//rl_redisplay();
+        //rl_done = 1;
     }
+	/* if (sig == SIGINT)
+    {
+        stop_flag = 1;
+		//write(STDOUT_FILENO, "\n", 1);
+		rl_crlf();
+		//rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_on_new_line();
+        //rl_redisplay();
+		//rl_crlf();
+        //rl_on_new_line();
+		//write(STDOUT_FILENO, "\0", 1);
+		rl_done = 1;
+    } */
     else if (sig == SIGQUIT)
     {
         write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
@@ -127,8 +146,8 @@ static void	handle_eof(char **line)
 
 static int	process_command(t_main_data *data, char *line)
 {
-    printf(RED "PROCESS CMD\n" RESET);
-    printf(RED "PROCESS CMD\n" RESET);
+/*     printf(RED "PROCESS CMD\n" RESET);
+    printf(RED "PROCESS CMD\n" RESET); */
     reset_tokenizer_for_line(data->tok, line);
     
     // Check if interrupted by signal before processing
@@ -139,7 +158,7 @@ static int	process_command(t_main_data *data, char *line)
         return (130);
     }
 
-    printf(GREEN "BEFORE PARSER\n" RESET);
+  /*   printf(GREEN "BEFORE PARSER\n" RESET); */
     if (!parser(data))
         data->root->last_exit_status = traverse_tree(data->node, data);
     else
@@ -158,9 +177,11 @@ static void	cleanup_after_command(t_main_data *data, char **line)
 	*line = NULL;
 }
 
-static bool	execute_command_loop(t_main_data *data, char *prompt)
+/* static bool	execute_command_loop(t_main_data *data, char *prompt)
 {
     char	*line;
+
+	
 
     line = NULL;
     fflush(stdout);
@@ -172,19 +193,25 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
     {
         data->root->last_exit_status = 130;
         stop_flag = 0;
+	if (rl_done)
+			rl_done = 0;
+		return (true);
         if (!line)
 			return (true);
-    }
+    }   
+	line = NULL;
+    fflush(stdout);
+	line = readline(prompt);
     if (!line)
     {
         handle_eof(&line);
         return (false);
     }
 	//stop_flag = 0;
-/* 	if (stop_flag)
+	if (stop_flag)
 	{
 		stop_flag = 0;
-	} */
+	} 
     if (line[0] == '\0')
     {
         handle_empty_input(&line);
@@ -198,6 +225,44 @@ static bool	execute_command_loop(t_main_data *data, char *prompt)
     }
     add_history(line);
     process_command(data, line);  // This will handle stop_flag
+    cleanup_after_command(data, &line);
+    return (true);
+} */
+
+static bool	execute_command_loop(t_main_data *data, char *prompt)
+{
+    char	*line;
+
+	if (stop_flag)
+    {
+    	data->root->last_exit_status = 130;
+    	stop_flag = 0;
+		//rl_done = 0;
+ 		rl_replace_line("", 0);
+        rl_on_new_line();
+		return (true);
+		//rl_done = 0;
+		//rl_redisplay();
+ 	/* 2	rl_on_new_line();
+		rl_replace_line("", 0);
+        if (rl_done)
+            rl_done = 0;
+        return (true); 2 */
+	/* 3	rl_on_new_line();
+		rl_replace_line("", 0);
+		return true; 3 */
+    }   
+    line = readline(prompt);
+    if (rl_done)
+		rl_done = 0;
+    if (!line)
+        return (handle_eof(&line), false);
+    if (*line == '\0')
+		return (handle_empty_input(&line), true);
+    if (!ft_strncmp(line, "exit", 5))
+        return (free(line), false);
+    add_history(line);
+    process_command(data, line);
     cleanup_after_command(data, &line);
     return (true);
 }

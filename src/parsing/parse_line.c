@@ -400,10 +400,10 @@ int	check_op_syntax(t_token *tok)
 		return (1);
 	printf(PURPLE "\nWORD = %s\n", tok->word);
 	if (tok->type == TOKEN_AND_AND && ft_strncmp(tok->word, "&&", 2))
-		return (printf(GREEN "\nCASE &&\n" RESET), 1);
+		return (printf("\nCASE &&\n"), 1);
 	else if (tok->type == TOKEN_OR && ft_strncmp(tok->word, "||", 2))
-		return (printf(GREEN "\nCASE ||\n" RESET), 1);
-	printf(GREEN "\nELSE\n" RESET);
+		return (printf("\nCASE ||\n"), 1);
+	printf("\nELSE\n");
 	return (0);
 }
 
