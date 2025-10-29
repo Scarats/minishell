@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:44:54 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:48:23 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/29 21:43:25 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	execution(t_node *node, t_main_data *data)
 		errno = EISDIR;
 		return (126);
 	}
-	if (strchr(node->cmd_argv[0], '/'))
+	if (ft_strchr(node->cmd_argv[0], '/'))
 		execve(node->cmd_argv[0], node->cmd_argv, t_env_to_char_arr(root,
 				root->env));
 	else if (!node->path)
