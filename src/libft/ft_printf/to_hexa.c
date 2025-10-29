@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   to_hexa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 14:30:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/06 14:30:15 by aadeikal         ###   ########.fr       */
+/*   Updated: 2024/11/11 16:10:19 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,24 +24,4 @@ unsigned long long	to_hexa(unsigned long long addr)
 	type_c(HEXA[addr % 16]);
 	count += 1;
 	return (count);
-}
-
-unsigned int	to_hexa_ptr(unsigned int nb, char *ptr)
-{
-	int	i;
-
-	i = 0;
-	if (nb == 0)
-		ptr[i++] = '0';
-	else
-	{
-		while (nb > 0)
-		{
-			ptr[i++] = HEXA_MAJ[nb % 16];
-			nb /= 16;
-		}
-	}
-	ptr[i] = '\0';
-	swap(ptr, i);
-	return (i);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   type_u.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/10 22:53:27 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/06 14:24:45 by aadeikal         ###   ########.fr       */
+/*   Updated: 2024/11/11 15:13:14 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,24 +33,4 @@ int	type_u(unsigned int nb)
 		count += 1;
 	}
 	return (count);
-}
-
-int	buffer_type_u(unsigned int nb, t_buffer *s_buffer)
-{
-	int	count;
-
-	if (nb >= 10)
-	{
-		count = buffer_type_u(nb / 10, s_buffer);
-		if (*(s_buffer->pos) < s_buffer->max_size - 1)
-			s_buffer->buffer[(*(s_buffer->pos))++] = (nb % 10) + '0';
-		else
-			(*(s_buffer->pos))++;
-		return (count + 1);
-	}
-	if (*(s_buffer->pos) < s_buffer->max_size - 1)
-		s_buffer->buffer[(*(s_buffer->pos))++] = nb + '0';
-	else
-		(*(s_buffer->pos))++;
-	return (1);
 }

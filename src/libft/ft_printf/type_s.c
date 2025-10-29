@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   type_s.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 12:06:54 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/14 14:51:48 by aadeikal         ###   ########.fr       */
+/*   Updated: 2024/11/11 15:12:34 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,20 +28,4 @@ int	type_s(char *str)
 		i++;
 	}
 	return (i);
-}
-
-int	buffer_type_s(char *str, t_buffer *s_buffer)
-{
-	int	count;
-
-	if (!str)
-		str = "(null)";
-	count = 0;
-	while (*str)
-	{
-		write_char_to_buffer(*str, s_buffer);
-		str++;
-		count++;
-	}
-	return (count);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   type_i.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/06 13:36:10 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/06 14:18:14 by aadeikal         ###   ########.fr       */
+/*   Updated: 2024/11/11 15:10:36 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,35 +38,4 @@ int	type_i(int nb)
 		count += 1;
 	}
 	return (count);
-}
-
-static int	buffer_type_i_recursive(int nb, t_buffer *s_buffer)
-{
-	int	count;
-
-	count = 0;
-	if (nb >= 10)
-	{
-		count = buffer_type_i_recursive(nb / 10, s_buffer);
-		write_char_to_buffer((nb % 10) + '0', s_buffer);
-		return (count + 1);
-	}
-	write_char_to_buffer(nb + '0', s_buffer);
-	return (1);
-}
-
-int	buffer_type_i(int nb, t_buffer *s_buffer)
-{
-	int	count;
-
-	count = 0;
-	if (nb == -2147483648)
-		return (buffer_type_s("-2147483648", s_buffer));
-	if (nb < 0)
-	{
-		write_char_to_buffer('-', s_buffer);
-		count = 1;
-		nb = -nb;
-	}
-	return (count + buffer_type_i_recursive(nb, s_buffer));
 }
