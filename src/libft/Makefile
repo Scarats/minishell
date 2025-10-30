@@ -21,7 +21,11 @@ SRCS	= ft_isalpha.c ft_isdigit.c ft_isalnum.c \
         ./get_next_line/get_next_line_utils.c \
 		arraylen.c ft_strcpy.c my_malloc.c get_extension.c \
 		ft_isspace.c check_access.c my_strdup.c \
-		fdprintf.c free_2d_array.c my_free.c ft_strcmp.c gen_random.c \
+		free_2d_array.c my_free.c ft_strcmp.c gen_random.c \
+		./fdprintf/fdprintf.c \
+		./fdprintf/fdprintf.h ./fdprintf/fdto_hexa.c ./fdprintf/fdtype_c.c \
+		./fdprintf/fdtype_i.c ./fdprintf/fdtype_p.c ./fdprintf/fdtype_s.c \
+		./fdprintf/fdtype_u.c ./fdprintf/fdtype_xx.c \
 
 
 FLAGS	= -Wall -Wextra -Werror 

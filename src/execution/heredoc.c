@@ -33,7 +33,7 @@ static int read_heredoc_input(int fd, char *delimiter, t_main_data *data)
     while (1)
     {
         // Check for SIGINT interruption
-        if (stop_flag)
+        if (g_stop_flag)
         {
             data->root->last_exit_status = 130;
             return (-1);  // Abort heredoc

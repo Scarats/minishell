@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:09:55 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:48:37 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:50:46 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 	int	saved_out;
 	int	error;
 
+	if (node && node->cmd_argv && node->cmd_argv[0]
+        && ft_strcmp(node->cmd_argv[0], "exit") == 0)
+        return (exec_handler(data, node));
 	saved_in = dup(STDIN_FILENO);
 	saved_out = dup(STDOUT_FILENO);
 	if (saved_in == -1 || saved_out == -1)

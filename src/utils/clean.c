@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:01:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 17:16:55 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/30 18:34:13 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ void	handle_empty_input(char **line)
 
 void	handle_eof(char **line)
 {
+	(void)line;
 	write(STDOUT_FILENO, "exit\n", 5);
 	free(*line);
 	*line = NULL;
