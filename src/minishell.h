@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 21:50:06 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/30 21:54:12 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ typedef struct s_redir
 {
 	t_token_type		type;
 	char				*filename;
-	int					fd;
+	int					heredoc_fd;
 	struct s_redir		*next;
 }						t_redir;
 
