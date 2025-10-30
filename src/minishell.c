@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 20:38:39 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/30 22:28:49 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,8 @@ void	handler(int sig)
 	{
 		g_stop_flag = 1;
 		write(STDOUT_FILENO, "\n", 1);
-		//rl_done = 1;		
-		//rl_on_new_line();
-		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_done = 1;
+		rl_replace_line("", 0);
 		//rl_redisplay();
 		//rl_done = 1;
 	}
@@ -79,7 +76,11 @@ int	process_command(t_main_data *data, char *line)
 	if (!parser(data))
 		root->last_exit_status = traverse_tree(data->node, data);
 	else
+	{
+		if(!g_stop_flag)
+			root->last_exit_status = 2;
 		return (1);
+	}
 	return (root->last_exit_status);
 }
 
@@ -132,21 +133,25 @@ bool	execute_command_loop(t_root *root, char *prompt)
     {
         root->last_exit_status = 130;
         g_stop_flag = 0;
-        rl_done = 0;  // Reset for the next readline
+        //rl_done = 0;  // Reset for the next readline
+		//rl_on_new_line();
         return (true);  // Restart the loop in main()
     }
-    rl_done = 0;
+    //rl_done = 0;
     line = readline(prompt);
+    if (g_stop_flag)
+    {
+        g_stop_flag = 0;
+        root->last_exit_status = 130;
+        if (line)
+            free(line);
+        //rl_done = 0;
+        //rl_on_new_line();
+        return (true);
+    }    
     if (!line)
     {
-        if(g_stop_flag)
-		{
-			g_stop_flag = 0;
-			root->last_exit_status = 130;
-			rl_done = 0;
-			return (true);
-		}	
-		handle_eof(&line);
+        handle_eof(&line);
         return (false);
     }
     if (line[0] == '\0')

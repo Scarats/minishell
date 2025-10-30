@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tree_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:41:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:47:51 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 22:14:54 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ t_redir	*add_redirection(t_main_data *data, t_node *node, t_token_type type)
 	redirection = my_malloc(&root->list_of_list, &data->malloc_tree,
 			sizeof(t_redir));
 	redirection->type = type;
-	redirection->fd = -1;
+	redirection->heredoc_fd = -1;
 	if (!node->redirection)
 		node->redirection = redirection;
 	else
