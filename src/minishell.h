@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 18:34:13 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/30 21:50:06 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,6 +225,7 @@ typedef struct s_root
 
 	t_list				*malloc_root;
 	t_list				*list_of_list;
+	bool				prompt_printed;	
 }						t_root;
 
 typedef struct s_cmd_builder
@@ -297,7 +298,7 @@ int						redirections(t_node *node, t_main_data *data);
 int						open_file(char *filename, int action);
 int						get_bin_path(t_node *node, t_main_data *data);
 void					print_exec_error(int error, t_node *node);
-int						heredoc(t_redir *redir, t_main_data *data);
+int 					heredoc(t_redir *redir, t_main_data *data);
 
 /* -------------------- Builtins / Command helpers -------------------- */
 int						exec_builtins(t_node *node, t_main_data *data);
@@ -334,7 +335,7 @@ int						initialize_shell(t_root *root,
 							char *prompt, size_t prompt_size);
 void					reset_tokenizer_for_line(t_tokenizer *tok, char *line);
 int						init(t_root *root);
-void					create_prompt(char *prompt, size_t size);
+void					create_prompt(char *prompt, size_t size, t_root *root);
 void					cleanup_after_command(t_main_data *data, char **line);
 void					handle_eof(char **line);
 void					handle_empty_input(char **line);

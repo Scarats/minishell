@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:48:29 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 21:50:06 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	handle_child(t_main_data *data, t_node *node)
 
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
-int	exec_cmd(t_node *node, t_main_data *data)
+/* int	exec_cmd(t_node *node, t_main_data *data)
 {
 	int	pid;
 	int	status;
@@ -79,5 +79,59 @@ int	exec_cmd(t_node *node, t_main_data *data)
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
+	return (1);
+} */
+
+int	exec_cmd(t_node *node, t_main_data *data)
+{
+	int		pid;
+	int		status;
+	int		error;
+	//t_env	*path;
+	t_root	*root;
+
+	root = data->root;
+    if (node->builtin)
+    {
+        if (data->in_child)
+            return exec_handler(data, node);
+        return exec_builtin_in_parent(node, data);
+    }
+    pid = fork();
+    if (pid == -1)
+        return 1;
+    if (pid == 0)
+    {
+        signal(SIGQUIT, SIG_DFL);
+        error = exec_handler(data, node);
+        if (error == 127 && node->cmd_argv && node->cmd_argv[0])
+            fdprintf(2, "minishell: %s: command not found\n", node->cmd_argv[0]);
+        my_multi_free(&root->list_of_list);
+        exit(error);
+    }
+    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+        close(node->input_fd);
+    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+        close(node->output_fd);
+
+    if (waitpid(pid, &status, 0) == -1)
+    {
+        if (WIFEXITED(status))
+            root->last_exit_status = WEXITSTATUS(status);
+        else if (WIFSIGNALED(status))
+            root->last_exit_status = 128 + WTERMSIG(status);
+    }
+    handle_signals();
+    if (WIFEXITED(status))
+        return WEXITSTATUS(status);
+    else if (WIFSIGNALED(status))
+        return (128 + WTERMSIG(status));
+    return 1;
+	if (node->builtin)
+	{
+		if (data->in_child)
+			return (exec_handler(data, node));
+		return (exec_builtin_in_parent(node, data));
+	}
 	return (1);
 }

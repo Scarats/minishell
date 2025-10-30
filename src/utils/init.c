@@ -3,30 +3,62 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:44:48 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 20:10:44 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	create_prompt(char *prompt, size_t size)
+static char	*get_host_from_env(t_root *root)
 {
-	char	hostname[64];
-	char	username[64];
+	char *hostname;
+	char *host_env;
+	int i;
+	int len;
+	int y;
 
-	hostname[0] = '\0';
-	username[0] = '\0';
-	gethostname(hostname, sizeof(hostname) - 1);
-	getlogin_r(username, sizeof(username) - 1);
+	i = 0;
+	host_env = get_env_var(root->env, "SESSION_MANAGER");
+	len = ft_strlen(host_env);
+	hostname = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char) * 7);
+	if (!hostname)
+		return (NULL);
+	hostname[6] = '\0';
+	while (i < len)
+	{
+		if(host_env[i] == '/')
+			break ;
+		i++;	
+	}
+	i++;
+	y = 0;
+	while (host_env[i] != '.')
+		hostname[y++] = host_env[i++];
+	return (hostname);
+} 
+
+void	create_prompt(char *prompt, size_t size, t_root *root)
+{
+	char	*username;
+	char	*hostname;
+
+	username = get_env_var(root->env, "LOGNAME");
+	hostname = get_host_from_env(root);
+	get_host_from_env(root);
 	ft_bzero(prompt, size);
 	ft_strlcat(prompt, BLUE, size);
-	ft_strlcat(prompt, username, size);
-	ft_strlcat(prompt, RESET "@" GREEN, size);
-	ft_strlcat(prompt, hostname, size);
-	ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", size);
+	if (username && hostname)
+	{
+		ft_strlcat(prompt, username, size);
+		ft_strlcat(prompt, RESET "@" GREEN, size);
+		ft_strlcat(prompt, hostname, size);
+		ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", size);
+	}
+	else
+		ft_strlcat(prompt, PURPLE "minishell" RESET "> ", size);
 }
 
 int	init(t_root *root)
@@ -69,7 +101,7 @@ void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 
 int	initialize_shell(t_root *root, char *prompt, size_t prompt_size)
 {
-	create_prompt(prompt, prompt_size);
+	create_prompt(prompt, prompt_size, root);
 	handle_signals();
 	if (init(root))
 	{
