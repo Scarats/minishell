@@ -1,75 +1,101 @@
 #include "../minishell.h"
 
+// Create a unique temp filename under /tmp
 static char *generate_heredoc_filename(void)
 {
-    static int counter = 0;
-    char *filename;
-    char *tmp;
-    
-    tmp = ft_itoa(counter++);
-    if (!tmp)
-        return (NULL);
-    filename = ft_strjoin("/tmp/minishell_heredoc_", tmp);
-    free(tmp);
-    return (filename);
+    static int counter;
+    char *num = ft_itoa(counter++);
+    char *name;
+
+    if (!num)
+        return NULL;
+    name = ft_strjoin("/tmp/minishell_heredoc_", num);
+    free(num);
+    return name;
 }
 
-/* static void heredoc_child_signal_handler(int sig)
+static int is_delimiter_match(char *line, const char *delim)
+{
+    size_t dlen;
+
+    if (!line || !delim)
+        return 0;
+    dlen = ft_strlen(delim);
+    return (ft_strncmp(line, delim, dlen) == 0 && line[dlen] == '\0');
+}
+
+// Child signal handler: Ctrl-C aborts heredoc with code 130, Ctrl-\ ignored
+static void heredoc_child_signal_handler(int sig)
 {
     if (sig == SIGINT)
     {
         write(STDOUT_FILENO, "\n", 1);
         _exit(130);
     }
-    if (sig == SIGQUIT)
-        return;
-} */
-
-static int is_delimiter_match(char *line, char *delimiter)
-{
-    size_t delim_len;
-    
-    if (!delimiter)
-        return (0);
-    delim_len = ft_strlen(delimiter);
-    if (ft_strncmp(line, delimiter, delim_len) == 0 && line[delim_len] == '\0')
-        return (1);
-    return (0);
+    // SIGQUIT: do nothing
 }
 
-static int read_heredoc_input(int fd, char *delimiter, t_main_data *data)
+static void setup_child_signals(void)
 {
-    char *line;
-    t_root *root;
+    struct sigaction sa;
 
-    root = data->root;    
-    while (1)
+    sa.sa_handler = heredoc_child_signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGQUIT, &sa, NULL);
+}
+
+// Ensure readline uses the terminal even if stdin/stdout were redirected
+static void attach_tty_for_readline(void)
+{
+    int tty = open("/dev/tty", O_RDWR);
+    if (tty >= 0)
     {
-        // Check for SIGINT interruption
-        if (g_stop_flag)
-        {
-            root->last_exit_status = 130;
-            return (-1);  // Abort heredoc
-        }
-        line = readline("> ");
-        if (!line)  // EOF (Ctrl+D)
-            break;
-        if (is_delimiter_match(line, delimiter))
-        {
-            free(line);
-            break;
-        }
-        ft_putendl_fd(line, fd);  // Write line + newline to temp file
-        free(line);
+        dup2(tty, STDIN_FILENO);
+        dup2(tty, STDOUT_FILENO);
+        close(tty);
     }
-    return (0);
 }
 
-/* static int read_heredoc_input(int fd, char *delimiter)
+// Parent ignores SIGINT/SIGQUIT while waiting for child heredoc
+static void set_parent_heredoc_signals(struct sigaction *old_int,
+                                       struct sigaction *old_quit)
+{
+    struct sigaction ign;
+
+    ign.sa_handler = SIG_IGN;
+    sigemptyset(&ign.sa_mask);
+    ign.sa_flags = 0;
+    sigaction(SIGINT, &ign, old_int);
+    sigaction(SIGQUIT, &ign, old_quit);
+}
+
+static void restore_parent_signals(struct sigaction *old_int,
+                                   struct sigaction *old_quit)
+{
+    sigaction(SIGINT, old_int, NULL);
+    sigaction(SIGQUIT, old_quit, NULL);
+}
+
+static int cleanup_and_return_error(int fd, char *filename)
+{
+    if (fd != -1)
+        close(fd);
+    if (filename)
+    {
+        unlink(filename);
+        free(filename);
+    }
+    return -1;
+}
+
+// Read from user until delimiter line, write lines (with newline) into fd
+static void read_heredoc_input(int fd, const char *delimiter)
 {
     char *line;
-    
-    while (1)
+
+    for (;;)
     {
         line = readline("> ");
         if (!line)
@@ -82,235 +108,82 @@ static int read_heredoc_input(int fd, char *delimiter, t_main_data *data)
         ft_putendl_fd(line, fd);
         free(line);
     }
-    return (0);
-} */
-
-/* static void setup_child_signals(void)
-{
-    struct sigaction sa_new;
-    
-    sa_new.sa_handler = heredoc_child_signal_handler;
-    sigemptyset(&sa_new.sa_mask);
-    sa_new.sa_flags = 0;
-    sigaction(SIGINT, &sa_new, NULL);
-    sigaction(SIGQUIT, &sa_new, NULL);
-} */
-
-/* static void attach_tty_for_readline(void)
-{
-    int tty = open("/dev/tty", O_RDWR);
-    if (tty >= 0)
-    {
-        dup2(tty, STDIN_FILENO);
-        dup2(tty, STDOUT_FILENO);
-        close(tty);
-    }
-} */
-
-/* static void	set_parent_heredoc_signals(struct sigaction *old_int,
-        struct sigaction *old_quit)
-{
-    struct sigaction	ignore;
-
-    ignore.sa_handler = SIG_IGN;
-    sigemptyset(&ignore.sa_mask);
-    ignore.sa_flags = 0;
-    sigaction(SIGINT, &ignore, old_int);
-    sigaction(SIGQUIT, &ignore, old_quit);
 }
 
-static void	restore_parent_signals(struct sigaction *old_int,
-        struct sigaction *old_quit)
+static int open_and_consume_tmp(char *filename)
 {
-    sigaction(SIGINT, old_int, NULL);
-    sigaction(SIGQUIT, old_quit, NULL);
-} */
+    int read_fd = open(filename, O_RDONLY);
 
-/* static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
-{
-    setup_child_signals();
-    attach_tty_for_readline();
-    read_heredoc_input(fd, redir->filename);
-    close(fd);
-    my_multi_free(&data->root->list_of_list);
-    exit(0);
-} */
+    if (read_fd == -1)
+        return cleanup_and_return_error(-1, filename);
+    unlink(filename); // remove path; fd keeps content alive
+    free(filename);
+    return read_fd;
+}
 
-/* static int handle_wait_status(int status, t_main_data *data, char *filename)
+// Public API used by redirections(): returns read-fd on success, else -1
+int heredoc(t_redir *redir, t_main_data *data)
 {
-    if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
-    {
-        stop_flag = 1;
-        data->root->last_exit_status = 130;
-        unlink(filename);
-        return (-1);
-    }
-    if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-    {
-        stop_flag = 1;
-        data->root->last_exit_status = 130;
-        unlink(filename);
-        return (-1);
-    }
-    return (0);
-} */
+    int                 wstatus;
+    int                 pid;
+    int                 fd = -1;
+    char                *filename = NULL;
+    struct sigaction    old_int, old_quit;
+    t_root *root;
 
-/* static int handle_wait_status(int status, t_main_data *data, char *filename)
-{
-    if (WIFEXITED(status))
-    {
-        int exit_code = WEXITSTATUS(status);
-        if (exit_code == 130)
-        {
-            data->root->last_exit_status = 130;
-            unlink(filename);
-            return (-1);
-        }
-    }
-    if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-    {
-        data->root->last_exit_status = 130;
-        unlink(filename);
-        return (-1);
-    }
-    return (0);
-} */
+    root = data->root;
 
-static int create_heredoc_file(char **filename)
-{
-    int fd;
-    
-    *filename = generate_heredoc_filename();
-    if (!*filename)
-        return (-1);
-    fd = open(*filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+    // Create temp file for child to write into
+    filename = generate_heredoc_filename();
+    if (!filename)
+        return -1;
+    fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
     if (fd == -1)
-    {
-        free(*filename);
-        return (-1);
-    }
-    return (fd);
-}
-
-/* static int cleanup_and_return_error(int fd, char *filename)
-{
-    if (fd != -1)
-        close(fd);
-    if (filename)
-    {
-        unlink(filename);
-        free(filename);
-    }
-    return (-1);
-} */
-
-/* static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
-{
-    int					pid;
-    int					status;
-    struct sigaction	old_int;
-    struct sigaction	old_quit;
+        return cleanup_and_return_error(-1, filename);
 
     set_parent_heredoc_signals(&old_int, &old_quit);
     pid = fork();
     if (pid == -1)
     {
         restore_parent_signals(&old_int, &old_quit);
-        return (cleanup_and_return_error(fd, filename));
+        return cleanup_and_return_error(fd, filename);
     }
     if (pid == 0)
-        return (handle_child_process(fd, redir, data));
-    close(fd);
-    if (waitpid(pid, &status, 0) == -1)
     {
-        restore_parent_signals(&old_int, &old_quit);
-        return (cleanup_and_return_error(-1, filename));
-    }
-    restore_parent_signals(&old_int, &old_quit);
-    if (handle_wait_status(status, data, filename) == -1)
-        return (cleanup_and_return_error(-1, filename));
-    return (0);
-} */
-
-/* static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
-{
-    int                 pid;
-    int                 status;
-    struct sigaction    ignore;
-    struct sigaction    old_int;
-    struct sigaction    old_quit;
-
-    sigemptyset(&ignore.sa_mask);        // Make readline prompt/input use the terminal, not the pipe
-    ignore.sa_flags = 0;
-    ignore.sa_handler = SIG_IGN;
-    sigaction(SIGINT, &ignore, &old_int);
-    sigaction(SIGQUIT, &ignore, &old_quit);
-    pid = fork();
-    if (pid == -1)
-    {
-        sigaction(SIGINT, &old_int, NULL);
-        sigaction(SIGQUIT, &old_quit, NULL);
-        return (cleanup_and_return_error(fd, filename));
-    }
-    if (pid == 0)
-        return (handle_child_process(fd, redir, data));
-    close(fd);
-    if (waitpid(pid, &status, 0) == -1)
-    {
-        sigaction(SIGINT, &old_int, NULL);
-        sigaction(SIGQUIT, &old_quit, NULL);
-        return (cleanup_and_return_error(-1, filename));
-    }
-    sigaction(SIGINT, &old_int, NULL);
-    sigaction(SIGQUIT, &old_quit, NULL);
-    if (handle_wait_status(status, data, filename) == -1)
-        return (cleanup_and_return_error(-1, filename));
-    return (0);
-} */
-
-static int cleanup_and_return_error(int fd, char *filename)
-{
-    if (fd != -1)
+        // Child: setup signals and readline, write to temp, then exit
+        setup_child_signals();
+        attach_tty_for_readline();
+        read_heredoc_input(fd, redir->filename);
         close(fd);
-    if (filename)
-    {
-        unlink(filename);
-        free(filename);
+        my_multi_free(&root->list_of_list);
+        _exit(0);
     }
-    return (-1);
-}
-
-static int open_and_assign_filename(char *filename, t_redir *redir, t_main_data *data)
-{
-    int read_fd;
-
-    (void)redir;
-    (void)data;
-    read_fd = open(filename, O_RDONLY);
-    if (read_fd == -1)
-    {
-        unlink(filename);
-        free(filename);
-        return (-1);
-    }
-    unlink(filename);  // Remove temp file; fd keeps data alive
-    free(filename);
-    return (read_fd);
-}
-
-int heredoc(t_redir *redir, t_main_data *data)
-{
-    int fd;
-    char *filename;
-    
-    fd = create_heredoc_file(&filename);
-    if (fd == -1)
-        return (-1);
-    if (read_heredoc_input(fd, redir->filename, data) == -1)
-    {
-        cleanup_and_return_error(fd, filename);
-        return (-1);
-    }
+    // Parent
     close(fd);
-    return (open_and_assign_filename(filename, redir, data));
+    while (waitpid(pid, &wstatus, 0) == -1 && errno == EINTR)
+        ;
+    restore_parent_signals(&old_int, &old_quit);
+
+    // Handle child termination status
+    if (WIFEXITED(wstatus))
+    {
+        int code = WEXITSTATUS(wstatus);
+        if (code == 130) // interrupted with Ctrl-C
+        {
+            root->last_exit_status = 130;
+            root->heredoc_aborted = 1;   // <- mark abort of the whole line
+            //errno = EINTR;               // <- let caller distinguish interrupt
+            return cleanup_and_return_error(-1, filename);
+        }
+    }
+    else if (WIFSIGNALED(wstatus) && WTERMSIG(wstatus) == SIGINT)
+    {
+        root->last_exit_status = 130;
+        root->heredoc_aborted = 1;       // <- mark abort of the whole line
+        //errno = EINTR;                   // <- let caller distinguish interrupt
+        return cleanup_and_return_error(-1, filename);
+    }
+
+    // Success: reopen for reading, unlink path, return fd
+    return open_and_consume_tmp(filename);
 }

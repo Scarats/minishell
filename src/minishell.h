@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 21:54:12 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/30 23:36:12 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,6 +225,7 @@ typedef struct s_root
 
 	t_list				*malloc_root;
 	t_list				*list_of_list;
+	int					heredoc_aborted;
 	bool				prompt_printed;	
 }						t_root;
 
@@ -340,5 +341,6 @@ void					cleanup_after_command(t_main_data *data, char **line);
 void					handle_eof(char **line);
 void					handle_empty_input(char **line);
 void					cleanup(t_main_data *data, t_root *root);
+int set_last_exit_status_from_wait(t_root *root, int status);
 
 #endif

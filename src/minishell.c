@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 20:38:39 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/10/30 23:41:21 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ void	handler(int sig)
 		write(STDOUT_FILENO, "\n", 1);
 		//rl_done = 1;		
 		//rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		rl_done = 1;
+		//rl_replace_line("", 0);
+		//rl_on_new_line();
+		//rl_done = 1;
 		//rl_redisplay();
 		//rl_done = 1;
 	}
@@ -64,7 +64,7 @@ void	handler(int sig)
     }
 } */
 
-int	process_command(t_main_data *data, char *line)
+/* int	process_command(t_main_data *data, char *line) THIS WORKED BEFORE
 {
 	t_root	*root;
 
@@ -81,6 +81,35 @@ int	process_command(t_main_data *data, char *line)
 	else
 		return (1);
 	return (root->last_exit_status);
+} */
+
+int	process_command(t_main_data *data, char *line)
+{
+    t_root	*root;
+
+    root = data->root;
+    reset_tokenizer_for_line(data->tok, line);
+    if (g_stop_flag)
+    {
+        root->last_exit_status = 130;
+        g_stop_flag = 0;
+        return (130);
+    }
+    // parser() must return non-zero on error; it should set root->heredoc_aborted on HD abort
+    int perr = parser(data);
+    if (perr != 0)
+    {
+        if (root->heredoc_aborted)
+        {
+            // Silent cancel (no "Interrupted system call" message)
+            root->heredoc_aborted = 0;
+            root->last_exit_status = 130;
+            return 130;
+        }
+        return 1;
+    }
+    root->last_exit_status = traverse_tree(data->node, data);
+    return root->last_exit_status;
 }
 
 /* bool	execute_command_loop(t_root *root, char *prompt) first function (working)
@@ -132,23 +161,24 @@ bool	execute_command_loop(t_root *root, char *prompt)
     {
         root->last_exit_status = 130;
         g_stop_flag = 0;
-        rl_done = 0;  // Reset for the next readline
-        return (true);  // Restart the loop in main()
+        //rl_done = 0;  // Reset for the next readline
+        //return (true);  // Restart the loop in main()
     }
     rl_done = 0;
     line = readline(prompt);
-    if (!line)
+    if (g_stop_flag)
     {
-        if(g_stop_flag)
-		{
-			g_stop_flag = 0;
-			root->last_exit_status = 130;
-			rl_done = 0;
-			return (true);
-		}	
+       	root->last_exit_status = 130;
+		g_stop_flag = 0;
+		if (line)
+			free(line);
+		return (true);		
+	}
+	if (!line)
+	{
 		handle_eof(&line);
-        return (false);
-    }
+		return (false);
+	}
     if (line[0] == '\0')
     {
         handle_empty_input(&line);
@@ -231,6 +261,7 @@ int	main(int ac, char **av, char **envp)
 	root.env = set_env_var_list(&root, envp);
 	if (initialize_shell(&root, prompt, sizeof(prompt)))
 		return (1);
+	rl_catch_signals = 0;
 	while (execute_command_loop(&root, prompt))
 		;
 	exit_status = root.last_exit_status;

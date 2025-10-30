@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:44:54 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/29 21:43:25 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 22:56:26 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	subshell_child(t_main_data *data, t_node *node)
 	exit(error);
 }
 
-int	create_subshell(t_node *node, t_main_data *data)
+/* int	create_subshell(t_node *node, t_main_data *data)
 {
 	int		pid;
 	int		status;
@@ -81,6 +81,28 @@ int	create_subshell(t_node *node, t_main_data *data)
 	else if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);
+} */
+
+int	create_subshell(t_node *node, t_main_data *data)
+{
+    int		pid;
+    int		status;
+    t_root	*root;
+
+    root = data->root;
+    status = 0;
+    pid = fork();
+    if (pid < 0)
+        return (1);
+    else if (pid == 0)
+        subshell_child(data, node);
+
+    // Wait, handling EINTR
+    while (waitpid(pid, &status, 0) == -1 && errno == EINTR)
+        ;
+
+    set_last_exit_status_from_wait(root, status);
+    return root->last_exit_status;
 }
 
 // Will check the type of the node.
