@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/29 21:24:01 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:16:55 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void	handler(int sig)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
+		rl_done = 1;
 	}
 	else if (sig == SIGQUIT)
 	{
@@ -54,6 +55,12 @@ int	process_command(t_main_data *data, char *line)
 
 	root = data->root;
 	reset_tokenizer_for_line(data->tok, line);
+	if (g_stop_flag)
+	{
+		root->last_exit_status = 130;
+		g_stop_flag = 0;
+		return (130);
+	}
 	if (!parser(data))
 		root->last_exit_status = traverse_tree(data->node, data);
 	else
@@ -67,7 +74,19 @@ bool	execute_command_loop(t_root *root, char *prompt)
 
 	line = NULL;
 	fflush(stdout);
+	if (g_stop_flag)
+	{
+		root->last_exit_status = 130;
+		g_stop_flag = 0;
+		//rl_on_new_line();
+		return (true);
+	}
 	line = readline(prompt);
+/* 	if (rl_done)
+	{
+		rl_done = 0;
+		return (false);
+	} */
 	if (!line)
 	{
 		handle_eof(&line);

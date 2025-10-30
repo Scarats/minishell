@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   clean.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:01:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:44:57 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:16:55 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ void	handle_eof(char **line)
 
 void	cleanup_after_command(t_main_data *data, char **line)
 {
-	t_root	*root;
+	//t_root	*root;
 
-	root = data->root;
+	//root = data->root;
 	my_free(&data->malloc_tok);
 	my_free(&data->malloc_tree);
 	ft_memset(data, 0, sizeof(t_main_data));

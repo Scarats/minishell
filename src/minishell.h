@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 16:03:48 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/10/30 17:16:55 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,6 +297,7 @@ int						redirections(t_node *node, t_main_data *data);
 int						open_file(char *filename, int action);
 int						get_bin_path(t_node *node, t_main_data *data);
 void					print_exec_error(int error, t_node *node);
+int						heredoc(t_redir *redir, t_main_data *data);
 
 /* -------------------- Builtins / Command helpers -------------------- */
 int						exec_builtins(t_node *node, t_main_data *data);
