@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 17:53:03 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 18:09:47 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ int expand_var(t_main_data *data, t_token *tok, t_token *removed,
 	ft_bzero(&var, sizeof(var));
 	if (!tok || !tok->slice)
 		return (1);
-	if (tok->prev_token->prev_token->type == TOKEN_HEREDOC)
+	if (tok->prev_token && tok->prev_token->prev_token && tok->prev_token->prev_token->type == TOKEN_HEREDOC)
 	{
 		var.var_len = 0;
 		var.expanded = "$";

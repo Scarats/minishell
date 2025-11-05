@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tree_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:41:18 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 22:14:54 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/05 18:46:16 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,9 @@ int	get_cmd_argc(t_token *tok_array, int size)
 	while (i < size)
 	{
 		if (tok_array[i].type == TOKEN_CMD
-			|| tok_array[i].type == TOKEN_ARGUMENT)
+			|| tok_array[i].type == TOKEN_ARGUMENT
+			|| tok_array[i].type == TOKEN_TEXT
+			|| tok_array[i].type == TOKEN_ENV_VAR)
 			cmd_argc++;
 		i++;
 	}

@@ -6,11 +6,23 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 17:48:48 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 18:47:32 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+// Check if there is something after the $
+t_token_type no_env_var(t_main_data *data)
+{
+	char	next;
+
+	next = data->tok->input[data->tok->prev_pos + 1];
+	if (!next || (!ft_isalpha(next) && !ft_isdigit(next)
+			&& next != '_' && next != '?'))
+		return (TOKEN_TEXT);
+	return (TOKEN_DOLLAR);
+}
 
 // remove_token: unlink a token from a doubly-linked list
 void	remove_token(t_token **head, t_token *t)
@@ -67,15 +79,17 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
 		return (1);
 	if (type == TOKEN_TEXT)
 		type = get_word_type(tok);
+	else if (type == TOKEN_DOLLAR)
+		type = no_env_var(data);
 	tok->type = type;
 	removed = tok->prev_token;
 	tok->slice = ft_substr(data->tok->input, start, end - start);
 	if (tok->slice)
 		my_addtolist(&data->malloc_tok, tok->slice);
 	tok->word = tok->slice;
+	printf("word = %s\n", tok->word);
 	if (tok->type == TOKEN_ENV_VAR)
 		expand_var(data, tok, removed, &removed_dollar);
-	printf("tok = %s\n", tok->word);
 	merge_with_prev_if_adjacent(data, tok, start, removed_dollar);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:50:28 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:45:51 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 18:47:06 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,15 @@ int	handle_redirection(t_cmd_builder *builder, int *i)
 // Add command or argument to cmd_argv
 void	add_cmd_or_arg(t_cmd_builder *builder, int i, int *j)
 {
-	if ((builder->tok_array[i].type == TOKEN_CMD
-			|| builder->tok_array[i].type == TOKEN_ARGUMENT))
-	{
-		builder->node->cmd_argv[*j] = my_strdup(&builder->data->malloc_tree,
-				builder->tok_array[i].word);
-		(*j)++;
-	}
+	if (builder->tok_array[i].type == TOKEN_CMD
+        || builder->tok_array[i].type == TOKEN_ARGUMENT
+        || builder->tok_array[i].type == TOKEN_TEXT
+        || builder->tok_array[i].type == TOKEN_ENV_VAR)
+    {
+        builder->node->cmd_argv[*j] = my_strdup(&builder->data->malloc_tree,
+                builder->tok_array[i].word);
+        (*j)++;
+    }
 }
 
 // Process all tokens and build cmd_argv
