@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:40:21 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 17:48:48 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
 	tok->word = tok->slice;
 	if (tok->type == TOKEN_ENV_VAR)
 		expand_var(data, tok, removed, &removed_dollar);
+	printf("tok = %s\n", tok->word);
 	merge_with_prev_if_adjacent(data, tok, start, removed_dollar);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 16:45:26 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 17:53:03 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,59 +17,57 @@
 // - If allow_skip_dollar=1 and the immediate previous char is '$',
 // skip that '$' too.
 // - Otherwise, never merge across a '$'.
-int	no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
+int no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
 {
-    int	i;
-    int	skipped_quotes;
+	int i;
+	int skipped_quotes;
 
-    if (start <= 0)
-        return (1);
-    i = start - 1;
-    skipped_quotes = 0;
-    while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
-    {
-        i--;
-        skipped_quotes++;
-    }
-    if (i < 0)
-        return (1);
-    if (s[i] == '$')
-    {
-        if (!allow_skip_dollar)
-            return (0);
-        i--;
-        while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
-        {
-            i--;
-            skipped_quotes++;
-        }
-        if (i < 0)
-            return (1);
-    }
-    if (s[i] == ' ' && skipped_quotes > 1)
-        return (1);
-    return (s[i] != ' ');
+	if (start <= 0)
+		return (1);
+	i = start - 1;
+	skipped_quotes = 0;
+	while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+	{
+		i--;
+		skipped_quotes++;
+	}
+	if (i < 0)
+		return (1);
+	if (s[i] == '$')
+	{
+		if (!allow_skip_dollar)
+			return (0);
+		i--;
+		while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+		{
+			i--;
+			skipped_quotes++;
+		}
+		if (i < 0)
+			return (1);
+	}
+	if (s[i] == ' ' && skipped_quotes > 1)
+		return (1);
+	return (s[i] != ' ');
 }
 
 // Merge current word-like token into the previous one if adjacent (no space).
 // just_removed_dollar indicates we removed a preceding '$' for this token.
-int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
-		int just_removed_dollar)
+int merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
+								int just_removed_dollar)
 {
-	t_token	*prev;
-	size_t	a;
-	size_t	b;
-	char	*joined;
+	t_token *prev;
+	size_t a;
+	size_t b;
+	char *joined;
 
 	prev = tok->prev_token;
-	if (!tok || !prev || !is_word_token(prev->type) || !is_word_token(tok->type)
-		|| !no_space_before_token_start(data->tok->input, start,
-			just_removed_dollar))
+	if (!tok || !prev || !is_word_token(prev->type) || !is_word_token(tok->type) || !no_space_before_token_start(data->tok->input, start, just_removed_dollar))
 		return (0);
 	a = ft_strlen(prev->word);
 	b = ft_strlen(tok->word);
 	joined = my_malloc(&((t_root *)data->root)->list_of_list, &data->malloc_tok,
-			a + b + 1);
+					   a + b + 1);
 	ft_memcpy(joined, prev->word, a);
 	ft_memcpy(joined + a, tok->word, b);
 	joined[a + b] = '\0';
@@ -83,13 +81,13 @@ int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
 	return (1);
 }
 
-int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
-		size_t var_len)
+int set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
+							   size_t var_len)
 {
-	char	*rest;
-	size_t	vlen;
-	size_t	rlen;
-	char	*joined;
+	char *rest;
+	size_t vlen;
+	size_t rlen;
+	char *joined;
 
 	if (!tok || !tok->slice)
 		return (1);
@@ -100,7 +98,7 @@ int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
 		vlen = 0;
 	rlen = ft_strlen(rest);
 	joined = my_malloc(&((t_root *)data->root)->list_of_list, &data->malloc_tok,
-			vlen + rlen + 1);
+					   vlen + rlen + 1);
 	if (vlen)
 		ft_memcpy(joined, expanded, vlen);
 	if (rlen)
@@ -110,9 +108,9 @@ int	set_token_word_with_suffix(t_main_data *data, t_token *tok, char *expanded,
 	return (0);
 }
 
-void	expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
+void expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
 {
-	t_root	*root;
+	t_root *root;
 
 	root = data->root;
 	if (tok->slice[0] == '?')
@@ -125,9 +123,7 @@ void	expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
 	else if (ft_isalpha((unsigned char)tok->slice[0]) || tok->slice[0] == '_')
 	{
 		var->var_len = 1;
-		while (tok->slice[var->var_len]
-			&& (ft_isalnum((unsigned char)tok->slice[var->var_len])
-				|| tok->slice[var->var_len] == '_'))
+		while (tok->slice[var->var_len] && (ft_isalnum((unsigned char)tok->slice[var->var_len]) || tok->slice[var->var_len] == '_'))
 			var->var_len++;
 		var->saved = tok->slice[var->var_len];
 		tok->slice[var->var_len] = '\0';
@@ -136,15 +132,21 @@ void	expand_var_logic(t_expand *var, t_main_data *data, t_token *tok)
 	}
 }
 
-int	expand_var(t_main_data *data, t_token *tok, t_token *removed,
-		int *removed_dollar)
+int expand_var(t_main_data *data, t_token *tok, t_token *removed,
+			   int *removed_dollar)
 {
-	t_expand	var;
+	t_expand var;
 
 	ft_bzero(&var, sizeof(var));
 	if (!tok || !tok->slice)
 		return (1);
-	expand_var_logic(&var, data, tok);
+	if (tok->prev_token->prev_token->type == TOKEN_HEREDOC)
+	{
+		var.var_len = 0;
+		var.expanded = "$";
+	}
+	else
+		expand_var_logic(&var, data, tok);
 	if (tok->prev_token && tok->prev_token->type == TOKEN_DOLLAR)
 	{
 		remove_token(&data->tok->token_list, removed);
