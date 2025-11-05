@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 16:01:22 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 16:42:17 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,26 +19,36 @@
 // - Otherwise, never merge across a '$'.
 int	no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
 {
-	int	i;
+    int	i;
+    int	skipped_quotes;
 
-	if (start <= 0)
-		return (0);
-	i = start - 1;
-	while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
-		i--;
-	if (i < 0)
-		return (0);
-	if (s[i] == '$')
-	{
-		if (!allow_skip_dollar)
-			return (0);
-		i--;
-		while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
-			i--;
-		if (i < 0)
-			return (0);
-	}
-	return (s[i] != ' ');
+    if (start <= 0)
+        return (1);
+    i = start - 1;
+    skipped_quotes = 0;
+    while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+    {
+        i--;
+        skipped_quotes++;
+    }
+    if (i < 0)
+        return (1);
+    if (s[i] == '$')
+    {
+        if (!allow_skip_dollar)
+            return (0);
+        i--;
+        while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+        {
+            i--;
+            skipped_quotes++;
+        }
+        if (i < 0)
+            return (1);
+    }
+    if (s[i] == ' ' && skipped_quotes > 1)
+        return (1);
+    return (s[i] != ' ');
 }
 
 // Merge current word-like token into the previous one if adjacent (no space).
@@ -52,10 +62,16 @@ int	merge_with_prev_if_adjacent(t_main_data *data, t_token *tok, int start,
 	char	*joined;
 
 	prev = tok->prev_token;
-	if (!tok || !prev || !is_word_token(prev->type) || !is_word_token(tok->type)
+	if (is_word_token(tok->type))
+		printf("tok text\n");
+	if (!no_space_before_token_start(data->tok->input, start,
+			just_removed_dollar))
+		printf("no space before\n");
+	if (!tok || !prev || !is_word_token(tok->type)
 		|| !no_space_before_token_start(data->tok->input, start,
 			just_removed_dollar))
 		return (0);
+	printf("merging\n");
 	a = ft_strlen(prev->word);
 	b = ft_strlen(tok->word);
 	joined = my_malloc(&((t_root *)data->root)->list_of_list, &data->malloc_tok,
