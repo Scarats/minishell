@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 20:10:44 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/05 17:02:46 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static char	*get_host_from_env(t_root *root)
 	host_env = get_env_var(root->env, "SESSION_MANAGER");
 	len = ft_strlen(host_env);
 	hostname = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char) * 7);
-	if (!hostname)
+	if (!hostname || !host_env)
 		return (NULL);
 	hostname[6] = '\0';
 	while (i < len)
