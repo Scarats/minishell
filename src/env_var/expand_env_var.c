@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:10:00 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/23 15:31:50 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 16:45:26 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,26 +19,36 @@
 // - Otherwise, never merge across a '$'.
 int	no_space_before_token_start(const char *s, int start, int allow_skip_dollar)
 {
-	int	i;
+    int	i;
+    int	skipped_quotes;
 
-	if (start <= 0)
-		return (0);
-	i = start - 1;
-	while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
-		i--;
-	if (i < 0)
-		return (0);
-	if (s[i] == '$')
-	{
-		if (!allow_skip_dollar)
-			return (0);
-		i--;
-		while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
-			i--;
-		if (i < 0)
-			return (0);
-	}
-	return (s[i] != ' ');
+    if (start <= 0)
+        return (1);
+    i = start - 1;
+    skipped_quotes = 0;
+    while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+    {
+        i--;
+        skipped_quotes++;
+    }
+    if (i < 0)
+        return (1);
+    if (s[i] == '$')
+    {
+        if (!allow_skip_dollar)
+            return (0);
+        i--;
+        while (i >= 0 && (s[i] == '\'' || s[i] == '"'))
+        {
+            i--;
+            skipped_quotes++;
+        }
+        if (i < 0)
+            return (1);
+    }
+    if (s[i] == ' ' && skipped_quotes > 1)
+        return (1);
+    return (s[i] != ' ');
 }
 
 // Merge current word-like token into the previous one if adjacent (no space).
