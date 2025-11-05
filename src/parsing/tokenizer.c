@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:40:21 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 15:19:17 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ int	create_token(t_main_data *data, int start, int end, t_token_type type)
 	if (tok->slice)
 		my_addtolist(&data->malloc_tok, tok->slice);
 	tok->word = tok->slice;
+	printf(GREEN"text = \"%s\"\n"RESET, tok->word);
 	if (tok->type == TOKEN_ENV_VAR)
 		expand_var(data, tok, removed, &removed_dollar);
 	merge_with_prev_if_adjacent(data, tok, start, removed_dollar);
