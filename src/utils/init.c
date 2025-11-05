@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 17:02:46 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/05 17:08:22 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static char	*get_host_from_env(t_root *root)
 	}
 	i++;
 	y = 0;
-	while (host_env[i] != '.')
+	while (host_env[i] && host_env[i] != '.')
 		hostname[y++] = host_env[i++];
 	return (hostname);
 } 
