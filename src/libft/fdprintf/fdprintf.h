@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   fdprintf.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/11 14:54:38 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 18:38:39 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/05 16:58:41 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FDRINTF_H
+#ifndef FDPRINTF_H
 # define FDPRINTF_H
 
 # include "../libft.h"
