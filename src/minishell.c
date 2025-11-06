@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 22:28:49 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/06 16:29:32 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 volatile sig_atomic_t	g_stop_flag = 0;
 
-void	handle_signals(void)
+/* void	handle_signals(void)
 {
 	struct sigaction	sa_int;
 	struct sigaction	sa_quit;
@@ -28,9 +28,9 @@ void	handle_signals(void)
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_flags = 0;
 	sigaction(SIGQUIT, &sa_quit, NULL);
-}
+} */
 
-void	handler(int sig)
+/* void	handler(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -41,14 +41,14 @@ void	handler(int sig)
 		//rl_redisplay();
 		//rl_done = 1;
 	}
-	/* else if (sig == SIGQUIT)
+	else if (sig == SIGQUIT)
 	{
 		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
-	} */
-}
+	}
+} */
 /* void	handler(int sig)
 {
     if (sig == SIGINT)
@@ -128,7 +128,6 @@ bool	execute_command_loop(t_root *root, char *prompt)
     char	*line;
 
     line = NULL;
-    fflush(stdout);
     if (g_stop_flag)
     {
         root->last_exit_status = 130;
@@ -164,6 +163,20 @@ bool	execute_command_loop(t_root *root, char *prompt)
     add_history(line);
     process_command(root->data, line);
     cleanup_after_command(root->data, &line);
+	if (g_stop_flag)
+    {
+       	root->last_exit_status = 130;
+        g_stop_flag = 0;
+
+		int	ttyfd;
+
+		ttyfd = open("/dev/tty", O_RDONLY);
+        if (ttyfd != -1)
+        {
+            dup2(ttyfd, STDIN_FILENO);
+            close(ttyfd);
+        }
+    }
     return (true);
 }
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 17:08:22 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/06 15:59:05 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,16 +49,16 @@ void	create_prompt(char *prompt, size_t size, t_root *root)
 	hostname = get_host_from_env(root);
 	get_host_from_env(root);
 	ft_bzero(prompt, size);
-	ft_strlcat(prompt, BLUE, size);
+	//ft_strlcat(prompt, RESET, size);
 	if (username && hostname)
 	{
 		ft_strlcat(prompt, username, size);
-		ft_strlcat(prompt, RESET "@" GREEN, size);
+		ft_strlcat(prompt, "@", size);
 		ft_strlcat(prompt, hostname, size);
-		ft_strlcat(prompt, RESET ":" PURPLE "minishell" RESET "> ", size);
+		ft_strlcat(prompt, ":minishell> ", size);
 	}
 	else
-		ft_strlcat(prompt, PURPLE "minishell" RESET "> ", size);
+		ft_strlcat(prompt, PURPLE "minishell> ", size);
 }
 
 int	init(t_root *root)
