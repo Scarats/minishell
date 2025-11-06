@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:55:44 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 21:53:14 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/06 15:27:25 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ int	pipes_logic(t_node *node, t_main_data *data)
 {
 	if (pipe(node->pipefd) == -1)
 		return (perror("pipe"), 1);
-	printf(RED "PIPE\n" RESET);
 	node->left_pid = fork();
 	if (node->left_pid == -1)
 		return (perror("fork"), 1);
