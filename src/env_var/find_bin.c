@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/20 16:47:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:05:15 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/10 14:01:16 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ char	*loop_find_bin(char **path, char *slash_bin)
 {
 	char	*tmp;
 	size_t	i;
+	struct stat st;
 
 	i = 0;
 	if (!path || !*path || !slash_bin)
@@ -29,7 +30,10 @@ char	*loop_find_bin(char **path, char *slash_bin)
 		if (!tmp)
 			break ;
 		if (access(tmp, X_OK) == 0)
-			return (tmp);
+		{
+			if (stat(tmp, &st) == 0 && !S_ISDIR(st.st_mode))
+				return (tmp);
+		}
 		free(tmp);
 		i++;
 	}
