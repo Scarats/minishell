@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 21:54:12 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/10 14:24:47 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -340,5 +340,13 @@ void					cleanup_after_command(t_main_data *data, char **line);
 void					handle_eof(char **line);
 void					handle_empty_input(char **line);
 void					cleanup(t_main_data *data, t_root *root);
+void	handle_signals_rl(void);
+void	handle_signals(void);
+void	handle_signals_heredoc(void);
+void	handler_rl(int sig);
+void	handler_heredoc(int sig);
+
+int process_heredocs(t_main_data *data);
+int process_heredocs_in_node(t_node *node, t_main_data *data);
 
 #endif

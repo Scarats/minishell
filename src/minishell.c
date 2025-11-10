@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 22:28:49 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/10 14:48:06 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,52 +14,98 @@
 
 volatile sig_atomic_t	g_stop_flag = 0;
 
+void	handle_signals_rl(void)
+{
+    struct sigaction	sa_int;
+    struct sigaction	sa_quit;
+
+    sa_int.sa_handler = handler_rl;
+    sa_int.sa_flags = 0;
+    sigemptyset(&sa_int.sa_mask);
+    sigaction(SIGINT, &sa_int, NULL);
+    
+    sa_quit.sa_handler = handler_rl;
+    sa_quit.sa_flags = 0;
+    sigemptyset(&sa_quit.sa_mask);
+    sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
 void	handle_signals(void)
 {
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
+    struct sigaction	sa_int;
+    struct sigaction	sa_quit;
 
-	sa_int.sa_handler = handler;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
+    sa_int.sa_handler = handler;
+    sa_int.sa_flags = 0;
+    sigemptyset(&sa_int.sa_mask);
+    sigaction(SIGINT, &sa_int, NULL);
+    
+    sa_quit.sa_handler = handler;
+    sa_quit.sa_flags = 0;
+    sigemptyset(&sa_quit.sa_mask);
+    sigaction(SIGQUIT, &sa_quit, NULL);
+}
 
-	sa_quit.sa_handler = SIG_IGN;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+void	handle_signals_heredoc(void)
+{
+    struct sigaction	sa_int;
+    struct sigaction	sa_quit;
+
+    sa_int.sa_handler = handler_heredoc;
+    sa_int.sa_flags = 0;
+    sigemptyset(&sa_int.sa_mask);
+    sigaction(SIGINT, &sa_int, NULL);
+    
+    sa_quit.sa_handler = handler;
+    sa_quit.sa_flags = 0;
+    sigemptyset(&sa_quit.sa_mask);
+    sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+void	handler_rl(int sig)
+{
+    if (sig == SIGINT)
+    {
+        g_stop_flag = 1;
+        rl_on_new_line();
+        rl_replace_line("", 0);
+		write(STDOUT_FILENO, "\n", 1);
+        rl_redisplay();
+    }
+    else if (sig == SIGQUIT)
+    {
+        write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
 }
 
 void	handler(int sig)
 {
-	if (sig == SIGINT)
-	{
-		g_stop_flag = 1;
+    if (sig == SIGINT)
+    {
+        g_stop_flag = 1;
 		write(STDOUT_FILENO, "\n", 1);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		//rl_redisplay();
-		//rl_done = 1;
-	}
-	/* else if (sig == SIGQUIT)
-	{
-		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
-	} */
+    }
+    else if (sig == SIGQUIT)
+    {
+        write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
 }
-/* void	handler(int sig)
+
+void	handler_heredoc(int sig)
 {
     if (sig == SIGINT)
     {
         g_stop_flag = 1;
         write(STDOUT_FILENO, "\n", 1);
-        // Do NOT call rl_on_new_line/rl_replace_line/rl_redisplay here.
-        // Only tell readline to stop and return control.
-        rl_done = 1;
+        exit(130);  // Exit with proper code
     }
-} */
+}
 
 int	process_command(t_main_data *data, char *line)
 {
@@ -71,153 +117,78 @@ int	process_command(t_main_data *data, char *line)
 	{
 		root->last_exit_status = 130;
 		g_stop_flag = 0;
-		return (130);
+		return (1);
 	}
 	if (!parser(data))
 		root->last_exit_status = traverse_tree(data->node, data);
+/* 	if (process_heredocs(data)) 
+	{
+    	root->last_exit_status = 130;  // Propagate status
+    	return root->last_exit_status;
+	} */
 	else
 	{
 		if(!g_stop_flag)
-			root->last_exit_status = 2;
+			root->last_exit_status = 1;
 		return (1);
 	}
 	return (root->last_exit_status);
 }
 
-/* bool	execute_command_loop(t_root *root, char *prompt) first function (working)
-{
-	char	*line;
-
-	line = NULL;
-	fflush(stdout);
-	if (g_stop_flag)
-	{
-		root->last_exit_status = 130;
-		g_stop_flag = 0;		
-		rl_done = 0;
-		//rl_on_new_line();
-		return (true);
-	}
-	rl_done = 0;
-	line = readline(prompt);
-	if (rl_done)
-	{
-		rl_done = 0;
-		return (false);
-	}
-	if (!line)
-	{
-		handle_eof(&line);
-		return (false);
-	}
-	if (line[0] == '\0')
-	{
-		handle_empty_input(&line);
-		return (true);
-	}
-	if (init(root))
-		return (false);
-	add_history(line);
-	process_command(root->data, line);
-	cleanup_after_command(root->data, &line);
-	return (true);
-} */
-
 bool	execute_command_loop(t_root *root, char *prompt)
 {
-    char	*line;
+    char *line;
+    int ttyfd;
 
-    line = NULL;
-    fflush(stdout);
-    if (g_stop_flag)
-    {
-        root->last_exit_status = 130;
-        g_stop_flag = 0;
-        //rl_done = 0;  // Reset for the next readline
-		//rl_on_new_line();
-        return (true);  // Restart the loop in main()
-    }
-    //rl_done = 0;
+    g_stop_flag = 0;
+    handle_signals_rl();
     line = readline(prompt);
+    
     if (g_stop_flag)
     {
-        g_stop_flag = 0;
         root->last_exit_status = 130;
+        g_stop_flag = 0;
         if (line)
             free(line);
-        //rl_done = 0;
-        //rl_on_new_line();
+        
+        // Restore terminal state
+        ttyfd = open("/dev/tty", O_RDONLY);
+        if (ttyfd != -1)
+        {
+            dup2(ttyfd, STDIN_FILENO);
+            close(ttyfd);
+        }
         return (true);
-    }    
+    }
+    
     if (!line)
     {
         handle_eof(&line);
         return (false);
     }
+    
     if (line[0] == '\0')
     {
         handle_empty_input(&line);
         return (true);
     }
+    
+    if (!ft_strncmp(line, "exit", 4) && (line[4] == '\0' || line[4] == ' '))
+    {
+        free(line);
+        return (false);
+    }
+    
     if (init(root))
         return (false);
+    
     add_history(line);
+    handle_signals();  // Switch to execution signal handling
     process_command(root->data, line);
     cleanup_after_command(root->data, &line);
+    
     return (true);
 }
-
-/* bool	execute_command_loop(t_root *root, char *prompt)
-{
-    char	*line;
-
-    line = NULL;
-    fflush(stdout);
-
-    while (1)
-    {
-        rl_done = 0;                 // start a fresh readline session
-        line = readline(prompt);
-
-        // If SIGINT interrupted readline, clean up readline state here (not in handler),
-        // set exit status, and restart the prompt without eating the next key.
-        if (g_stop_flag)
-        {
-            root->last_exit_status = 130;
-            g_stop_flag = 0;
-
-            if (line)
-                free(line);
-            line = NULL;
-
-            // Now safely reset readline UI state
-			rl_replace_line("", 0);
-            rl_on_new_line();            
-            //rl_redisplay();
-
-            // Show the prompt again by looping
-            continue;
-        }
-        break;
-    }
-
-    if (!line)
-    {
-        handle_eof(&line);
-        return (false);
-    }
-    if (line[0] == '\0')
-    {
-        handle_empty_input(&line);
-        return (true);
-    }
-    if (init(root))
-        return (false);
-    add_history(line);
-    process_command(root->data, line);
-    cleanup_after_command(root->data, &line);
-    return (true);
-} */
 
 int	main(int ac, char **av, char **envp)
 {
