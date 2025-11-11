@@ -14,52 +14,43 @@ static char *generate_heredoc_filename(void)
     return (filename);
 }
 
-static int is_delimiter_match(char *line, char *delimiter)
+static void heredoc_child_signal_handler(int sig)
 {
-    char *trimmed_line;
-    char *trimmed_delim;
-    int match = 0;
-    
-    if (!line || !delimiter)
-        return (0);
-    
-    // Trim both line and delimiter for proper comparison
-    trimmed_line = ft_strtrim(line, " \t\n");
-    trimmed_delim = ft_strtrim(delimiter, " \t\n");
-    
-    if (trimmed_line && trimmed_delim)
-        match = (ft_strcmp(trimmed_line, trimmed_delim) == 0);
-    
-    if (trimmed_line) free(trimmed_line);
-    if (trimmed_delim) free(trimmed_delim);
-    return (match);
+    if (sig == SIGINT)
+    {
+        write(STDOUT_FILENO, "\n", 1);
+        printf("SIGINT HEREDOC\n");
+        rl_redisplay();
+        exit(130);
+
+    }
+    if (sig == SIGQUIT)
+        return;
 }
 
-static void setup_heredoc_signals(void)
+static int is_delimiter_match(char *line, char *delimiter)
 {
-    struct sigaction sa;
+    size_t delim_len;
     
-    sa.sa_handler = SIG_DFL;  // Default signal handling in child
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGQUIT, &sa, NULL);
+    if (!delimiter)
+        return (0);
+    delim_len = ft_strlen(delimiter);
+    if (ft_strncmp(line, delimiter, delim_len) == 0 && line[delim_len] == '\0')
+        return (1);
+    return (0);
 }
 
 static int read_heredoc_input(int fd, char *delimiter)
 {
     char *line;
     
-    setup_heredoc_signals();  // Set up proper signal handling for heredoc
-    
     while (1)
     {
         line = readline("> ");
-        if (!line)  // EOF (Ctrl+D)
+        if (!line)
             break;
         if (is_delimiter_match(line, delimiter))
         {
-            printf("eof\n");
             free(line);
             break;
         }
@@ -69,63 +60,50 @@ static int read_heredoc_input(int fd, char *delimiter)
     return (0);
 }
 
-static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
+static void setup_child_signals(void)
 {
-    (void)data;
-    read_heredoc_input(fd, redir->filename);
-    close(fd);
-    exit(0);  // Child must exit
+    struct sigaction sa_new;
+    
+    sa_new.sa_handler = heredoc_child_signal_handler;
+    sigemptyset(&sa_new.sa_mask);
+    sa_new.sa_flags = 0;
+    sigaction(SIGINT, &sa_new, NULL);
+    sigaction(SIGQUIT, &sa_new, NULL);
 }
 
-static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
+static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
 {
-    pid_t pid;
-    int status;
-    t_root *root = data->root;
-    
-    pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-        return (-1);
-    }
-    
-    if (pid == 0)  // Child process
-    {
-        handle_child_process(fd, redir, data);
-    }
-    
-    // Parent process
+    t_root *root;
+
+    root = data->root;
+    setup_child_signals();
+    read_heredoc_input(fd, redir->filename);
     close(fd);
-    
-    if (waitpid(pid, &status, 0) == -1)
-    {
-        perror("waitpid");
-        return (-1);
-    }
-    
-    // Handle child exit status
+    my_multi_free(&root->list_of_list);
+    exit(0);
+}
+
+static int handle_wait_status(int status, t_main_data *data, char *filename)
+{
+    t_root *root;
+
+    root = data->root;
     if (WIFEXITED(status))
     {
         int exit_code = WEXITSTATUS(status);
-        if (exit_code == 130)  // SIGINT
+        if (exit_code == 130)
         {
             root->last_exit_status = 130;
             unlink(filename);
             return (-1);
         }
     }
-    else if (WIFSIGNALED(status))
+    if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
     {
-        int sig = WTERMSIG(status);
-        if (sig == SIGINT)
-        {
-            root->last_exit_status = 130;
-            unlink(filename);
-            return (-1);
-        }
+        root->last_exit_status = 130;
+        unlink(filename);
+        return (-1);
     }
-    
     return (0);
 }
 
@@ -140,17 +118,49 @@ static int create_heredoc_file(char **filename)
     if (fd == -1)
     {
         free(*filename);
-        *filename = NULL;
         return (-1);
     }
     return (fd);
 }
 
+static int cleanup_and_return_error(int fd, char *filename)
+{
+    if (fd != -1)
+        close(fd);
+    if (filename)
+    {
+        unlink(filename);
+        free(filename);
+    }
+    return (-1);
+}
+
+static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
+{
+    int pid, status;
+    
+    pid = fork();
+    if (pid == -1)
+        return (cleanup_and_return_error(fd, filename));
+    if (pid == 0)
+        return (handle_child_process(fd, redir, data));
+    close(fd);
+    if (waitpid(pid, &status, 0) == -1)
+        return (cleanup_and_return_error(-1, filename));
+    if (handle_wait_status(status, data, filename) == -1)
+    {
+        handle_signals();
+        return (cleanup_and_return_error(-1, filename));
+    }
+    return (0);
+}
+
 static int open_and_assign_filename(char *filename, t_redir *redir, t_main_data *data)
 {
     int read_fd;
-    t_root *root = data->root;
-    
+    t_root *root;
+
+    root = data->root;    
     read_fd = open(filename, O_RDONLY);
     if (read_fd == -1)
     {
@@ -169,16 +179,9 @@ int heredoc(t_redir *redir, t_main_data *data)
     char *filename;
     
     fd = create_heredoc_file(&filename);
-    printf("heredoc exec\n");
     if (fd == -1)
         return (-1);
-    
     if (handle_fork_and_wait(fd, redir, data, filename) == -1)
-    {
-        if (filename)
-            free(filename);
         return (-1);
-    }
-    
     return (open_and_assign_filename(filename, redir, data));
 }
