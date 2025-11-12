@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/11 16:43:48 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/12 14:01:36 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,15 @@ void	handler(int sig)
 	if (sig == SIGINT)
 	{
 		g_stop_flag = 1;
-		printf("SIGINT\n");
-        
-        //rl_replace_line("", 0);
-        //rl_on_new_line();
-        rl_redisplay();
-		write(STDOUT_FILENO, "\n", 1);
+		
+		//printf("SIGINT\n");
+        write(STDOUT_FILENO, "\n", 1);
+		rl_done = 1;
+        //
+        rl_replace_line("", 0);
+		rl_on_new_line();
+        //rl_redisplay();
+		
 	}
 	else if (sig == SIGQUIT)
 	{
@@ -56,9 +59,10 @@ void	handler_heredoc(int sig)
 	{
 		g_stop_flag = 1;
 		// srl_on_new_line();
-		//
-		rl_on_new_line();
+		rl_done = 1;
+		
 		rl_replace_line("", 0);
+		rl_on_new_line();
 		write(STDOUT_FILENO, "\n", 1);
 		close(STDIN_FILENO);
 		// printf("Closing\n");
@@ -74,16 +78,18 @@ static int	process_command(t_main_data *data, char *line)
 
 	root = data->root;
 	reset_tokenizer_for_line(data->tok, line);
+	if (g_stop_flag)
+	{
+		root->last_exit_status = 130;
+		g_stop_flag = 0;
+		return (130);
+	}
 	if (!parser(data))
 	{
 		root->last_exit_status = traverse_tree(data->node, data);
-		return (root->last_exit_status);
 	}
 	else
-	{
-        root->last_exit_status = 2;
-         return (root->last_exit_status);
-    }
+		return (1);
 	return (root->last_exit_status);
 }
 
@@ -115,27 +121,31 @@ static int	process_command(t_main_data *data, char *line)
 static bool	execute_command_loop(t_root *root, char *prompt)
 {
     char *line;
-    int ttyfd;
+    //eint ttyfd;
 
     //line = NULL;
-    g_stop_flag = 0;
-    handle_signals();
-    line = readline(prompt);    
+    //g_stop_flag = 0;
+    //handle_signals();
+	line = readline(prompt);
 	if (g_stop_flag)
 	{
 		root->last_exit_status = 130;
 		g_stop_flag = 0;
+		//rl_replace_line("", 0);
+		//rl_on_new_line();
 		if (line)
 			free(line);
-		// Restore terminal state
+/* 		// Restore terminal state
 		ttyfd = open("/dev/tty", O_RDONLY);
 		if (ttyfd != -1)
 		{
 			dup2(ttyfd, STDIN_FILENO);
 			close(ttyfd);
-		}
+		} */
 		return (true);
 	}
+	if (rl_done)
+		rl_done = 0;
 	if (!line)
 	{
 		handle_eof(&line);
@@ -156,7 +166,6 @@ static bool	execute_command_loop(t_root *root, char *prompt)
 	add_history(line);
 	process_command(root->data, line);
 	cleanup_after_command(root->data, &line);
-    g_stop_flag = 0;
 	return (true);
 }
 

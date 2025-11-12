@@ -19,21 +19,13 @@ static void heredoc_child_signal_handler(int sig)
     if (sig == SIGINT)
     {
         write(STDOUT_FILENO, "\n", 1);
+        printf("SIGINT HEREDOC\n");
+        rl_redisplay();
         exit(130);
+
     }
     if (sig == SIGQUIT)
         return;
-}
-
-static void attach_tty_for_readline(void)
-{
-    int tty = open("/dev/tty", O_RDWR);
-    if (tty >= 0)
-    {
-        dup2(tty, STDIN_FILENO);
-        dup2(tty, STDOUT_FILENO);
-        close(tty);
-    }
 }
 
 static int is_delimiter_match(char *line, char *delimiter)
@@ -83,9 +75,8 @@ static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
 {
     t_root *root;
 
-    root = data->root; 
+    root = data->root;
     setup_child_signals();
-    attach_tty_for_readline();
     read_heredoc_input(fd, redir->filename);
     close(fd);
     my_multi_free(&root->list_of_list);
@@ -96,14 +87,13 @@ static int handle_wait_status(int status, t_main_data *data, char *filename)
 {
     t_root *root;
 
-    root = data->root; 
+    root = data->root;
     if (WIFEXITED(status))
     {
         int exit_code = WEXITSTATUS(status);
         if (exit_code == 130)
         {
             root->last_exit_status = 130;
-            g_stop_flag = 1;
             unlink(filename);
             return (-1);
         }
@@ -111,7 +101,6 @@ static int handle_wait_status(int status, t_main_data *data, char *filename)
     if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
     {
         root->last_exit_status = 130;
-        g_stop_flag = 1;
         unlink(filename);
         return (-1);
     }
@@ -145,36 +134,11 @@ static int cleanup_and_return_error(int fd, char *filename)
     }
     return (-1);
 }
-static int wait_heredoc_child(pid_t pid, t_root *root)
-{
-    int status;
-    struct sigaction oldint, oldquit, ign;
-
-    ign.sa_handler = SIG_IGN;
-    sigemptyset(&ign.sa_mask);
-    ign.sa_flags = 0;
-    sigaction(SIGINT, &ign, &oldint);
-    sigaction(SIGQUIT, &ign, &oldquit);
-    if (waitpid(pid, &status, 0) == -1)
-        status = -1;
-    sigaction(SIGINT, &oldint, NULL);
-    sigaction(SIGQUIT, &oldquit, NULL);
-    if (status != -1 && WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-    {
-        root->last_exit_status = 130;
-        g_stop_flag = 1;
-        return (-1);
-    }
-    return (0);
-}
 
 static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
 {
     int pid, status;
-    t_root *root;
-    struct sigaction oldint, oldquit, ign;
     
-    root = data->root; 
     pid = fork();
     if (pid == -1)
         return (cleanup_and_return_error(fd, filename));
@@ -187,11 +151,6 @@ static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char 
     {
         handle_signals();
         return (cleanup_and_return_error(-1, filename));
-    }
-    else
-    {
-        if(wait_heredoc_child(pid, root))
-            return(-1);
     }
     return (0);
 }
