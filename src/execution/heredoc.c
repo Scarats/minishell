@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-static char *generate_heredoc_filename(void)
+static char *generate_heredoc_filename(t_main_data *data)
 {
     static int counter = 0;
     char *filename;
@@ -10,6 +10,7 @@ static char *generate_heredoc_filename(void)
     if (!tmp)
         return (NULL);
     filename = ft_strjoin("/tmp/minishell_heredoc_", tmp);
+    my_addtolist(&data->malloc_tree, filename);
     free(tmp);
     return (filename);
 }
@@ -118,11 +119,11 @@ static int handle_wait_status(int status, t_main_data *data, char *filename)
     return (0);
 }
 
-static int create_heredoc_file(char **filename)
+static int create_heredoc_file(char **filename, t_main_data *data)
 {
     int fd;
     
-    *filename = generate_heredoc_filename();
+    *filename = generate_heredoc_filename(data);
     if (!*filename)
         return (-1);
     fd = open(*filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
@@ -219,7 +220,7 @@ int heredoc(t_redir *redir, t_main_data *data)
     int fd;
     char *filename;
     
-    fd = create_heredoc_file(&filename);
+    fd = create_heredoc_file(&filename, data);
     if (fd == -1)
         return (-1);
     if (handle_fork_and_wait(fd, redir, data, filename) == -1)
