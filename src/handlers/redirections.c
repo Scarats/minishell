@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:42:15 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 21:45:44 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 18:48:16 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,14 +58,36 @@ int	open_file(char *filename, int action)
 	return (0);
 }
 
-// Check the redirections, change accordingly the inpout and output fds
-// If redirected, changes the fd.
-/* int	redirections(t_node *node, t_main_data *data)
+int	heredoc_redir(int fd, t_redir *redir, t_main_data *data, t_root *root)
 {
-	t_redir	*redir;
+	fd = heredoc(redir, data);
+	if (fd < 0)
+	{
+		if (root->last_exit_status == 130)
+			return (130);
+		return (1);
+	}
+	if (dup2(fd, STDIN_FILENO) == -1)
+	{
+		close(fd);
+		return (1);
+	}
+	close(fd);
+	return (0);
+}
 
-	if (!data)
-		data = NULL;
+int	redirections(t_node *node, t_main_data *data)
+{
+	t_root	*root;
+	t_redir	*redir;
+	int		fd;
+	int		error;
+
+	if (!data || !node)
+		return (1);
+	fd = -1;
+	error = 0;
+	root = data->root;
 	redir = node->redirection;
 	while (redir)
 	{
@@ -76,48 +98,11 @@ int	open_file(char *filename, int action)
 			return (1);
 		else if (redir->type == TOKEN_APPEND && open_file(redir->filename, 3))
 			return (1);
+		else if (redir->type == TOKEN_HEREDOC)
+			error = heredoc_redir(fd, redir, data, root);
 		redir = redir->next;
 	}
-	return (0);
-} */
-
-int	redirections(t_node *node, t_main_data *data)
-{
-    t_redir	*redir;
-	t_root *root;
-	int fd;
-    
-	if (!data || !node)
-		return (1);
-	root = data->root;
-    redir = node->redirection;
-    while (redir)
-    {
-        if (redir->type == TOKEN_REDIRECT_IN && open_file(redir->filename, 1))
-            return (1);
-        else if (redir->type == TOKEN_REDIRECT_OUT && open_file(redir->filename, 2))
-            return (1);
-        else if (redir->type == TOKEN_APPEND && open_file(redir->filename, 3))
-            return (1);
-        else if (redir->type == TOKEN_HEREDOC)
-        {
-            fd = heredoc(redir, data);
-            if (fd < 0)
-            {
-                if (root->last_exit_status == 130)
-                    return (130);
-                return (1);
-            }
-            if (dup2(fd, STDIN_FILENO) == -1)
-            {
-                close(fd);
-                return (1);
-            }
-            close(fd);
-        }
-        redir = redir->next;
-    }
-    return (0);
+	return (error);
 }
 
 int	set_io_fds(t_node *node, t_main_data *data)

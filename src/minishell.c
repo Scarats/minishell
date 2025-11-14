@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/12 14:01:36 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 18:48:12 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,14 +34,10 @@ void	handler(int sig)
 	if (sig == SIGINT)
 	{
 		g_stop_flag = 1;
-		
-		//printf("SIGINT\n");
         write(STDOUT_FILENO, "\n", 1);
 		rl_done = 1;
-        //
         rl_replace_line("", 0);
 		rl_on_new_line();
-        //rl_redisplay();
 		
 	}
 	else if (sig == SIGQUIT)
@@ -58,18 +54,12 @@ void	handler_heredoc(int sig)
 	if (sig == SIGINT)
 	{
 		g_stop_flag = 1;
-		// srl_on_new_line();
 		rl_done = 1;
 		
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		write(STDOUT_FILENO, "\n", 1);
 		close(STDIN_FILENO);
-		// printf("Closing\n");
-		// rl_done = 1;
-		// close(STDIN_FILENO);
-		// rl_replace_line("", 0);
-		// rl_redisplay();
 	}
 }
 static int	process_command(t_main_data *data, char *line)
