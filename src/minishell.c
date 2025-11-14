@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 19:33:03 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 19:43:14 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,10 @@ void	handler(int sig)
 	if (sig == SIGINT)
 	{
 		g_stop_flag = 1;
-        write(STDOUT_FILENO, "\n", 1);
+		write(STDOUT_FILENO, "\n", 1);
 		rl_done = 1;
-        rl_replace_line("", 0);
+		rl_replace_line("", 0);
 		rl_on_new_line();
-		
 	}
 	else if (sig == SIGQUIT)
 	{
@@ -49,19 +48,6 @@ void	handler(int sig)
 	}
 }
 
-void	handler_heredoc(int sig)
-{
-	if (sig == SIGINT)
-	{
-		g_stop_flag = 1;
-		rl_done = 1;
-		
-		rl_replace_line("", 0);
-		rl_on_new_line();
-		write(STDOUT_FILENO, "\n", 1);
-		close(STDIN_FILENO);
-	}
-}
 static int	process_command(t_main_data *data, char *line)
 {
 	t_root	*root;
@@ -85,7 +71,7 @@ static int	process_command(t_main_data *data, char *line)
 
 static bool	execute_command_loop(t_root *root, char *prompt)
 {
-    char *line;
+	char	*line;
 
 	line = readline(prompt);
 	if (g_stop_flag)
@@ -99,20 +85,11 @@ static bool	execute_command_loop(t_root *root, char *prompt)
 	if (rl_done)
 		rl_done = 0;
 	if (!line)
-	{
-		handle_eof(&line);
-		return (false);
-	}
+		return (handle_eof(&line), false);
 	if (line[0] == '\0')
-	{
-		handle_empty_input(&line);
-		return (true);
-	}
+		return (handle_empty_input(&line), true);
 	if (!ft_strncmp(line, "exit", 4) && (line[4] == '\0' || line[4] == ' '))
-	{
-		free(line);
-		return (false);
-	}
+		return (free(line), false);
 	if (init(root))
 		return (false);
 	add_history(line);
@@ -123,10 +100,10 @@ static bool	execute_command_loop(t_root *root, char *prompt)
 
 int	main(int ac, char **av, char **envp)
 {
-	t_main_data data;
-	t_root root;
-	char prompt[1024];
-	int exit_status;
+	t_main_data	data;
+	t_root		root;
+	char		prompt[1024];
+	int			exit_status;
 
 	ft_memset(&root, 0, sizeof(root));
 	ft_memset(&data, 0, sizeof(data));

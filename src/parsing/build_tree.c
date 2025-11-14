@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:50:28 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 19:34:17 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 19:43:14 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,6 @@ t_node	*create_node(t_main_data *data, t_token *tok_array, t_node_type type,
 	t_node	*node;
 	t_root	*root;
 
-	printf("create_node\n");
 	root = data->root;
 	node = my_malloc(&root->list_of_list, &data->malloc_tree, sizeof(t_node));
 	node->type = type;
