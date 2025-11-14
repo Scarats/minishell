@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/11 16:27:31 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 19:17:41 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,32 @@
 
 static char	*get_host_from_env(t_root *root)
 {
-	char *hostname;
-	char *host_env;
-	int i;
-	int len;
-	int y;
+	char	*hostname;
+	char	*host_env;
+	int		i;
+	int		len;
+	int		y;
 
 	i = 0;
 	host_env = get_env_var(root->env, "SESSION_MANAGER");
 	len = ft_strlen(host_env);
-	hostname = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char) * 7);
+	hostname = my_malloc(&root->list_of_list, &root->malloc_root, sizeof(char)
+			* 7);
 	if (!hostname || !host_env)
 		return (NULL);
 	hostname[6] = '\0';
 	while (i < len)
 	{
-		if(host_env[i] == '/')
+		if (host_env[i] == '/')
 			break ;
-		i++;	
+		i++;
 	}
 	i++;
 	y = 0;
 	while (host_env[i] && host_env[i] != '.')
 		hostname[y++] = host_env[i++];
 	return (hostname);
-} 
+}
 
 void	create_prompt(char *prompt, size_t size, t_root *root)
 {

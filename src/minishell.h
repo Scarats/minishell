@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 16:28:54 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 19:28:03 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,7 +241,7 @@ t_token_type			get_tok_type(char c, char next);
 t_char_type				get_char_type(char c);
 char					check_next_char(char *str, int pos);
 int						tokenizer(t_main_data *data);
-int						handle_quotes(t_tokenizer *tok, t_main_data *data);
+int						handle_quotes(t_tokenizer *tok, t_main_data *data, char c);
 char					*clean_string(char *input);
 int						create_token(t_main_data *data, int start, int end,
 							t_token_type type);
