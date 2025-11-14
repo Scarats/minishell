@@ -1,5 +1,21 @@
 #include "../minishell.h"
 
+static void setup_parent_signals_for_heredoc(struct sigaction *old_int, struct sigaction *old_quit)
+{
+    struct sigaction ign;
+    ign.sa_handler = SIG_IGN;
+    sigemptyset(&ign.sa_mask);
+    ign.sa_flags = 0;
+    sigaction(SIGINT, &ign, old_int);
+    sigaction(SIGQUIT, &ign, old_quit);
+}
+
+/* static void restore_parent_signals(struct sigaction *old_int, struct sigaction *old_quit)
+{
+    sigaction(SIGINT, old_int, NULL);
+    sigaction(SIGQUIT, old_quit, NULL);
+} */
+
 static char *generate_heredoc_filename(void)
 {
     static int counter = 0;
@@ -145,7 +161,7 @@ static int cleanup_and_return_error(int fd, char *filename)
     }
     return (-1);
 }
-static int wait_heredoc_child(pid_t pid, t_root *root)
+/* static int wait_heredoc_child(pid_t pid, t_root *root)
 {
     int status;
     struct sigaction oldint, oldquit, ign;
@@ -162,37 +178,58 @@ static int wait_heredoc_child(pid_t pid, t_root *root)
     if (status != -1 && WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
     {
         root->last_exit_status = 130;
+        set_last_exit_status_var(root, 130);
+        root->data->redir->aborted = true;
         g_stop_flag = 1;
         return (-1);
     }
     return (0);
-}
+} */
 
-static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char *filename)
+/* static void	ignore_signals(void)
 {
-    int pid, status;
-    t_root *root;
-    struct sigaction oldint, oldquit, ign;
-    
-    root = data->root; 
+	struct sigaction	sa;
+
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+} */
+
+static int handle_fork_and_wait(int fd, t_redir *redir,
+                                t_main_data *data, char *filename)
+{
+    int                 pid;
+    int                 status;
+    struct sigaction    old_int;
+    struct sigaction    old_quit;
+
+    setup_parent_signals_for_heredoc(&old_int, &old_quit);
     pid = fork();
     if (pid == -1)
+    {
+        // restore parent handlers before returning
+        sigaction(SIGINT, &old_int, NULL);
+        sigaction(SIGQUIT, &old_quit, NULL);
         return (cleanup_and_return_error(fd, filename));
+    }
     if (pid == 0)
         return (handle_child_process(fd, redir, data));
+
     close(fd);
     if (waitpid(pid, &status, 0) == -1)
+    {
+        sigaction(SIGINT, &old_int, NULL);
+        sigaction(SIGQUIT, &old_quit, NULL);
         return (cleanup_and_return_error(-1, filename));
+    }
+    // restore what the parent had before heredoc
+    sigaction(SIGINT, &old_int, NULL);
+    sigaction(SIGQUIT, &old_quit, NULL);
+
     if (handle_wait_status(status, data, filename) == -1)
-    {
-        handle_signals();
         return (cleanup_and_return_error(-1, filename));
-    }
-    else
-    {
-        if(wait_heredoc_child(pid, root))
-            return(-1);
-    }
     return (0);
 }
 

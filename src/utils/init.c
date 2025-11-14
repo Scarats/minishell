@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/11 16:27:31 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 13:59:31 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ int	init(t_root *root)
 	data->malloc_tree = NULL;
 	data->error = 0;
 	data->in_child = false;
+	root->last_exit_status = 0;
 	return (0);
 }
 

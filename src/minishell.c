@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/12 14:01:36 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 14:15:21 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,18 +37,18 @@ void	handler(int sig)
 		
 		//printf("SIGINT\n");
         write(STDOUT_FILENO, "\n", 1);
-		rl_done = 1;
+		//rl_done = 1;
         //
         rl_replace_line("", 0);
 		rl_on_new_line();
-        //rl_redisplay();
+        rl_redisplay();
 		
 	}
 	else if (sig == SIGQUIT)
 	{
 		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
-		rl_on_new_line();
 		rl_replace_line("", 0);
+		rl_on_new_line();		
 		rl_redisplay();
 	}
 }
@@ -59,17 +59,17 @@ void	handler_heredoc(int sig)
 	{
 		g_stop_flag = 1;
 		// srl_on_new_line();
-		rl_done = 1;
+		//rl_done = 1;
 		
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		write(STDOUT_FILENO, "\n", 1);
-		close(STDIN_FILENO);
+		//close(STDIN_FILENO);
 		// printf("Closing\n");
 		// rl_done = 1;
 		// close(STDIN_FILENO);
 		// rl_replace_line("", 0);
-		// rl_redisplay();
+		rl_redisplay();
 	}
 }
 static int	process_command(t_main_data *data, char *line)
@@ -125,7 +125,8 @@ static bool	execute_command_loop(t_root *root, char *prompt)
 
     //line = NULL;
     //g_stop_flag = 0;
-    //handle_signals();
+    
+	handle_signals();
 	line = readline(prompt);
 	if (g_stop_flag)
 	{
@@ -232,6 +233,7 @@ int	main(int ac, char **av, char **envp)
 	root.data = &data;
 	data.root = &root;
 	root.env = set_env_var_list(&root, envp);
+	handle_signals();
 	if (initialize_shell(&root, prompt, sizeof(prompt)))
 		return (1);
 	while (execute_command_loop(&root, prompt))
