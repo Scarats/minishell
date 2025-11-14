@@ -1,6 +1,6 @@
 #include "../minishell.h"
 
-static int	is_delimiter_match(char *line, char *delimiter)
+int	is_delimiter_match(char *line, char *delimiter)
 {
 	size_t	delim_len;
 
@@ -12,7 +12,7 @@ static int	is_delimiter_match(char *line, char *delimiter)
 	return (0);
 }
 
-static int	read_heredoc_input(int fd, char *delimiter)
+int	read_heredoc_input(int fd, char *delimiter)
 {
 	char	*line;
 
@@ -32,7 +32,7 @@ static int	read_heredoc_input(int fd, char *delimiter)
 	return (0);
 }
 
-static void	setup_child_signals(void)
+void	setup_child_signals(void)
 {
 	struct sigaction	sa_new;
 
