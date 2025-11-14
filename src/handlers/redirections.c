@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:42:15 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 19:31:52 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 19:34:17 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,31 +58,6 @@ int	open_file(char *filename, int action)
 	return (0);
 }
 
-// Check the redirections, change accordingly the inpout and output fds
-// If redirected, changes the fd.
-/* int	redirections(t_node *node, t_main_data *data)
-{
-	t_redir	*redir;
-	t_redir	*redir;
-	t_root	*root;
-	int		fd;
-
-	if (!data)
-		data = NULL;
-	redir = node->redirection;
-	while (redir)
-	{
-		if (redir->type == TOKEN_REDIRECT_IN && open_file(redir->filename, 1))
-			return (1);
-		else if (redir->type == TOKEN_REDIRECT_OUT && open_file(redir->filename,
-				2))
-			return (1);
-		else if (redir->type == TOKEN_APPEND && open_file(redir->filename, 3))
-			return (1);
-		redir = redir->next;
-	}
-	return (0);
-} */
 int	heredoc_redir(int fd, t_redir *redir, t_main_data *data, t_root *root)
 {
 	fd = heredoc(redir, data);
