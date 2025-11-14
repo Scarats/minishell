@@ -3,6 +3,8 @@
 static void setup_parent_signals_for_heredoc(struct sigaction *old_int, struct sigaction *old_quit)
 {
     struct sigaction ign;
+
+    ft_bzero(&ign, sizeof(ign));
     ign.sa_handler = SIG_IGN;
     sigemptyset(&ign.sa_mask);
     ign.sa_flags = 0;
@@ -35,7 +37,8 @@ static void heredoc_child_signal_handler(int sig)
     if (sig == SIGINT)
     {
         write(STDOUT_FILENO, "\n", 1);
-        exit(130);
+        return ;
+        //exit(130);
     }
     if (sig == SIGQUIT)
         return;
@@ -86,13 +89,15 @@ static int read_heredoc_input(int fd, char *delimiter)
 
 static void setup_child_signals(void)
 {
-    struct sigaction sa_new;
+    struct sigaction sa_ign;
     
-    sa_new.sa_handler = heredoc_child_signal_handler;
-    sigemptyset(&sa_new.sa_mask);
-    sa_new.sa_flags = 0;
-    sigaction(SIGINT, &sa_new, NULL);
-    sigaction(SIGQUIT, &sa_new, NULL);
+    ft_bzero(&sa_ign, sizeof(sa_ign));
+    sa_ign.sa_handler = heredoc_child_signal_handler;
+    sigemptyset(&sa_ign.sa_mask);
+    sa_ign.sa_flags = SA_RESTART;
+    //sa_new.sa_flags = 0;
+    sigaction(SIGINT, &sa_ign, NULL);
+    sigaction(SIGQUIT, &sa_ign, NULL);
 }
 
 static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
@@ -100,6 +105,7 @@ static int handle_child_process(int fd, t_redir *redir, t_main_data *data)
     t_root *root;
 
     root = data->root; 
+    rl_catch_signals = 0;
     setup_child_signals();
     attach_tty_for_readline();
     read_heredoc_input(fd, redir->filename);
@@ -209,7 +215,6 @@ static int handle_fork_and_wait(int fd, t_redir *redir,
     pid = fork();
     if (pid == -1)
     {
-        // restore parent handlers before returning
         sigaction(SIGINT, &old_int, NULL);
         sigaction(SIGQUIT, &old_quit, NULL);
         return (cleanup_and_return_error(fd, filename));
@@ -224,7 +229,6 @@ static int handle_fork_and_wait(int fd, t_redir *redir,
         sigaction(SIGQUIT, &old_quit, NULL);
         return (cleanup_and_return_error(-1, filename));
     }
-    // restore what the parent had before heredoc
     sigaction(SIGINT, &old_int, NULL);
     sigaction(SIGQUIT, &old_quit, NULL);
 

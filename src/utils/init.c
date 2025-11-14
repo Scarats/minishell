@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 13:59:31 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 14:47:04 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	reset_tokenizer_for_line(t_tokenizer *tok, char *line)
 int	initialize_shell(t_root *root, char *prompt, size_t prompt_size)
 {
 	create_prompt(prompt, prompt_size, root);
-	handle_signals();
+	//handle_signals();
 	if (init(root))
 	{
 		fdprintf(2, "Initialization failed\n");
