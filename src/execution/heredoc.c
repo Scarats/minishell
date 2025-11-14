@@ -172,7 +172,7 @@ static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char 
 {
     int pid, status;
     t_root *root;
-    struct sigaction oldint, oldquit, ign;
+    //struct sigaction oldint, oldquit, ign;
     
     root = data->root; 
     pid = fork();
