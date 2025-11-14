@@ -6,12 +6,11 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/06 17:48:27 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 19:48:32 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
 
 // Call step by step each function for clean execution.
 int	exec_handler(t_main_data *data, t_node *node)
