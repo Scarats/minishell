@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:25 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/30 17:00:40 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:45:00 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,11 @@ int	del_one(t_root *root, t_env **head, const char *name)
 {
 	t_env	*prev;
 	t_env	*curr;
-	//int		length;
 
 	if (!head || !*head || !name)
 		return (1);
 	prev = NULL;
 	curr = *head;
-	//length = ft_strlen(name);
 	while (curr)
 	{
 		if (curr->name && !ft_strcmp(curr->name, name))
