@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 19:48:32 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 20:00:20 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,6 +297,17 @@ int					open_file(char *filename, int action);
 int					get_bin_path(t_node *node, t_main_data *data);
 void				print_exec_error(int error, t_node *node);
 int					heredoc(t_redir *redir, t_main_data *data);
+char				*generate_heredoc_filename(t_main_data *data);
+void				heredoc_child_signal_handler(int sig);
+void				attach_tty_for_readline(void);
+int					is_delimiter_match(char *line, char *delimiter);
+int					read_heredoc_input(int fd, char *delimiter);
+void				setup_child_signals(void);
+int					handle_child_process(int fd,
+						t_redir *redir, t_main_data *data);
+int					handle_wait_status(int status,
+						t_main_data *data, char *filename);
+int					create_heredoc_file(t_main_data *data, char **filename);
 
 /* -------------------- Builtins / Command helpers -------------------- */
 int					exec_builtins(t_node *node, t_main_data *data);
