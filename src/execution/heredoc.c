@@ -1,73 +1,5 @@
 #include "../minishell.h"
 
-static char *generate_heredoc_filename(void)
-{
-    static int counter = 0;
-    char *filename;
-    char *tmp;
-    
-    tmp = ft_itoa(counter++);
-    if (!tmp)
-        return (NULL);
-    filename = ft_strjoin("/tmp/minishell_heredoc_", tmp);
-    free(tmp);
-    return (filename);
-}
-
-static void heredoc_child_signal_handler(int sig)
-{
-    if (sig == SIGINT)
-    {
-        write(STDOUT_FILENO, "\n", 1);
-        exit(130);
-    }
-    if (sig == SIGQUIT)
-        return;
-}
-
-static void attach_tty_for_readline(void)
-{
-    int tty = open("/dev/tty", O_RDWR);
-    if (tty >= 0)
-    {
-        dup2(tty, STDIN_FILENO);
-        dup2(tty, STDOUT_FILENO);
-        close(tty);
-    }
-}
-
-static int is_delimiter_match(char *line, char *delimiter)
-{
-    size_t delim_len;
-    
-    if (!delimiter)
-        return (0);
-    delim_len = ft_strlen(delimiter);
-    if (ft_strncmp(line, delimiter, delim_len) == 0 && line[delim_len] == '\0')
-        return (1);
-    return (0);
-}
-
-static int read_heredoc_input(int fd, char *delimiter)
-{
-    char *line;
-    
-    while (1)
-    {
-        line = readline("> ");
-        if (!line)
-            break;
-        if (is_delimiter_match(line, delimiter))
-        {
-            free(line);
-            break;
-        }
-        ft_putendl_fd(line, fd);
-        free(line);
-    }
-    return (0);
-}
-
 static void setup_child_signals(void)
 {
     struct sigaction sa_new;
@@ -118,11 +50,11 @@ static int handle_wait_status(int status, t_main_data *data, char *filename)
     return (0);
 }
 
-static int create_heredoc_file(char **filename)
+static int create_heredoc_file(t_main_data *data, char **filename)
 {
     int fd;
     
-    *filename = generate_heredoc_filename();
+    *filename = generate_heredoc_filename(data);
     if (!*filename)
         return (-1);
     fd = open(*filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
@@ -172,7 +104,6 @@ static int handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data, char 
 {
     int pid, status;
     t_root *root;
-    //struct sigaction oldint, oldquit, ign;
     
     root = data->root; 
     pid = fork();
@@ -219,7 +150,7 @@ int heredoc(t_redir *redir, t_main_data *data)
     int fd;
     char *filename;
     
-    fd = create_heredoc_file(&filename);
+    fd = create_heredoc_file(data, &filename);
     if (fd == -1)
         return (-1);
     if (handle_fork_and_wait(fd, redir, data, filename) == -1)

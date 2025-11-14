@@ -6,23 +6,11 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/06 17:54:51 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 18:41:43 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
-
-// Check if there is something after the $
-t_token_type no_env_var(t_main_data *data)
-{
-	char	next;
-
-	next = data->tok->input[data->tok->prev_pos + 1];
-	if (!next || (!ft_isalpha(next) && !ft_isdigit(next)
-			&& next != '_' && next != '?' && next != '"' && next != '\''))
-		return (TOKEN_TEXT);
-	return (TOKEN_DOLLAR);
-}
 
 // remove_token: unlink a token from a doubly-linked list
 void	remove_token(t_token **head, t_token *t)
@@ -116,8 +104,8 @@ int	tokenizer(t_main_data *data)
 	tok_type = TOKEN_NULL;
 	while (data->tok->pos < data->tok->length)
 	{
-		data->tok->curr_char_type = get_char_type(data->tok->input
-			[data->tok->pos]);
+		data->tok->curr_char_type = get_char_type(
+				data->tok->input[data->tok->pos]);
 		handle_quotes(data->tok, data);
 		tok_type = get_tok_type(data->tok->input[data->tok->prev_pos],
 				check_next_char(data->tok->input, data->tok->prev_pos));
