@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 17:41:28 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 18:18:07 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -334,6 +334,7 @@ int					export_env(t_env *root_env);
 char				**t_env_to_char_arr(t_root *root, t_env *list);
 int					set_last_exit_status_var(t_root *root, int status);
 char				*my_getcwd(t_root *root);
+t_token_type	no_env_var(t_main_data *data);
 
 /* -------------------- Signals / cleanup / utilities -------------------- */
 void				handler(int sig);

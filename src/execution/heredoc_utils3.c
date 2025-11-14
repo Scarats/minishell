@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_utils3.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 17:44:49 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 17:45:13 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 18:20:34 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minihsell.h"
+#include "../minishell.h"
 
 static char	*generate_heredoc_filename(t_main_data *data)
 {
