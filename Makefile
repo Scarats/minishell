@@ -12,7 +12,7 @@ SRCS = src/minishell.c \
 	   src/handlers/redirections.c src/parsing/tokenizer.c src/parsing/parsing_handlers.c \
 	   src/env_var/expand_env_var.c src/parsing/parsing_utils.c src/parsing/build_tree.c \
 	   src/parsing/check_tok_type.c src/parsing/tree_checks.c src/utils/clean.c \
-	   src/utils/init.c \
+	   src/utils/init.c src/execution/heredoc_utils.c src/execution/heredoc_utils2.c \
 
 FLAGS = -Wall -Wextra -Werror -fPIE -g
 CC    = cc

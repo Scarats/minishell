@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:29:33 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 17:25:43 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/14 17:34:15 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ int	handle_quotes(t_tokenizer *tok, t_main_data *data)
 	char	c;
 
 	c = data->tok->input[tok->pos];
+	tok->curr_char_type = CHAR_SPACE;
 	if (c == '\'' && !tok->double_quote)
 	{
 		if (tok->single_quote && tok->prev_char_type == CHAR_SPACE)
@@ -71,7 +72,6 @@ int	handle_quotes(t_tokenizer *tok, t_main_data *data)
 		}
 		tok->double_quote = !tok->double_quote;
 	}
-	tok->curr_char_type = CHAR_SPACE;
 	else if ((tok->double_quote && c != '$') || tok->single_quote)
 		tok->curr_char_type = CHAR_TEXT;
 	return (0);

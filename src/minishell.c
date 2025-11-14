@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/12 14:01:36 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/14 17:42:12 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,8 @@ void	handler_heredoc(int sig)
 		// rl_redisplay();
 	}
 }
-static int	process_command(t_main_data *data, char *line)
+
+int	process_command(t_main_data *data, char *line)
 {
 	t_root	*root;
 
@@ -93,32 +94,7 @@ static int	process_command(t_main_data *data, char *line)
 	return (root->last_exit_status);
 }
 
-// previous process_command
-/* int	process_command(t_main_data *data, char *line)
-{
-	t_root	*root;
-	char	*line;
-
-	root = data->root;
-	reset_tokenizer_for_line(data->tok, line);
-	if (g_stop_flag)
-	{
-		root->last_exit_status = 130;
-		g_stop_flag = 0;
-		printf("processed g_stop_flag\n");
-		return (root->last_exit_status);
-	}
-	if (!parser(data))
-		root->last_exit_status = traverse_tree(data->node, data);
-	else
-	{
-		if(!g_stop_flag)
-			root->last_exit_status = 1;
-		return (1);
-	}
-	return (root->last_exit_status);
-} */
-static bool	execute_command_loop(t_root *root, char *prompt)
+bool	execute_command_loop(t_root *root, char *prompt)
 {
     char *line;
     //eint ttyfd;

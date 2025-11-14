@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   heredoc_utils2.c                                   :+:      :+:    :+:   */
+/*   heredoc_utils3.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/14 17:38:05 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 17:38:06 by tcardair         ###   ########.fr       */
+/*   Created: 2025/11/14 17:44:49 by tcardair          #+#    #+#             */
+/*   Updated: 2025/11/14 17:45:13 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../minishell.h"
+#include "../minihsell.h"
 
-char	*generate_heredoc_filename(t_main_data *data)
+static char	*generate_heredoc_filename(t_main_data *data)
 {
 	static int	counter = 0;
 	char		*filename;
@@ -27,7 +27,7 @@ char	*generate_heredoc_filename(t_main_data *data)
 	return (filename);
 }
 
-void	heredoc_child_signal_handler(int sig)
+static void	heredoc_child_signal_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
@@ -38,7 +38,7 @@ void	heredoc_child_signal_handler(int sig)
 		return ;
 }
 
-void	attach_tty_for_readline(void)
+static void	attach_tty_for_readline(void)
 {
 	int	tty;
 
@@ -51,7 +51,7 @@ void	attach_tty_for_readline(void)
 	}
 }
 
-int	create_heredoc_file(char **filename, t_main_data *data)
+static int	create_heredoc_file(char **filename, t_main_data *data)
 {
 	int	fd;
 
