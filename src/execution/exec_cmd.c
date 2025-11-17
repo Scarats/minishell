@@ -6,16 +6,16 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:53:07 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 00:00:21 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 // Call step by step each function for clean execution.
-int	exec_handler(t_main_data *data, t_node *node)
+int exec_handler(t_main_data *data, t_node *node)
 {
-	int	error;
+	int error;
 
 	error = 0;
 	error = set_io_fds(node, data);
@@ -33,20 +33,20 @@ int	exec_handler(t_main_data *data, t_node *node)
 	return (execution(node, data));
 }
 
-void	handle_child(t_main_data *data, t_node *node)
+void handle_child(t_main_data *data, t_node *node)
 {
-    int		error;
-    t_env	*path;
-    t_root	*root;
+	int error;
+	t_env *path;
+	t_root *root;
 
-    root = data->root;
-    if (node->pipefd[0] >= 0)
-        close(node->pipefd[0]);
-    if (node->pipefd[1] >= 0)
-        close(node->pipefd[1]);
-    node->pipefd[0] = -1;
-    node->pipefd[1] = -1;
-    error = exec_handler(data, node);
+	root = data->root;
+	if (node->pipefd[0] >= 0)
+		close(node->pipefd[0]);
+	if (node->pipefd[1] >= 0)
+		close(node->pipefd[1]);
+	node->pipefd[0] = -1;
+	node->pipefd[1] = -1;
+	error = exec_handler(data, node);
 	/* if (error)
 	{
 		path = find_tenv_var(root->env, "PATH");
@@ -57,58 +57,56 @@ void	handle_child(t_main_data *data, t_node *node)
 			print_exec_error(error, node);
 	} */
 	if (error)
-    {
-        if (error == 130)
-            ;
-        else if (error == 127)
-        {
-            path = find_tenv_var(root->env, "PATH");
-            if (!path || !path->value)
-                fdprintf(2, "minishell: %s: No such file or directory\n",
-                    node->cmd_argv[0]);
-            else
-                print_exec_error(error, node);
-        }
-        else
-            print_exec_error(error, node);
-    }
+	{
+		if (error == 130)
+			;
+		else if (error == 127)
+		{
+			path = find_tenv_var(root->env, "PATH");
+			if (!path || !path->value)
+				fdprintf(2, "minishell: %s: No such file or directory\n",
+						 node->cmd_argv[0]);
+			else
+				print_exec_error(error, node);
+		}
+		else
+			print_exec_error(error, node);
+	}
 	my_multi_free(&root->list_of_list);
 	exit(error);
 }
 
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
-int	exec_cmd(t_node *node, t_main_data *data)
+int exec_cmd(t_node *node, t_main_data *data)
 {
-    int	pid;
-    int	status;
-    // int	stdin_backup;
-    // int	stdout_backup;
+	int pid;
+	int status;
+	// int	stdin_backup;
+	// int	stdout_backup;
 
-    printf("exec_cmd\n");
-    if (node->builtin && !node->in_pipe)
+	printf("exec_cmd\n");
+	if (node->builtin && !node->in_pipe)
 		return (exec_builtin_in_parent(node, data));
-    status = 0;
-    pid = fork();
-    if (pid == -1)
-        return (1);
-    if (pid == 0)
-        handle_child(data, node);
-    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-        close(node->input_fd);
-    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-        close(node->output_fd);
-    // I ADDED THIS
-	while(waitpid(pid, &status, 0) == -1)
+	status = 0;
+	pid = fork();
+	if (pid == -1)
+		return (1);
+	if (pid == 0)
+		handle_child(data, node);
+	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+		close(node->input_fd);
+	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+		close(node->output_fd);
+	while (waitpid(pid, &status, 0) == -1)
 	{
 		if (errno == EINTR)
-			continue ;
-        return (1);
+			continue;
+		return (1);
 	}
-	//
-    if (WIFEXITED(status))
-        return (WEXITSTATUS(status));
-    else if (WIFSIGNALED(status))
-        return (128 + WTERMSIG(status));
-    return (1);
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	else if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
+	return (1);
 }
