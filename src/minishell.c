@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 17:08:11 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 20:02:04 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,10 @@ static bool	execute_command_loop(t_root *root, char *prompt)
 		return (handle_eof(&line), false);
 	if (line[0] == '\0')
 		return (handle_empty_input(&line), true);
-	if (!ft_strncmp(line, "exit", 4) && (line[4] == '\0' || line[4] == ' '))
-		return (free(line), false);
+	printf("nefpre init\n");
 	if (init(root))
 		return (false);
+	printf("after init\n");
 	add_history(line);
 	process_command(root->data, line);
 	cleanup_after_command(root->data, &line);

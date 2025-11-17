@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 19:26:51 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 19:58:59 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	int	pid;
 	int	status;
 
+	printf("exec_cmd\n");
 	if (node->builtin && !node->in_pipe)
 		return (if_builtin(node, data));
 	status = 0;
