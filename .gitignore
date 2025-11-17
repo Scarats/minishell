@@ -1,6 +1,7 @@
 .vscode
 .DS_Store
 .minishell_history
+./src/minishell_history
 minishell
 *.a
 *.o

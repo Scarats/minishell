@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:53:46 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 19:56:00 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 16:52:37 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int	create_heredoc_file(t_main_data *data, char **filename)
 	fd = open(*filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (fd == -1)
 	{
-		free(*filename);
+		// free(*filename);
 		return (-1);
 	}
 	return (fd);

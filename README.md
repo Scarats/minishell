@@ -46,14 +46,20 @@ ls && (cd src && ls)
 ```
 # ToDo
 
-**Thomas**
+- [ ] echo << ho$la$"$a"$$"b"
+- [ ] echo cat << hola > bonjour /* and CTRL+C */
+- [ ] tcardair@c2r7s1:minishell> echo << ho$la$"$a"$$"b"
+		tcardair@c2r7s1:minishell> exit
+		[1]    81087 segmentation fault (core dumped)  ./minishell
+- [ ] free() remove them
+- [ ] exit code
+- [ ] exit invalid 
+- [ ] bash-5.1$ exit djbndh
+		exit
+		bash: exit: djbndh: numeric argument required
 
-- [ ] norminette.
-- [ ] if / in command, return bash: `/src`: No such file or directory instead of `command not found`.
-- [ ] `$?`
-	- [ ] should not be modifiable.
-- [ ] Check access permissions for builtins.
-**Albert**
-
-- [ ] fds not closed after exit(some given exit code).
-- [ ] Heredoc.
+		╭─  │  ~/goinfre/minikirk │   master !3 ?1 ▓▒░································░▒▓ 2 ✘ │ 16:37:26  
+		╰─ echo $?
+		2
+- [ ] forbidden function read_history
+- [ ] rl_clear_history

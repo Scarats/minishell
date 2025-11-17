@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 11:23:45 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 19:17:41 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 16:56:50 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ void	create_prompt(char *prompt, size_t size, t_root *root)
 	hostname = get_host_from_env(root);
 	get_host_from_env(root);
 	ft_bzero(prompt, size);
-	ft_strlcat(prompt, RESET, size);
 	if (username && hostname)
 	{
 		ft_strlcat(prompt, username, size);
@@ -109,6 +108,5 @@ int	initialize_shell(t_root *root, char *prompt, size_t prompt_size)
 		fdprintf(2, "Initialization failed\n");
 		return (1);
 	}
-	read_history(".minishell_history");
 	return (0);
 }
