@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:53:43 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 00:18:02 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 	if (pid == 0)
 		return (handle_child_process(fd, redir, data));
 	close(fd);
+	data->heredoc_fd = -1;
 	while (waitpid(pid, &status, 0) == -1)
 	{
 		if (errno == EINTR)
@@ -105,6 +106,7 @@ int	heredoc(t_redir *redir, t_main_data *data)
 	fd = create_heredoc_file(data, &filename);
 	if (fd == -1)
 		return (-1);
+	data->heredoc_fd = fd;
 	if (handle_fork_and_wait(fd, redir, data, filename) == -1)
 		return (-1);
 	return (open_and_assign_filename(filename, redir, data));

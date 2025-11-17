@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:45:16 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 00:13:58 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,8 @@ typedef struct s_main_data
 	bool			in_child;
 
 	t_fd_backup		fd_backup;
+
+	int				heredoc_fd;
 
 	void			*root;	// Pointer to root,
 	// has to be casted at the beginning.

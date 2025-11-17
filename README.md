@@ -47,7 +47,7 @@ ls && (cd src && ls)
 # ToDo
 
 - [X] echo << ho$la$"$a"$$"b"
-- [X] echo cat << hola > bonjour /* and CTRL+C */
+- [ ] echo cat << hola > bonjour /* and CTRL+C */
 - [X] tcardair@c2r7s1:minishell> echo << ho$la$"$a"$$"b"
 		tcardair@c2r7s1:minishell> exit
 		[1]    81087 segmentation fault (core dumped)  ./minishell
@@ -62,7 +62,7 @@ ls && (cd src && ls)
 		╰─ echo $?
 		2
 - [X] forbidden function read_history
-- [ ] rl_clear_history
+- [X] rl_clear_history
 - [X] sleep 4 | ls /* ctr + C = wrong error code */
 	- [X] ctrl + c in exec not working.
 - [ ] return code in pipes in the wrong order.
