@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_2.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:53:46 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 16:52:37 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 22:03:42 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,16 @@ int	handle_child_process(int fd, t_redir *redir, t_main_data *data)
 {
 	t_root	*root;
 
+	//int ret;
+
 	root = data->root;
 	setup_child_signals();
 	attach_tty_for_readline();
 	read_heredoc_input(fd, redir->filename);
 	close(fd);
 	my_multi_free(&root->list_of_list);
+	//if (ret == -1)
+	//	exit(130);
 	exit(0);
 }
 
