@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 19:26:51 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 19:55:48 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,10 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	int	pid;
 	int	status;
 
+	printf("as not a builtin\n");
 	if (node->builtin && !node->in_pipe)
 		return (if_builtin(node, data));
+	printf("was not a builtin\n");
 	status = 0;
 	pid = fork();
 	if (pid == -1)

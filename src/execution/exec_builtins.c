@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:09:55 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 18:28:47 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 19:44:04 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 	int	saved_out;
 	int	error;
 
+	printf("exec builtin_in_parent\n");
 	if (node && node->cmd_argv && node->cmd_argv[0]
 		&& ft_strcmp(node->cmd_argv[0], "exit") == 0)
 		return (exec_handler(data, node));
@@ -45,6 +46,7 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 // check if builtin and redirect to the according functions.
 int	if_builtin(t_node *node, t_main_data *data)
 {
+	printf("if_builtin\n");
 	if (data->in_child)
 		return (exec_handler(data, node));
 	return (exec_builtin_in_parent(node, data));
