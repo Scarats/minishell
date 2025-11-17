@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:53:46 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:49:09 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:53:26 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ int	handle_child_process(int fd, t_redir *redir, t_main_data *data)
 {
 	t_root	*root;
 
+	//int ret;
+
 	root = data->root;
 	if (data->fd_backup.in >= 0)
     {
@@ -43,6 +45,8 @@ int	handle_child_process(int fd, t_redir *redir, t_main_data *data)
 	read_heredoc_input(fd, redir->filename);
 	close(fd);
 	my_multi_free(&root->list_of_list);
+	//if (ret == -1)
+	//	exit(130);
 	exit(0);
 }
 

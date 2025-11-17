@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 21:38:48 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:53:43 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,12 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 	if (pid == 0)
 		return (handle_child_process(fd, redir, data));
 	close(fd);
-	if (waitpid(pid, &status, 0) == -1)
+	while (waitpid(pid, &status, 0) == -1)
+	{
+		if (errno == EINTR)
+			continue ;
 		return (cleanup_and_return_error(-1, filename));
+	}
 	if (handle_wait_status(status, data, filename) == -1)
 	{
 		handle_signals();

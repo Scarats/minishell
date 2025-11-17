@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 22:11:30 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:53:05 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	handle_child(t_main_data *data, t_node *node)
     node->pipefd[0] = -1;
     node->pipefd[1] = -1;
     error = exec_handler(data, node);
-	if (error)
+	/* if (error)
 	{
 		path = find_tenv_var(root->env, "PATH");
 		if (error == 127 && (!path || !path->value))
@@ -55,7 +55,23 @@ void	handle_child(t_main_data *data, t_node *node)
 				node->cmd_argv[0]);
 		else
 			print_exec_error(error, node);
-	}
+	} */
+	if (error)
+    {
+        if (error == 130)
+            ;
+        else if (error == 127)
+        {
+            path = find_tenv_var(root->env, "PATH");
+            if (!path || !path->value)
+                fdprintf(2, "minishell: %s: No such file or directory\n",
+                    node->cmd_argv[0]);
+            else
+                print_exec_error(error, node);
+        }
+        else
+            print_exec_error(error, node);
+    }
 	my_multi_free(&root->list_of_list);
 	exit(error);
 }
@@ -82,8 +98,14 @@ int	exec_cmd(t_node *node, t_main_data *data)
         close(node->input_fd);
     if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
         close(node->output_fd);
-    if (waitpid(pid, &status, 0) == -1)
+    // I ADDED THIS
+	while(waitpid(pid, &status, 0) == -1)
+	{
+		if (errno == EINTR)
+			continue ;
         return (1);
+	}
+	//
     if (WIFEXITED(status))
         return (WEXITSTATUS(status));
     else if (WIFSIGNALED(status))
