@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 18:27:52 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 18:39:49 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ void	handle_child(t_main_data *data, t_node *node)
 	t_env	*path;
 	t_root	*root;
 
-	fdprintf(2, "%s = %i\n", node->cmd_argv[0], getpid());
 	root = data->root;
 	error = exec_handler(data, node);
 	if (error)
@@ -65,7 +64,6 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	if (node->builtin && !node->in_pipe)
 		return (if_builtin(node, data));
 	status = 0;
-	printf("exec_cmd\n");
 	pid = fork();
 	if (pid == -1)
 		return (1);

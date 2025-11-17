@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:55:44 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 18:27:37 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 18:37:36 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,11 +76,17 @@ int	pipes(t_node *node, t_main_data *data)
 	t_root	*root;
 	int error;
 
-	node->in_pipe;
+	node->in_pipe = true;
 	error = 0;
 	if (!node || !data)
 		return (1);
 	root = data->root;
 	error = pipes_logic(node, data);
+	if (node->pipefd[0] != -1)
+        close(node->pipefd[0]);
+    if (node->pipefd[1] != -1)
+        close(node->pipefd[1]);
+    node->pipefd[0] = -1;
+    node->pipefd[1] = -1;
 	return (error);
 }
