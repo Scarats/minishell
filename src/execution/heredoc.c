@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 16:59:42 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 17:41:03 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,7 @@ static int	cleanup_and_return_error(int fd, char *filename)
 	if (fd != -1)
 		close(fd);
 	if (filename)
-	{
 		unlink(filename);
-		// free(filename);
-	}
 	return (-1);
 }
 
@@ -57,6 +54,7 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 	int		status;
 
 	root = data->root;
+	printf("handle_fork and wait\n");
 	pid = fork();
 	if (pid == -1)
 		return (cleanup_and_return_error(fd, filename));
@@ -89,11 +87,9 @@ static int	open_and_assign_filename(char *filename, t_redir *redir,
 	if (read_fd == -1)
 	{
 		unlink(filename);
-		// free(filename);
 		return (-1);
 	}
 	redir->filename = my_strdup(&root->list_of_list, filename);
-	// free(filename);
 	return (read_fd);
 }
 

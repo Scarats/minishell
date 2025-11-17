@@ -61,5 +61,8 @@ ls && (cd src && ls)
 		╭─  │  ~/goinfre/minikirk │   master !3 ?1 ▓▒░································░▒▓ 2 ✘ │ 16:37:26  
 		╰─ echo $?
 		2
-- [ ] forbidden function read_history
+- [X] forbidden function read_history
 - [ ] rl_clear_history
+- [ ] sleep 4 | ls /* ctr + C = wrong error code */
+	- [ ] ctrl + c in exec not working.
+- [ ] return code in pipes in the wrong order.

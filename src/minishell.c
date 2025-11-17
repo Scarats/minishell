@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 20:00:20 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 17:08:11 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,6 @@ void	handler(int sig)
 		rl_done = 1;
 		rl_replace_line("", 0);
 		rl_on_new_line();
-	}
-	else if (sig == SIGQUIT)
-	{
-		write(STDOUT_FILENO, "minishell: quit (core dumped)\n", 31);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
 	}
 }
 

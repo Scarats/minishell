@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:50:28 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 20:00:20 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 17:45:09 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,8 +103,8 @@ t_node	*create_node(t_main_data *data, t_token *tok_array, t_node_type type,
 	node->builtin = false;
 	node->pipefd[0] = -1;
 	node->pipefd[1] = -1;
-	node->left_pid = -1;
-	node->right_pid = -1;
+	// node->left_pid = -1;
+	// node->right_pid = -1;
 	node->input_fd = -1;
 	node->output_fd = -1;
 	if (type == NODE_COMMAND && tok_array)
