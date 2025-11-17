@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 18:39:49 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 19:26:51 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,18 @@ int	exec_handler(t_main_data *data, t_node *node)
 
 void	handle_child(t_main_data *data, t_node *node)
 {
-	int		error;
-	t_env	*path;
-	t_root	*root;
+    int		error;
+    t_env	*path;
+    t_root	*root;
 
-	root = data->root;
-	error = exec_handler(data, node);
+    root = data->root;
+    if (node->pipefd[0] >= 0)
+        close(node->pipefd[0]);
+    if (node->pipefd[1] >= 0)
+        close(node->pipefd[1]);
+    node->pipefd[0] = -1;
+    node->pipefd[1] = -1;
+    error = exec_handler(data, node);
 	if (error)
 	{
 		path = find_tenv_var(root->env, "PATH");
