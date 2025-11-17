@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 17:41:03 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 21:38:48 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ static int	open_and_assign_filename(char *filename, t_redir *redir,
 		unlink(filename);
 		return (-1);
 	}
-	redir->filename = my_strdup(&root->list_of_list, filename);
+	redir->filename = my_strdup(&root->data->malloc_tree, filename);
 	return (read_fd);
 }
 

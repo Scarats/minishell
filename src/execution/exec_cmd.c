@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 19:58:59 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 20:41:40 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,27 +64,29 @@ void	handle_child(t_main_data *data, t_node *node)
 // Should handle the bin before creating and opening the files.
 int	exec_cmd(t_node *node, t_main_data *data)
 {
-	int	pid;
-	int	status;
+    int	pid;
+    int	status;
+    // int	stdin_backup;
+    // int	stdout_backup;
 
-	printf("exec_cmd\n");
-	if (node->builtin && !node->in_pipe)
-		return (if_builtin(node, data));
-	status = 0;
-	pid = fork();
-	if (pid == -1)
-		return (1);
-	if (pid == 0)
-		handle_child(data, node);
-	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-		close(node->input_fd);
-	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-		close(node->output_fd);
-	if (waitpid(pid, &status, 0) == -1)
-		return (1);
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	else if (WIFSIGNALED(status))
-		return (128 + WTERMSIG(status));
-	return (1);
+    printf("exec_cmd\n");
+    if (node->builtin && !node->in_pipe)
+		return (exec_builtin_in_parent(node, data));
+    status = 0;
+    pid = fork();
+    if (pid == -1)
+        return (1);
+    if (pid == 0)
+        handle_child(data, node);
+    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+        close(node->input_fd);
+    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+        close(node->output_fd);
+    if (waitpid(pid, &status, 0) == -1)
+        return (1);
+    if (WIFEXITED(status))
+        return (WEXITSTATUS(status));
+    else if (WIFSIGNALED(status))
+        return (128 + WTERMSIG(status));
+    return (1);
 }

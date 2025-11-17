@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:09:55 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 18:28:47 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 21:41:44 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 	int	saved_out;
 	int	error;
 
-	if (node && node->cmd_argv && node->cmd_argv[0]
-		&& ft_strcmp(node->cmd_argv[0], "exit") == 0)
+	// && ft_strcmp(node->cmd_argv[0], "exit") == 0)
+	if (node && node->cmd_argv && node->cmd_argv[0])
 		return (exec_handler(data, node));
 	saved_in = dup(STDIN_FILENO);
 	saved_out = dup(STDOUT_FILENO);
@@ -32,6 +32,8 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 			close(saved_out);
 		return (1);
 	}
+	close(saved_in);
+	close(saved_out);
 	error = exec_handler(data, node);
 	if (dup2(saved_in, STDIN_FILENO) == -1)
 		error = 1;
@@ -42,13 +44,6 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 	return (error);
 }
 
-// check if builtin and redirect to the according functions.
-int	if_builtin(t_node *node, t_main_data *data)
-{
-	if (data->in_child)
-		return (exec_handler(data, node));
-	return (exec_builtin_in_parent(node, data));
-}
 
 void	find_builtin(int *error, t_node *node, int length, t_main_data *data)
 {
