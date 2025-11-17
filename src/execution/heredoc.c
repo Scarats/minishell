@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 22:00:01 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:13:24 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 			continue ;
 		return (cleanup_and_return_error(-1, filename));
 	}
-	//	return (cleanup_and_return_error(-1, filename));
 	if (handle_wait_status(status, data, filename) == -1)
 	{
 		handle_signals();
