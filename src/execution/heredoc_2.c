@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:53:46 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 16:52:37 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:49:09 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,16 @@ int	handle_child_process(int fd, t_redir *redir, t_main_data *data)
 	t_root	*root;
 
 	root = data->root;
+	if (data->fd_backup.in >= 0)
+    {
+        close(data->fd_backup.in);
+        data->fd_backup.in = -1;
+    }
+    if (data->fd_backup.out >= 0)
+    {
+        close(data->fd_backup.out);
+        data->fd_backup.out = -1;
+    }
 	setup_child_signals();
 	attach_tty_for_readline();
 	read_heredoc_input(fd, redir->filename);

@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:09:55 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:20:22 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:47:40 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int	exec_builtin_in_parent(t_node *node, t_main_data *data)
 	if (node->cmd_argv[0] && ft_strcmp(node->cmd_argv[0], "exit") == 0)
 		return (exec_handler(data, node));
 	backup_fds(&fd);
+	data->fd_backup = fd;
 	error = exec_handler(data, node);
 	reset_fds(&fd);	
 	return (error);
