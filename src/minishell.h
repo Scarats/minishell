@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 18:29:04 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/17 23:08:04 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,12 @@ typedef enum e_token_type
 	TOKEN_SINGLE_QUOTE,
 	TOKEN_EOF
 }					t_token_type;
+
+typedef struct s_fd_backup
+{
+    int	in;
+    int	out;
+}	t_fd_backup;
 
 typedef enum e_node_type
 {
@@ -357,5 +363,7 @@ void				handle_signals_heredoc(void);
 
 int					process_heredocs(t_main_data *data);
 int					process_heredocs_in_node(t_node *node, t_main_data *data);
+int					backup_fds(t_fd_backup *fd);
+int					reset_fds(t_fd_backup *fd);
 
 #endif
