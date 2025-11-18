@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:28:01 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:29:12 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 20:25:30 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,27 @@ int	syntax_check_logic(int *i, t_token *token_array, int size)
 	return (0);
 }
 
+int check_parenthesis(t_token *token_array, int size)
+{
+	int depth;
+	int i;
+
+	printf("checking\n");
+	i = 0;
+	depth = 0;
+	while (i < size)
+	{
+		if (token_array[i].type == TOKEN_LPAREN)
+			depth++;
+		else if (token_array[i].type == TOKEN_RPAREN)
+			depth--;
+		if (depth < 0)
+			return (depth);
+		i++;
+	}
+	return (depth);
+}
+
 int	syntax_check(t_token *token_array, int size)
 {
 	int	i;
@@ -72,6 +93,10 @@ int	syntax_check(t_token *token_array, int size)
 	else if (size == 1 && ft_strlen(token_array[0].word) == 1
 		&& token_array[0].word[0] == '$')
 		return (fdprintf(2, "minishell: $: command not found\n"), 1);
+	if (check_parenthesis(token_array, size) > 0)
+		return (syntax_error("("), 1);
+	else if (check_parenthesis(token_array, size) < 0)
+		return (syntax_error(")"), 1);
 	i = 0;
 	error = 0;
 	while (i < size)
