@@ -6,31 +6,42 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 00:00:21 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 20:10:24 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
+void	close_ancestor_pipes(t_node *node)
+{
+    while (node)
+    {
+        close_pipe_pair(node->pipefd);
+        node->pipefd[0] = -1;
+        node->pipefd[1] = -1;
+        node = node->parent;
+    }
+}
+
 // Call step by step each function for clean execution.
 int exec_handler(t_main_data *data, t_node *node)
 {
-	int error;
+    int	error;
 
-	error = 0;
-	error = set_io_fds(node, data);
-	if (error != 0)
-		return (error);
-	error = redirections(node, data);
-	if (error != 0)
-		return (error);
-	if (!node->cmd_argv || !node->cmd_argv[0])
-		return (0);
-	if (node->builtin)
-		return (execution(node, data));
-	if (get_bin_path(node, data) != 0)
-		return (127);
-	return (execution(node, data));
+    error = set_io_fds(node, data);
+    if (error != 0)
+        return (error);
+    error = redirections(node, data);
+    if (error != 0)
+        return (error);
+    close_ancestor_pipes(node->parent);
+    if (!node->cmd_argv || !node->cmd_argv[0])
+        return (0);
+    if (node->builtin)
+        return (execution(node, data));
+    if (get_bin_path(node, data) != 0)
+        return (127);
+    return (execution(node, data));
 }
 
 void handle_child(t_main_data *data, t_node *node)

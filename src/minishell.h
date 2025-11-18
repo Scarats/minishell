@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 15:15:51 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/18 20:06:56 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,6 +135,7 @@ typedef struct s_node
 	int				in_subshell;		// increase each time we subshell.
 	struct s_node	*left;
 	struct s_node	*right;
+	struct s_node	*parent;
 
 	int				pipefd[2];
 	pid_t			pipe_left;
@@ -319,6 +320,8 @@ int					handle_child_process(int fd,
 int					handle_wait_status(int status,
 						t_main_data *data, char *filename);
 int					create_heredoc_file(t_main_data *data, char **filename);
+void				close_pipe_pair(int fd[2]);
+
 
 /* -------------------- Builtins / Command helpers -------------------- */
 int					exec_builtins(t_node *node, t_main_data *data);
