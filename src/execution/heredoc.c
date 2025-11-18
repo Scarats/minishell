@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 14:17:19 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:40:43 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,38 +56,22 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 	int		status;
 
 	root = data->root;
-	printf("handle_fork and wait\n");
 	pid = fork();
 	if (pid == -1)
 		return (cleanup_and_return_error(fd, filename));
 	if (pid == 0)
 		return (handle_child_process(fd, redir, data));
-/* 	close(fd);
-	data->heredoc_fd = -1; */
 	while (waitpid(pid, &status, 0) == -1)
 	{
-		if (errno == EINTR)
-			continue ;
-		return (cleanup_and_return_error(fd, filename));
+		if (errno != EINTR)
+			return (cleanup_and_return_error(fd, filename));
 	}
 	if (handle_wait_status(status, data, filename) == -1)
-	{
-		handle_signals();
+		return (handle_signals(), cleanup_and_return_error(fd, filename));
+	else if (wait_heredoc_child(pid, root))
 		return (cleanup_and_return_error(fd, filename));
-	}
-	else
-	{
-		if (wait_heredoc_child(pid, root))
-		{
-			//return (-1);
-			return (cleanup_and_return_error(fd, filename));
-		}			
-	}
-	if (fd >= 0)
-	{
-		close(fd);
+	if (fd >= 0 && (!close(fd) || 1))
 		fd = -1;
-	}
 	data->heredoc_fd = -1;
 	return (0);
 }
@@ -121,9 +105,7 @@ int	heredoc(t_redir *redir, t_main_data *data)
 	if (handle_fork_and_wait(fd, redir, data, filename) == -1)
 	{
 		data->heredoc_fd = -1;
-		//cleanup_and_return_error(-1, filename);
 		return (cleanup_and_return_error(-1, filename));
-		//return (-1);
 	}
 	return (open_and_assign_filename(filename, redir, data));
 }

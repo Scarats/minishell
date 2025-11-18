@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirections.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:42:15 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:16:25 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:43:31 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,20 +107,20 @@ int	redirections(t_node *node, t_main_data *data)
 
 int	set_io_fds(t_node *node, t_main_data *data)
 {
-    (void)data;
-    if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-    {
-        if (dup2(node->input_fd, STDIN_FILENO) == -1)
-            return (errno);
-        close(node->input_fd);
-        node->input_fd = STDIN_FILENO;
-    }
-    if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-    {
-        if (dup2(node->output_fd, STDOUT_FILENO) == -1)
-            return (errno);
-        close(node->output_fd);
-        node->output_fd = STDOUT_FILENO;
-    }
-    return (0);
+	(void)data;
+	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
+	{
+		if (dup2(node->input_fd, STDIN_FILENO) == -1)
+			return (errno);
+		close(node->input_fd);
+		node->input_fd = STDIN_FILENO;
+	}
+	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
+	{
+		if (dup2(node->output_fd, STDOUT_FILENO) == -1)
+			return (errno);
+		close(node->output_fd);
+		node->output_fd = STDOUT_FILENO;
+	}
+	return (0);
 }

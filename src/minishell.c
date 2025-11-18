@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 15:55:53 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:09:26 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void	handler(int sig)
 		rl_done = 1;
 		rl_replace_line("", 0);
 		rl_on_new_line();
+		rl_redisplay();
 	}
 }
 
@@ -81,10 +82,8 @@ static bool	execute_command_loop(t_root *root, char *prompt)
 		return (handle_eof(&line), false);
 	if (line[0] == '\0')
 		return (handle_empty_input(&line), true);
-	printf("nefpre init\n");
 	if (init(root))
 		return (false);
-	printf("after init\n");
 	add_history(line);
 	process_command(root->data, line);
 	cleanup_after_command(root->data, &line);

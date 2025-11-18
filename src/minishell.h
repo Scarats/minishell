@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 20:06:56 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:43:06 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,8 @@ typedef enum e_token_type
 
 typedef struct s_fd_backup
 {
-    int	in;
-    int	out;
+	int				in;
+	int				out;
 }	t_fd_backup;
 
 typedef enum e_node_type
@@ -321,7 +321,6 @@ int					handle_wait_status(int status,
 						t_main_data *data, char *filename);
 int					create_heredoc_file(t_main_data *data, char **filename);
 void				close_pipe_pair(int fd[2]);
-
 
 /* -------------------- Builtins / Command helpers -------------------- */
 int					exec_builtins(t_node *node, t_main_data *data);

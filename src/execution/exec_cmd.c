@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 20:10:24 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:29:21 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,41 +14,41 @@
 
 void	close_ancestor_pipes(t_node *node)
 {
-    while (node)
-    {
-        close_pipe_pair(node->pipefd);
-        node->pipefd[0] = -1;
-        node->pipefd[1] = -1;
-        node = node->parent;
-    }
+	while (node)
+	{
+		close_pipe_pair(node->pipefd);
+		node->pipefd[0] = -1;
+		node->pipefd[1] = -1;
+		node = node->parent;
+	}
 }
 
 // Call step by step each function for clean execution.
-int exec_handler(t_main_data *data, t_node *node)
+int	exec_handler(t_main_data *data, t_node *node)
 {
-    int	error;
+	int	error;
 
-    error = set_io_fds(node, data);
-    if (error != 0)
-        return (error);
-    error = redirections(node, data);
-    if (error != 0)
-        return (error);
-    close_ancestor_pipes(node->parent);
-    if (!node->cmd_argv || !node->cmd_argv[0])
-        return (0);
-    if (node->builtin)
-        return (execution(node, data));
-    if (get_bin_path(node, data) != 0)
-        return (127);
-    return (execution(node, data));
+	error = set_io_fds(node, data);
+	if (error != 0)
+		return (error);
+	error = redirections(node, data);
+	if (error != 0)
+		return (error);
+	close_ancestor_pipes(node->parent);
+	if (!node->cmd_argv || !node->cmd_argv[0])
+		return (0);
+	if (node->builtin)
+		return (execution(node, data));
+	if (get_bin_path(node, data) != 0)
+		return (127);
+	return (execution(node, data));
 }
 
-void handle_child(t_main_data *data, t_node *node)
+void	handle_child(t_main_data *data, t_node *node)
 {
-	int error;
-	t_env *path;
-	t_root *root;
+	int		error;
+	t_env	*path;
+	t_root	*root;
 
 	root = data->root;
 	if (node->pipefd[0] >= 0)
@@ -58,45 +58,28 @@ void handle_child(t_main_data *data, t_node *node)
 	node->pipefd[0] = -1;
 	node->pipefd[1] = -1;
 	error = exec_handler(data, node);
-	/* if (error)
+	if (error == 127)
 	{
 		path = find_tenv_var(root->env, "PATH");
-		if (error == 127 && (!path || !path->value))
+		if (!path || !path->value)
 			fdprintf(2, "minishell: %s: No such file or directory\n",
 				node->cmd_argv[0]);
 		else
 			print_exec_error(error, node);
-	} */
-	if (error)
-	{
-		if (error == 130)
-			;
-		else if (error == 127)
-		{
-			path = find_tenv_var(root->env, "PATH");
-			if (!path || !path->value)
-				fdprintf(2, "minishell: %s: No such file or directory\n",
-						 node->cmd_argv[0]);
-			else
-				print_exec_error(error, node);
-		}
-		else
-			print_exec_error(error, node);
 	}
+	else if (error && error != 130)
+		print_exec_error(error, node);
 	my_multi_free(&root->list_of_list);
 	exit(error);
 }
 
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
-int exec_cmd(t_node *node, t_main_data *data)
+int	exec_cmd(t_node *node, t_main_data *data)
 {
-	int pid;
-	int status;
-	// int	stdin_backup;
-	// int	stdout_backup;
+	int	pid;
+	int	status;
 
-	printf("exec_cmd\n");
 	if (node->builtin && !node->in_pipe)
 		return (exec_builtin_in_parent(node, data));
 	status = 0;
@@ -111,9 +94,8 @@ int exec_cmd(t_node *node, t_main_data *data)
 		close(node->output_fd);
 	while (waitpid(pid, &status, 0) == -1)
 	{
-		if (errno == EINTR)
-			continue;
-		return (1);
+		if (errno != EINTR)
+			return (1);
 	}
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));

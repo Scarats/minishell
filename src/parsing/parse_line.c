@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_line.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:28:01 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 20:25:30 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:44:14 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,11 @@ int	syntax_check_logic(int *i, t_token *token_array, int size)
 	return (0);
 }
 
-int check_parenthesis(t_token *token_array, int size)
+int	check_parenthesis(t_token *token_array, int size)
 {
-	int depth;
-	int i;
+	int	depth;
+	int	i;
 
-	printf("checking\n");
 	i = 0;
 	depth = 0;
 	while (i < size)

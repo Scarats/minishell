@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   handle_fds.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 23:02:12 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/17 23:15:17 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:43:58 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int backup_fds(t_fd_backup *fd)
+int	backup_fds(t_fd_backup *fd)
 {
 	fd->in = dup(STDIN_FILENO);
 	fd->out = dup(STDOUT_FILENO);
@@ -27,9 +27,9 @@ int backup_fds(t_fd_backup *fd)
 	return (0);
 }
 
-int reset_fds(t_fd_backup *fd)
+int	reset_fds(t_fd_backup *fd)
 {
-	int error;
+	int	error;
 
 	error = 0;
 	if (dup2(fd->in, STDIN_FILENO) == -1)

@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   tree.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:49:36 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 20:08:34 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:44:31 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 /* scan for && / || (most significant), return index or -1 */
-int find_and_or(t_token *tok_array, int size)
+int	find_and_or(t_token *tok_array, int size)
 {
-	int depth;
-	int pos;
+	int	depth;
+	int	pos;
 
 	depth = 0;
 	pos = size;
@@ -33,10 +33,10 @@ int find_and_or(t_token *tok_array, int size)
 }
 
 /* scan for | (most significant), return index or -1 */
-int find_pipe(t_token *tok_array, int size)
+int	find_pipe(t_token *tok_array, int size)
 {
-	int depth;
-	int pos;
+	int	depth;
+	int	pos;
 
 	depth = 0;
 	pos = size;
@@ -55,9 +55,9 @@ int find_pipe(t_token *tok_array, int size)
 /* Return the index of the most significant operator.
    (&&, ||, |)
    If none found, return (-1); */
-int find_operator(t_token *tok_array, int size)
+int	find_operator(t_token *tok_array, int size)
 {
-	int pos;
+	int	pos;
 
 	pos = find_and_or(tok_array, size);
 	if (pos >= 0)
@@ -66,18 +66,18 @@ int find_operator(t_token *tok_array, int size)
 }
 
 /* internal recursive builder (core logic) */
-t_node *build_tree_inner(t_main_data *data, t_token *tok_array, int size,
-						 int depth)
+t_node	*build_tree_inner(t_main_data *data, t_token *tok_array, int size,
+		int depth)
 {
-	int i;
-	t_node *node;
+	int		i;
+	t_node	*node;
 
 	node = NULL;
 	i = find_operator(tok_array, size);
 	if (i < 0)
 	{
 		node = create_node(data, tok_array,
-						   map_token_to_node(tok_array[0].type), size);
+				map_token_to_node(tok_array[0].type), size);
 		node->in_subshell = depth;
 		return (node);
 	}
@@ -97,9 +97,9 @@ t_node *build_tree_inner(t_main_data *data, t_token *tok_array, int size,
    Call itself from the first token of the left part,
    and call itself from the first token of the right part.
    Continue until no operator is found. */
-t_node *build_tree(t_main_data *data, t_token *tok_array, int size, int depth)
+t_node	*build_tree(t_main_data *data, t_token *tok_array, int size, int depth)
 {
-	t_node *node;
+	t_node	*node;
 
 	if (size <= 0 || !tok_array || check_paren_error(tok_array, size))
 		return (NULL);
