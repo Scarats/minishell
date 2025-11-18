@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 00:13:58 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 15:15:51 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -312,7 +312,7 @@ char				*generate_heredoc_filename(t_main_data *data);
 void				heredoc_child_signal_handler(int sig);
 void				attach_tty_for_readline(void);
 int					is_delimiter_match(char *line, char *delimiter);
-int					read_heredoc_input(int fd, char *delimiter);
+int					read_heredoc_input(int fd, char *delimiter, t_root *root);
 void				setup_child_signals(void);
 int					handle_child_process(int fd,
 						t_redir *redir, t_main_data *data);

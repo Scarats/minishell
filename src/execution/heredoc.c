@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 00:18:02 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/18 14:17:19 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,9 @@ static int	cleanup_and_return_error(int fd, char *filename)
 	if (fd != -1)
 		close(fd);
 	if (filename)
+	{
 		unlink(filename);
+	}
 	return (-1);
 }
 
@@ -60,24 +62,33 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 		return (cleanup_and_return_error(fd, filename));
 	if (pid == 0)
 		return (handle_child_process(fd, redir, data));
-	close(fd);
-	data->heredoc_fd = -1;
+/* 	close(fd);
+	data->heredoc_fd = -1; */
 	while (waitpid(pid, &status, 0) == -1)
 	{
 		if (errno == EINTR)
 			continue ;
-		return (cleanup_and_return_error(-1, filename));
+		return (cleanup_and_return_error(fd, filename));
 	}
 	if (handle_wait_status(status, data, filename) == -1)
 	{
 		handle_signals();
-		return (cleanup_and_return_error(-1, filename));
+		return (cleanup_and_return_error(fd, filename));
 	}
 	else
 	{
 		if (wait_heredoc_child(pid, root))
-			return (-1);
+		{
+			//return (-1);
+			return (cleanup_and_return_error(fd, filename));
+		}			
 	}
+	if (fd >= 0)
+	{
+		close(fd);
+		fd = -1;
+	}
+	data->heredoc_fd = -1;
 	return (0);
 }
 
@@ -108,6 +119,11 @@ int	heredoc(t_redir *redir, t_main_data *data)
 		return (-1);
 	data->heredoc_fd = fd;
 	if (handle_fork_and_wait(fd, redir, data, filename) == -1)
-		return (-1);
+	{
+		data->heredoc_fd = -1;
+		//cleanup_and_return_error(-1, filename);
+		return (cleanup_and_return_error(-1, filename));
+		//return (-1);
+	}
 	return (open_and_assign_filename(filename, redir, data));
 }
