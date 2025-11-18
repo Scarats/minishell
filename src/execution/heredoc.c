@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:52:11 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:40:43 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/18 22:53:26 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,9 @@ static int	handle_fork_and_wait(int fd, t_redir *redir, t_main_data *data,
 	data->heredoc_fd = -1;
 	return (0);
 }
+
+// Here on top there is some fuckery check 
+// that the code behaves exactly the same
 
 static int	open_and_assign_filename(char *filename, t_redir *redir,
 		t_main_data *data)
