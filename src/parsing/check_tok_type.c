@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 18:38:51 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 18:44:32 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/20 14:12:07 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	is_operator(t_token_type t)
 {
-	return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR);
+	return (t == TOKEN_PIPE || t == TOKEN_AND_AND || t == TOKEN_OR || t == TOKEN_AND);
 }
 
 int	is_op_or_redir(t_token_type t)
