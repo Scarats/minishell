@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:54:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/20 13:56:58 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:03:41 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@ void	heredoc_child_signal_handler(int sig)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 	}
-	if (sig == SIGQUIT)
-		return ;
 }
 
 void	attach_tty_for_readline(void)
