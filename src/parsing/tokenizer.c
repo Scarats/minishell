@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/14 20:00:20 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:23:21 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	remove_token(t_token **head, t_token *t)
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
-	t_token_type	effective;
+    t_token_type	effective;
 
 	if (!data || !tok_type)
 		return (1);
@@ -35,6 +35,8 @@ int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 		&& data->tok->prev_pos < data->tok->pos
 		&& data->tok->input[data->tok->prev_pos] == '$')
 	{
+		if (quote_after_dollar(data))
+			return (0);
 		create_token(data, data->tok->prev_pos, data->tok->prev_pos + 1,
 			TOKEN_DOLLAR);
 		data->tok->prev_pos = data->tok->prev_pos + 1;

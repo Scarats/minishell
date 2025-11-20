@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:43:06 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:21:32 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,6 +292,7 @@ t_node				*build_tree(t_main_data *data, t_token *tok_list, int size,
 						int depth);
 t_node				*create_node(t_main_data *data, t_token *tok_array,
 						t_node_type type, int size);
+int					quote_after_dollar(t_main_data *data);
 
 /* -------------------- Tree traversal
 	/ Execution control -------------------- */
