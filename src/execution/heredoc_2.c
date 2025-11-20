@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:53:46 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/20 14:18:35 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:37:41 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,17 +14,17 @@
 
 void	setup_child_signals(void)
 {
-    struct sigaction	sa_new;
-    struct sigaction	sa_quit;
+	struct sigaction	sa_new;
+	struct sigaction	sa_quit;
 
-    sa_new.sa_handler = heredoc_child_signal_handler;
-    sigemptyset(&sa_new.sa_mask);
-    sa_new.sa_flags = 0;
-    sigaction(SIGINT, &sa_new, NULL);
-    sa_quit.sa_handler = SIG_IGN;
-    sigemptyset(&sa_quit.sa_mask);
-    sa_quit.sa_flags = 0;
-    sigaction(SIGQUIT, &sa_quit, NULL);
+	sa_new.sa_handler = heredoc_child_signal_handler;
+	sigemptyset(&sa_new.sa_mask);
+	sa_new.sa_flags = 0;
+	sigaction(SIGINT, &sa_new, NULL);
+	sa_quit.sa_handler = SIG_IGN;
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 static void	close_backup_fd(int *fd, int std_fd)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 15:02:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/20 15:23:21 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:39:12 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	remove_token(t_token **head, t_token *t)
 
 int	handle_normal_token(t_main_data *data, t_token_type *tok_type)
 {
-    t_token_type	effective;
+	t_token_type	effective;
 
 	if (!data || !tok_type)
 		return (1);

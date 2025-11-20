@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:08 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/20 14:35:50 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/20 15:39:56 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 void	print_array(char **argv)
 {
-	int i;
-	bool pre_empty;
+	int		i;
+	bool	pre_empty;
 
 	pre_empty = false;
 	i = 0;
@@ -36,9 +36,9 @@ void	print_array(char **argv)
 	}
 }
 
-int is_n(char *str)
+int	is_n(char *str)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	if (!str[0] || !str[1])
@@ -56,9 +56,9 @@ int is_n(char *str)
 	return (1);
 }
 
-int echo(char **argv)
+int	echo(char **argv)
 {
-	bool n;
+	bool	n;
 
 	if (!argv || !*argv)
 		return (ft_printf("\n"), 0);
