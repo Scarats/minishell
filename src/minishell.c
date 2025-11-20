@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:06:50 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:09:26 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/20 13:56:41 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,8 @@ void	handler(int sig)
 		g_stop_flag = 1;
 		write(STDOUT_FILENO, "\n", 1);
 		rl_done = 1;
-		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay();
+		rl_replace_line("", 0);
 	}
 }
 

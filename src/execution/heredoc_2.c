@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:53:46 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:30:10 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/20 13:33:06 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,14 +40,13 @@ int	handle_child_process(int fd, t_redir *redir, t_main_data *data)
 	setup_child_signals();
 	attach_tty_for_readline();
 	read_heredoc_input(fd, redir->filename, root);
-	g_stop_flag = 0;
 	close(fd);
 	close_backup_fd(&data->fd_backup.in, STDIN_FILENO);
 	close_backup_fd(&data->fd_backup.out, STDOUT_FILENO);
 	my_multi_free(&root->list_of_list);
 	if (g_stop_flag)
 		exit(130);
-	exit(130);
+	exit(0);
 }
 
 int	handle_wait_status(int status, t_main_data *data, char *filename)

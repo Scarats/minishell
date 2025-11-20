@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 19:54:26 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:29:37 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/20 13:56:58 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,8 @@ void	heredoc_child_signal_handler(int sig)
 		g_stop_flag = 1;
 		write(STDOUT_FILENO, "\n", 1);
 		rl_done = 1;
-		rl_replace_line("", 0);
 		rl_on_new_line();
-		rl_redisplay();
+		rl_replace_line("", 0);
 	}
 	if (sig == SIGQUIT)
 		return ;
