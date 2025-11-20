@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:08 by tcardair          #+#    #+#             */
-/*   Updated: 2025/10/22 14:02:57 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/20 14:35:50 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,31 @@
 
 void	print_array(char **argv)
 {
-	int	i;
+	int i;
+	bool pre_empty;
 
+	pre_empty = false;
 	i = 0;
 	while (argv[i])
 	{
-		if (i > 0 && argv[i] != NULL)
-			ft_printf(" ");
-		ft_printf("%s", argv[i++]);
+		if (!ft_strcmp(argv[i], ""))
+		{
+			i++;
+			pre_empty = true;
+		}
+		else
+		{
+			if (i > 0 && argv[i] != NULL && !pre_empty)
+				ft_printf(" ");
+			ft_printf("%s", argv[i++]);
+			pre_empty = false;
+		}
 	}
 }
 
-int	is_n(char *str)
+int is_n(char *str)
 {
-	int	i;
+	int i;
 
 	i = 1;
 	if (!str[0] || !str[1])
@@ -45,9 +56,9 @@ int	is_n(char *str)
 	return (1);
 }
 
-int	echo(char **argv)
+int echo(char **argv)
 {
-	bool	n;
+	bool n;
 
 	if (!argv || !*argv)
 		return (ft_printf("\n"), 0);
