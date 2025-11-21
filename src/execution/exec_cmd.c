@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 17:35:15 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:42:07 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ int	exec_cmd(t_node *node, t_main_data *data)
 		return (1);
 	if (pid == 0)
 	{
-		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
 		close_unused_pipe_end(node);
 		handle_child(data, node);
