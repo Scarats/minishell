@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 16:16:04 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:38:44 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -374,5 +374,6 @@ int					process_heredocs(t_main_data *data);
 int					process_heredocs_in_node(t_node *node, t_main_data *data);
 int					backup_fds(t_fd_backup *fd);
 int					reset_fds(t_fd_backup *fd);
+void				assign_pid(int pid, t_node *node);
 
 #endif

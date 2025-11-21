@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 16:32:06 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:42:53 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,6 @@ void	handle_child(t_main_data *data, t_node *node)
 	exit(error);
 }
 
-
-
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
 int	exec_cmd(t_node *node, t_main_data *data)
@@ -99,7 +97,7 @@ int	exec_cmd(t_node *node, t_main_data *data)
 		close_unused_pipe_end(node);
 		handle_child(data, node);
 	}
-	assign_pid(pid, node);
+	assign_pid(pid, node->parent);
 	if (!node->in_pipe)
 		close_unused_pipe_end(node);
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)

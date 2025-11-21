@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:55:44 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 16:27:12 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:44:15 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,8 @@ int wait_child(pid_t pid)
 int	left(t_node *node, t_main_data *data)
 {
 	int	error;
-	int	saved_write;
 
 	error = 0;
-	saved_write = node->pipefd[1];
 	node->pipe_left = 1;
 	node->in_pipe = true;
 	node->left->in_pipe = true;
@@ -48,8 +46,6 @@ int	left(t_node *node, t_main_data *data)
 	if (node->input_fd != -1)
 		node->left->input_fd = node->input_fd;
 	error = traverse_tree(node->left, data);
-	if (saved_write >= 0)
-		close(saved_write);
 	node->left->pipefd[0] = -1;
 	node->left->pipefd[1] = -1;
 	return (error);
@@ -59,10 +55,8 @@ int	left(t_node *node, t_main_data *data)
 int	right(t_node *node, t_main_data *data)
 {
 	int	error;
-	int	saved_read;
 
 	error = 0;
-	saved_read = node->pipefd[0];
 	node->pipe_right = 1;
 	node->in_pipe = true;
 	node->right->in_pipe = true;
@@ -73,8 +67,6 @@ int	right(t_node *node, t_main_data *data)
 	if (node->output_fd != -1)
 		node->right->output_fd = node->output_fd;
 	error = traverse_tree(node->right, data);
-	if (saved_read >= 0)
-		close(saved_read);
 	node->right->pipefd[0] = -1;
 	node->right->pipefd[1] = -1;
 	return (error);
@@ -105,8 +97,6 @@ int	pipes(t_node *node, t_main_data *data)
         error = tmp;
     error = wait_child(node->left_pid);
     error = wait_child(node->right_pid);
-    /* reap any remaining child processes so their output (e.g. valgrind
-       summaries) is printed before the shell prompt */
     while (waitpid(-1, &status, 0) > 0)
         ;
     close_pipe_pair(node->pipefd);

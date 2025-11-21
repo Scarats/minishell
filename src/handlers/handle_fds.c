@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 23:02:12 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 16:31:40 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:43:28 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ int	reset_fds(t_fd_backup *fd)
 	return (error);
 }
 
-void assign_pid(int pid, t_node *node)
+void	assign_pid(int pid, t_node *node)
 {
 	if (node->pipe_left)
 		node->left_pid = pid;
-	else if (node->pipe_right)
+	if (node->pipe_right)
 		node->right_pid = pid;
 }
