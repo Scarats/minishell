@@ -6,7 +6,7 @@
 /*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:29:21 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/21 15:42:40 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,24 +82,18 @@ int	exec_cmd(t_node *node, t_main_data *data)
 
 	if (node->builtin && !node->in_pipe)
 		return (exec_builtin_in_parent(node, data));
-	status = 0;
 	pid = fork();
 	if (pid == -1)
 		return (1);
 	if (pid == 0)
-		handle_child(data, node);
-	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
-		close(node->input_fd);
-	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
-		close(node->output_fd);
-	while (waitpid(pid, &status, 0) == -1)
 	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+		handle_child(data, node);
+	}
+	cleanup_parent_fds(node);
+	while (waitpid(pid, &status, 0) == -1)
 		if (errno != EINTR)
 			return (1);
-	}
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	else if (WIFSIGNALED(status))
-		return (128 + WTERMSIG(status));
-	return (1);
+	return (get_exit_status(status));
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/20 15:21:32 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 15:43:16 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -301,6 +301,8 @@ int					traverse_tree(t_node *node, t_main_data *data);
 int					execution(t_node *node, t_main_data *data);
 int					exec_handler(t_main_data *data, t_node *node);
 int					exec_cmd(t_node *node, t_main_data *data);
+void				cleanup_parent_fds(t_node *node);
+int					get_exit_status(int status);
 int					and_and(t_node *node, t_main_data *data);
 int					or_or(t_node *node, t_main_data *data);
 int					pipes(t_node *node, t_main_data *data);

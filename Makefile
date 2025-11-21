@@ -1,7 +1,7 @@
 SRCS = src/minishell.c \
 	   src/parsing/parse_line.c src/parsing/parse_utils.c \
 	   src/parsing/tree.c src/parsing/tree_utils.c \
-	   src/execution/and_and.c src/execution/exec_cmd.c \
+	   src/execution/and_and.c src/execution/exec_cmd.c src/execution/exec_cmd_utils.c \
 	   src/execution/execution.c src/execution/or_or.c \
 	   src/execution/pipes.c src/execution/exec_builtins.c src/execution/heredoc.c \
 	   src/execution/heredoc_1.c src/execution/heredoc_2.c \
