@@ -3,31 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:55:44 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 16:44:15 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:36:05 by aadeikal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-int wait_child(pid_t pid)
+int	wait_child(pid_t pid)
 {
-    int	status;
+	int	status;
 
-    if (pid <= 0)
-        return (0);
-    while (waitpid(pid, &status, 0) == -1)
-    {
-        if (errno != EINTR)
-            return (1);
-    }
-    if (WIFEXITED(status))
-        return (WEXITSTATUS(status));
-    else if (WIFSIGNALED(status))
-        return (128 + WTERMSIG(status));
-    return (1);
+	if (pid <= 0)
+		return (0);
+	while (waitpid(pid, &status, 0) == -1)
+	{
+		if (errno != EINTR)
+			return (1);
+	}
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	else if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
+	return (1);
 }
 
 // Will call the left node.
@@ -83,24 +83,24 @@ void	close_pipe_pair(int fd[2])
 // Will create two childs, left and right, for each end of the pipe.
 int	pipes(t_node *node, t_main_data *data)
 {
-    int	error;
-    int	tmp;
-    int status;
+	int	error;
+	int	tmp;
+	int	status;
 
-    if (!node || !data)
-        return (1);
-    if (pipe(node->pipefd) == -1)
-        return (perror("pipe"), 1);
-    error = left(node, data);
-    tmp = right(node, data);
-    if (tmp != 0)
-        error = tmp;
-    error = wait_child(node->left_pid);
-    error = wait_child(node->right_pid);
-    while (waitpid(-1, &status, 0) > 0)
-        ;
-    close_pipe_pair(node->pipefd);
-    node->pipefd[0] = -1;
-    node->pipefd[1] = -1;
-    return (error);
+	if (!node || !data)
+		return (1);
+	if (pipe(node->pipefd) == -1)
+		return (perror("pipe"), 1);
+	error = left(node, data);
+	tmp = right(node, data);
+	if (tmp != 0)
+		error = tmp;
+	error = wait_child(node->left_pid);
+	error = wait_child(node->right_pid);
+	while (waitpid(-1, &status, 0) > 0)
+		;
+	close_pipe_pair(node->pipefd);
+	node->pipefd[0] = -1;
+	node->pipefd[1] = -1;
+	return (error);
 }
