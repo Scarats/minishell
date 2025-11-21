@@ -3,14 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   exec_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:29:21 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:25:18 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	close_unused_pipe_end(t_node *node)
+{
+	if (node->pipe_left && node->pipefd[0] >= 0)
+		close(node->pipefd[0]);
+	if (node->pipe_right && node->pipefd[1] >= 0)
+		close(node->pipefd[1]);
+}
 
 void	close_ancestor_pipes(t_node *node)
 {
@@ -51,13 +59,11 @@ void	handle_child(t_main_data *data, t_node *node)
 	t_root	*root;
 
 	root = data->root;
+	error = exec_handler(data, node);
 	if (node->pipefd[0] >= 0)
 		close(node->pipefd[0]);
 	if (node->pipefd[1] >= 0)
 		close(node->pipefd[1]);
-	node->pipefd[0] = -1;
-	node->pipefd[1] = -1;
-	error = exec_handler(data, node);
 	if (error == 127)
 	{
 		path = find_tenv_var(root->env, "PATH");
@@ -71,6 +77,14 @@ void	handle_child(t_main_data *data, t_node *node)
 		print_exec_error(error, node);
 	my_multi_free(&root->list_of_list);
 	exit(error);
+}
+
+void assign_pid(int pid, t_node *node)
+{
+	if (node->pipe_left)
+		node->left_pid = pid;
+	else if (node->pipe_right)
+		node->right_pid = pid;
 }
 
 // Handle the execution process.
@@ -87,11 +101,19 @@ int	exec_cmd(t_node *node, t_main_data *data)
 	if (pid == -1)
 		return (1);
 	if (pid == 0)
+	{
+		close_unused_pipe_end(node);
 		handle_child(data, node);
+	}
+	assign_pid(pid, node);
+	if (!node->in_pipe)
+		close_unused_pipe_end(node);
 	if (node->input_fd != -1 && node->input_fd != STDIN_FILENO)
 		close(node->input_fd);
 	if (node->output_fd != -1 && node->output_fd != STDOUT_FILENO)
 		close(node->output_fd);
+	if (node->in_pipe)
+		return (0);
 	while (waitpid(pid, &status, 0) == -1)
 	{
 		if (errno != EINTR)

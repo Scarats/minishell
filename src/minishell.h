@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:08:53 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/20 15:21:32 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:16:04 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,8 @@ typedef struct s_node
 	pid_t			pipe_left;
 	pid_t			pipe_right;
 	bool			in_pipe;
+	int				left_pid;
+	int				right_pid;
 
 	t_env			*curr_env;
 	char			**cmd_argv;
