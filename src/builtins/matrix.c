@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:02:19 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/05 17:14:33 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 15:09:08 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,11 +115,11 @@ int	matrix(char **argv)
 		width %= MATRIX;
 		free(buff);
 	}
-	if (width < 1)
+	if (width < 1 || width > 10000)
 		width = MATRIX;
 	array = malloc(width * sizeof(*array));
 	buff = malloc(width + 1);
-	if (argv[2] && ft_atoi(argv[2]) > 0)
+	if (argv[2] && (ft_atoi(argv[2]) > 0 && ft_atoi(argv[2]) < 10000))
 		height = ft_atoi(argv[2]);
 	else
 		height = MATRIX;
