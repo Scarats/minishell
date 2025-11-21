@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   handle_fds.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aadeikal <aadeikal@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 23:02:12 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/18 22:43:58 by aadeikal         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:31:40 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,12 @@ int	reset_fds(t_fd_backup *fd)
 	close(fd->in);
 	close(fd->out);
 	return (error);
+}
+
+void assign_pid(int pid, t_node *node)
+{
+	if (node->pipe_left)
+		node->left_pid = pid;
+	else if (node->pipe_right)
+		node->right_pid = pid;
 }

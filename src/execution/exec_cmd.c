@@ -6,7 +6,7 @@
 /*   By: tcardair <tcardair@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/22 14:36:31 by tcardair          #+#    #+#             */
-/*   Updated: 2025/11/21 16:25:18 by tcardair         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:32:06 by tcardair         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,7 @@ void	handle_child(t_main_data *data, t_node *node)
 	exit(error);
 }
 
-void assign_pid(int pid, t_node *node)
-{
-	if (node->pipe_left)
-		node->left_pid = pid;
-	else if (node->pipe_right)
-		node->right_pid = pid;
-}
+
 
 // Handle the execution process.
 // Should handle the bin before creating and opening the files.
